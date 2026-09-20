@@ -42,7 +42,7 @@ const metaLispSigns: Array<Sign> = [
 export const mockSessions: Array<Session> = [
   {
     id: "session-windbell",
-    projectId: "project-windbell",
+    workspaceId: "workspace-windbell",
     title: "风铃与符号过程",
     signs: windbellSigns,
     createdAt: 1710000000000,
@@ -50,7 +50,7 @@ export const mockSessions: Array<Session> = [
   },
   {
     id: "session-meta-lisp",
-    projectId: "project-meta-lisp",
+    workspaceId: "workspace-meta-lisp",
     title: "最小求值器",
     signs: metaLispSigns,
     createdAt: 1710000000000,

@@ -3,34 +3,34 @@ import type { RouteRecordRaw } from "vue-router"
 export const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    redirect: "/projects",
+    redirect: "/workspaces",
   },
   {
-    path: "/projects",
-    name: "project-list",
-    component: () => import("./project-list/ProjectList.vue"),
+    path: "/workspaces",
+    name: "workspace-list",
+    component: () => import("./workspace-list/WorkspaceList.vue"),
   },
   {
-    path: "/projects/:projectId",
+    path: "/workspaces/:workspaceId",
     redirect: (to) => ({
       name: "session-list",
       params: {
-        projectId: to.params.projectId,
+        workspaceId: to.params.workspaceId,
       },
     }),
   },
   {
-    path: "/projects/:projectId/sessions",
+    path: "/workspaces/:workspaceId/sessions",
     name: "session-list",
     component: () => import("./session-list/SessionList.vue"),
   },
   {
-    path: "/projects/:projectId/sessions/:sessionId",
+    path: "/workspaces/:workspaceId/sessions/:sessionId",
     name: "session",
     component: () => import("./session/Session.vue"),
   },
   {
-    path: "/projects/:projectId/tree",
+    path: "/workspaces/:workspaceId/tree",
     name: "tree",
     component: () => import("./tree/Tree.vue"),
   },

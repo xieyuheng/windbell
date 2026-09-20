@@ -1,11 +1,11 @@
 import type { Sign } from "@xieyuheng/semiosis.js"
-import type { ProjectId } from "./Project"
+import type { WorkspaceId } from "./Workspace"
 
 export type SessionId = string
 
 export type Session = {
   id: SessionId
-  projectId: ProjectId
+  workspaceId: WorkspaceId
   title: string
   signs: Array<Sign>
   createdAt: number

@@ -17,6 +17,10 @@ const messages = {
       themeLight: "浅色",
       themeDark: "深色",
     },
+    sidebar: {
+      workspaces: "工作区",
+      sessions: "对话",
+    },
   },
   "en-US": {
     app: {
@@ -26,6 +30,10 @@ const messages = {
       themeSystem: "System",
       themeLight: "Light",
       themeDark: "Dark",
+    },
+    sidebar: {
+      workspaces: "Workspaces",
+      sessions: "Sessions",
     },
   },
 }

@@ -1,15 +1,29 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
+import { computed, watch } from "vue"
 import { useI18n } from "vue-i18n"
+import { useRoute } from "vue-router"
+import SignList from "./components/SignList.vue"
 import { sessionMessages } from "./Session.i18n"
+import { createSessionState, loadSessionState } from "./SessionState"
+
+const route = useRoute()
+const sessionId = computed(() => String(route.params.sessionId ?? ""))
 
 const { t } = useI18n({
   messages: sessionMessages,
   useScope: "local",
 })
 
+const state = createSessionState(sessionId.value)
+const title = computed(() => state.title || t("notFound"))
+
+watch(sessionId, (value) => {
+  loadSessionState(state, value)
+})
+
 useHead(() => ({
-  title: t("title"),
+  title: title.value,
   meta: [
     {
       name: "description",
@@ -20,10 +34,14 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="flex flex-1 flex-col items-center justify-center gap-3 px-6">
-    <h1 class="text-2xl font-bold">{{ t("title") }}</h1>
-    <p class="text-sm text-neutral-600 dark:text-neutral-400">
-      {{ t("description") }}
-    </p>
+  <main class="flex flex-1 flex-col gap-6 px-6 py-8">
+    <header class="flex flex-col gap-2">
+      <p class="font-mono text-xs text-neutral-500 dark:text-neutral-400">
+        {{ state.sessionId }}
+      </p>
+      <h1 class="text-2xl font-bold">{{ title }}</h1>
+    </header>
+
+    <SignList :signs="state.signs" />
   </main>
 </template>
