@@ -11,29 +11,21 @@ const messages = {
   "zh-CN": {
     app: {
       name: "风铃",
-      language: "语言",
-      theme: "主题",
-      themeSystem: "跟随系统",
-      themeLight: "浅色",
-      themeDark: "深色",
     },
     sidebar: {
       workspaces: "工作区",
       sessions: "对话",
+      settings: "设置",
     },
   },
   "en-US": {
     app: {
       name: "Windbell",
-      language: "Language",
-      theme: "Theme",
-      themeSystem: "System",
-      themeLight: "Light",
-      themeDark: "Dark",
     },
     sidebar: {
       workspaces: "Workspaces",
       sessions: "Sessions",
+      settings: "Settings",
     },
   },
 }

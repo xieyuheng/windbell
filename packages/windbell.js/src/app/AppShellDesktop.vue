@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router"
-import AppHeader from "./AppHeader.vue"
 import WorkspaceManager from "./sidebar/WorkspaceManager.vue"
 </script>
 
@@ -9,8 +8,6 @@ import WorkspaceManager from "./sidebar/WorkspaceManager.vue"
     data-shell="desktop"
     class="flex min-h-screen flex-col bg-paper transition-colors"
   >
-    <AppHeader />
-
     <div class="flex min-h-0 flex-1">
       <aside class="hidden w-64 shrink-0 border-r border-line md:flex">
         <WorkspaceManager />

@@ -35,6 +35,11 @@ export const routes: Array<RouteRecordRaw> = [
     component: () => import("./tree/Tree.vue"),
   },
   {
+    path: "/settings",
+    name: "settings",
+    component: () => import("./settings/Settings.vue"),
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "not-found",
     component: () => import("./errors/PageNotFound.vue"),

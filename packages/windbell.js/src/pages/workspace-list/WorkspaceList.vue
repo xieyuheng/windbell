@@ -31,13 +31,23 @@ useHead(() => ({
 
 <template>
   <main class="flex flex-1 flex-col gap-6 px-5 py-8">
-    <header class="flex flex-col gap-2">
-      <h1 class="text-2xl font-bold text-ink">
-        {{ t("title") }}
-      </h1>
-      <p class="text-sm text-ink">
-        {{ t("description") }}
-      </p>
+    <header class="flex items-start justify-between gap-4">
+      <div class="flex flex-col gap-2">
+        <h1 class="text-2xl font-bold text-ink">
+          {{ t("title") }}
+        </h1>
+        <p class="text-sm text-ink">
+          {{ t("description") }}
+        </p>
+      </div>
+
+      <RouterLink
+        class="rounded-full border border-line px-3 py-1.5 text-sm text-ink-muted transition-colors hover:border-ink-muted hover:text-ink"
+        :to="{ name: 'settings' }"
+        :title="t('settings')"
+      >
+        ⚙
+      </RouterLink>
     </header>
 
     <ul class="flex flex-col gap-3">

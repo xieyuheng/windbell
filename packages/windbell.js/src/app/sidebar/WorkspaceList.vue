@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n"
+import { RouterLink } from "vue-router"
 import type { Workspace, WorkspaceId } from "../../models/Workspace"
 import type { Session, SessionId } from "../../models/Session"
 import SessionList from "./SessionList.vue"
@@ -26,9 +27,19 @@ const { t } = useI18n()
 
 <template>
   <section class="flex flex-col gap-1 px-3 py-4">
-    <h2 class="px-2 text-xs font-medium tracking-wide text-ink">
-      {{ t("sidebar.workspaces") }}
-    </h2>
+    <div class="flex items-center justify-between px-2">
+      <h2 class="text-xs font-medium tracking-wide text-ink">
+        {{ t("sidebar.workspaces") }}
+      </h2>
+
+      <RouterLink
+        class="text-xs text-ink-muted transition-colors hover:text-ink"
+        :to="{ name: 'settings' }"
+        :title="t('sidebar.settings')"
+      >
+        ⚙
+      </RouterLink>
+    </div>
 
     <div
       v-for="workspace in workspaces"
