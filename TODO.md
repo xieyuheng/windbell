@@ -2,13 +2,10 @@
 
 setup windbell package -- 支持 markdown 的极简 IDE
 
-UI design
-
 想象手机上的浏览，从左到右四级页面
 
 - projects
   - sessions
-    - maybe in a worktree
 
 - session
   - signs
