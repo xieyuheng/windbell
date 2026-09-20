@@ -62,15 +62,17 @@ useHead(() => ({
       class="flex flex-col gap-3 border-b border-neutral-200 px-5 py-5 dark:border-neutral-800"
     >
       <RouterLink
-        class="text-xs text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+        class="text-sm text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
         :to="{ name: 'workspace-list' }"
       >
         ← {{ t("back") }}
       </RouterLink>
 
       <div class="flex flex-col gap-1">
-        <h1 class="text-2xl font-bold">{{ workspace?.name ?? t("title") }}</h1>
-        <p class="text-sm text-neutral-600 dark:text-neutral-400">
+        <h1 class="text-2xl font-bold text-black dark:text-white">
+          {{ workspace?.name ?? t("title") }}
+        </h1>
+        <p class="text-sm text-black dark:text-white">
           {{ t("description") }}
         </p>
       </div>
@@ -90,21 +92,21 @@ useHead(() => ({
           }"
         >
           <div class="flex items-baseline justify-between gap-4">
-            <h2 class="truncate text-base font-medium">{{ session.title }}</h2>
-            <span
-              class="shrink-0 text-xs text-neutral-500 dark:text-neutral-400"
+            <h2
+              class="truncate text-base font-medium text-black dark:text-white"
             >
+              {{ session.title }}
+            </h2>
+            <span class="shrink-0 text-sm text-black dark:text-white">
               {{ formatUpdatedAt(session.updatedAt) }}
             </span>
           </div>
 
-          <p
-            class="line-clamp-2 text-sm leading-6 text-neutral-600 dark:text-neutral-400"
-          >
+          <p class="line-clamp-2 text-sm leading-7 text-black dark:text-white">
             {{ preview(session) }}
           </p>
 
-          <p class="text-xs text-neutral-500 dark:text-neutral-500">
+          <p class="text-sm text-black dark:text-white">
             {{ t("signCount", { count: session.signs.length }) }}
           </p>
         </RouterLink>
@@ -113,7 +115,7 @@ useHead(() => ({
 
     <div
       v-else
-      class="flex flex-1 items-center justify-center px-6 text-sm text-neutral-500"
+      class="flex flex-1 items-center justify-center px-6 text-sm text-black dark:text-white"
     >
       {{ t("empty") }}
     </div>

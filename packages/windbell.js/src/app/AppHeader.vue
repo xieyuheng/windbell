@@ -26,7 +26,9 @@ function onThemeChange(event: Event): void {
     class="flex items-center justify-between border-b border-neutral-200 py-3 dark:border-neutral-800"
     :class="compact ? 'px-4' : 'px-5'"
   >
-    <span class="font-semibold">{{ t("app.name") }}</span>
+    <span class="font-semibold text-black dark:text-white">{{
+      t("app.name")
+    }}</span>
 
     <div class="flex items-center text-sm" :class="compact ? 'gap-2' : 'gap-4'">
       <label class="flex items-center gap-2">

@@ -7,7 +7,7 @@ import WorkspaceManager from "./sidebar/WorkspaceManager.vue"
 <template>
   <div
     data-shell="desktop"
-    class="flex min-h-screen flex-col bg-white text-neutral-900 transition-colors dark:bg-neutral-950 dark:text-neutral-100"
+    class="flex min-h-screen flex-col bg-white transition-colors dark:bg-neutral-950"
   >
     <AppHeader />
 

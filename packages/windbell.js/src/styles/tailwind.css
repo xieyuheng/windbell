@@ -2,6 +2,14 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+body {
+  color: #000000;
+}
+
+.dark body {
+  color: #ffffff;
+}
+
 .dark select,
 .dark option {
   background-color: #171717;

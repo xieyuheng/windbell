@@ -57,7 +57,7 @@ function borderClass(kind: Sign["kind"]): string {
 function textClass(kind: Sign["kind"]): string {
   switch (kind) {
     case "UserSign":
-      return "text-neutral-500"
+      return "text-black dark:text-white"
     case "AssistantSign":
       return "text-emerald-600 dark:text-emerald-400"
     case "ToolSign":
@@ -78,11 +78,32 @@ function textClass(kind: Sign["kind"]): string {
       class="border-l-2 pl-4"
       :class="borderClass(sign.kind)"
     >
-      <p class="mb-1 text-xs tracking-wide" :class="textClass(sign.kind)">
+      <p
+        class="mb-1 text-sm font-medium tracking-wide"
+        :class="textClass(sign.kind)"
+      >
         {{ kindLabel(sign.kind) }}
       </p>
+
+      <details
+        v-if="sign.kind === 'AssistantSign' && sign.reasoning !== ''"
+        class="mb-3 rounded border border-neutral-200 bg-neutral-50 px-3 py-2 dark:border-neutral-800 dark:bg-neutral-900"
+        open
+      >
+        <summary
+          class="cursor-pointer text-sm font-medium text-black dark:text-white"
+        >
+          {{ t("thinking") }}
+        </summary>
+        <p
+          class="mt-2 whitespace-pre-wrap text-sm leading-7 text-black dark:text-white"
+        >
+          {{ sign.reasoning }}
+        </p>
+      </details>
+
       <p
-        class="whitespace-pre-wrap text-sm leading-7 text-neutral-700 dark:text-neutral-300"
+        class="whitespace-pre-wrap text-sm leading-7 text-black dark:text-white"
       >
         {{ body(sign) }}
       </p>

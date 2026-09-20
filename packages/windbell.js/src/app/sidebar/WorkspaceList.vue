@@ -27,7 +27,7 @@ const { t } = useI18n()
 <template>
   <section class="flex flex-col gap-1 px-3 py-4">
     <h2
-      class="px-2 text-xs font-medium tracking-wide text-neutral-500 dark:text-neutral-400"
+      class="px-2 text-xs font-medium tracking-wide text-black dark:text-white"
     >
       {{ t("sidebar.workspaces") }}
     </h2>
@@ -42,8 +42,8 @@ const { t } = useI18n()
         class="flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors"
         :class="
           workspace.id === activeWorkspaceId
-            ? 'bg-neutral-200 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100'
-            : 'text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900'
+            ? 'bg-neutral-200 text-black dark:bg-neutral-800 dark:text-white'
+            : 'text-black hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-900'
         "
         @click="$emit('toggle', workspace.id)"
       >

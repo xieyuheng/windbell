@@ -32,8 +32,10 @@ useHead(() => ({
 <template>
   <main class="flex flex-1 flex-col gap-6 px-5 py-8">
     <header class="flex flex-col gap-2">
-      <h1 class="text-2xl font-bold">{{ t("title") }}</h1>
-      <p class="text-sm text-neutral-600 dark:text-neutral-400">
+      <h1 class="text-2xl font-bold text-black dark:text-white">
+        {{ t("title") }}
+      </h1>
+      <p class="text-sm text-black dark:text-white">
         {{ t("description") }}
       </p>
     </header>
@@ -46,19 +48,19 @@ useHead(() => ({
         >
           <div class="flex items-start justify-between gap-4">
             <div class="min-w-0">
-              <h2 class="truncate text-base font-semibold">
+              <h2
+                class="truncate text-base font-semibold text-black dark:text-white"
+              >
                 {{ workspace.name }}
               </h2>
               <p
-                class="mt-1 truncate font-mono text-xs text-neutral-500 dark:text-neutral-400"
+                class="mt-1 truncate font-mono text-sm text-black dark:text-white"
               >
                 {{ workspace.root }}
               </p>
             </div>
 
-            <span
-              class="shrink-0 text-xs text-neutral-500 dark:text-neutral-400"
-            >
+            <span class="shrink-0 text-sm text-black dark:text-white">
               {{ t("sessionCount", { count: sessionCount(workspace.id) }) }}
             </span>
           </div>
