@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
 import { useI18n } from "vue-i18n"
-import { homeMessages } from "./Home.i18n"
+import { projectListMessages } from "./ProjectList.i18n"
 
 const { t } = useI18n({
-  messages: homeMessages,
+  messages: projectListMessages,
   useScope: "local",
 })
 
