@@ -2,16 +2,43 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-body {
-  color: #000000;
+@theme {
+  --color-paper: #fafaf9;
+  --color-paper-deep: #f2f2f0;
+
+  --color-ink: #1f1f1e;
+  --color-ink-muted: #6b6b68;
+
+  --color-line: #e4e4e1;
+
+  --color-accent: #5f8f84;
+  --color-warning: #a66a1f;
+  --color-info: #4f7f99;
+  --color-danger: #b4514b;
 }
 
-.dark body {
-  color: #ffffff;
+.dark {
+  --color-paper: #181818;
+  --color-paper-deep: #222222;
+
+  --color-ink: #f2f2f1;
+  --color-ink-muted: #a6a6a3;
+
+  --color-line: #343434;
+
+  --color-accent: #86b8ab;
+  --color-warning: #d0a04e;
+  --color-info: #7fa8bf;
+  --color-danger: #d98c82;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
 }
 
 .dark select,
 .dark option {
-  background-color: #171717;
-  color: #f5f5f5;
+  background-color: var(--color-paper-deep);
+  color: var(--color-ink);
 }

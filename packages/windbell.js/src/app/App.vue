@@ -17,7 +17,7 @@ useHead(() => ({
   meta: [
     {
       name: "theme-color",
-      content: theme.resolved === "dark" ? "#0a0a0a" : "#fafafa",
+      content: theme.resolved === "dark" ? "#181818" : "#fafaf9",
     },
   ],
 }))

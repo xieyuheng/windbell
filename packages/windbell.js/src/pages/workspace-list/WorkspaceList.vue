@@ -32,10 +32,10 @@ useHead(() => ({
 <template>
   <main class="flex flex-1 flex-col gap-6 px-5 py-8">
     <header class="flex flex-col gap-2">
-      <h1 class="text-2xl font-bold text-black dark:text-white">
+      <h1 class="text-2xl font-bold text-ink">
         {{ t("title") }}
       </h1>
-      <p class="text-sm text-black dark:text-white">
+      <p class="text-sm text-ink">
         {{ t("description") }}
       </p>
     </header>
@@ -43,24 +43,20 @@ useHead(() => ({
     <ul class="flex flex-col gap-3">
       <li v-for="workspace in state.workspaces" :key="workspace.id">
         <RouterLink
-          class="flex flex-col gap-3 rounded-2xl border border-neutral-200 px-4 py-4 transition-colors hover:border-neutral-400 dark:border-neutral-800 dark:hover:border-neutral-600"
+          class="flex flex-col gap-3 rounded-2xl border border-line px-4 py-4 transition-colors hover:border-ink-muted"
           :to="{ name: 'session-list', params: { workspaceId: workspace.id } }"
         >
           <div class="flex items-start justify-between gap-4">
             <div class="min-w-0">
-              <h2
-                class="truncate text-base font-semibold text-black dark:text-white"
-              >
+              <h2 class="truncate text-base font-semibold text-ink">
                 {{ workspace.name }}
               </h2>
-              <p
-                class="mt-1 truncate font-mono text-sm text-black dark:text-white"
-              >
+              <p class="mt-1 truncate font-mono text-sm text-ink">
                 {{ workspace.root }}
               </p>
             </div>
 
-            <span class="shrink-0 text-sm text-black dark:text-white">
+            <span class="shrink-0 text-sm text-ink">
               {{ t("sessionCount", { count: sessionCount(workspace.id) }) }}
             </span>
           </div>

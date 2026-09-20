@@ -42,30 +42,30 @@ function body(sign: Sign): string {
 function borderClass(kind: Sign["kind"]): string {
   switch (kind) {
     case "UserSign":
-      return "border-neutral-400"
+      return "border-ink-muted"
     case "AssistantSign":
-      return "border-emerald-500"
+      return "border-accent"
     case "ToolSign":
-      return "border-amber-500"
+      return "border-warning"
     case "SystemSign":
-      return "border-sky-500"
+      return "border-info"
     case "ErrorSign":
-      return "border-red-500"
+      return "border-danger"
   }
 }
 
 function textClass(kind: Sign["kind"]): string {
   switch (kind) {
     case "UserSign":
-      return "text-black dark:text-white"
+      return "text-ink"
     case "AssistantSign":
-      return "text-emerald-600 dark:text-emerald-400"
+      return "text-accent"
     case "ToolSign":
-      return "text-amber-600 dark:text-amber-400"
+      return "text-warning"
     case "SystemSign":
-      return "text-sky-600 dark:text-sky-400"
+      return "text-info"
     case "ErrorSign":
-      return "text-red-600 dark:text-red-400"
+      return "text-danger"
   }
 }
 </script>
@@ -87,24 +87,18 @@ function textClass(kind: Sign["kind"]): string {
 
       <details
         v-if="sign.kind === 'AssistantSign' && sign.reasoning !== ''"
-        class="mb-3 rounded border border-neutral-200 bg-neutral-50 px-3 py-2 dark:border-neutral-800 dark:bg-neutral-900"
+        class="mb-3 rounded border border-line bg-paper-deep px-3 py-2"
         open
       >
-        <summary
-          class="cursor-pointer text-sm font-medium text-black dark:text-white"
-        >
+        <summary class="cursor-pointer text-sm font-medium text-ink">
           {{ t("thinking") }}
         </summary>
-        <p
-          class="mt-2 whitespace-pre-wrap text-sm leading-7 text-black dark:text-white"
-        >
+        <p class="mt-2 whitespace-pre-wrap text-sm leading-7 text-ink">
           {{ sign.reasoning }}
         </p>
       </details>
 
-      <p
-        class="whitespace-pre-wrap text-sm leading-7 text-black dark:text-white"
-      >
+      <p class="whitespace-pre-wrap text-sm leading-7 text-ink">
         {{ body(sign) }}
       </p>
     </li>

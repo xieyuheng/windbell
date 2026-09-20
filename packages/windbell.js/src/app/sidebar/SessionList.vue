@@ -20,8 +20,8 @@ defineEmits<{
       class="truncate rounded px-2 py-1.5 text-left text-sm transition-colors"
       :class="
         session.id === activeSessionId
-          ? 'bg-neutral-200 text-black dark:bg-neutral-800 dark:text-white'
-          : 'text-black hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-900'
+          ? 'bg-paper-deep text-ink'
+          : 'text-ink hover:bg-paper-deep'
       "
       @click="$emit('select', session.id)"
     >

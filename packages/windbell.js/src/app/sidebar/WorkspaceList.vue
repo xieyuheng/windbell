@@ -26,9 +26,7 @@ const { t } = useI18n()
 
 <template>
   <section class="flex flex-col gap-1 px-3 py-4">
-    <h2
-      class="px-2 text-xs font-medium tracking-wide text-black dark:text-white"
-    >
+    <h2 class="px-2 text-xs font-medium tracking-wide text-ink">
       {{ t("sidebar.workspaces") }}
     </h2>
 
@@ -42,12 +40,12 @@ const { t } = useI18n()
         class="flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors"
         :class="
           workspace.id === activeWorkspaceId
-            ? 'bg-neutral-200 text-black dark:bg-neutral-800 dark:text-white'
-            : 'text-black hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-900'
+            ? 'bg-paper-deep text-ink'
+            : 'text-ink hover:bg-paper-deep'
         "
         @click="$emit('toggle', workspace.id)"
       >
-        <span class="w-3 text-xs text-neutral-500">
+        <span class="w-3 text-xs text-ink-muted">
           {{ expandedWorkspaceIds.has(workspace.id) ? "▾" : "▸" }}
         </span>
         <span class="truncate">{{ workspace.name }}</span>

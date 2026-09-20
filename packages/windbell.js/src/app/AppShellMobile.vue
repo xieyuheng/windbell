@@ -6,7 +6,7 @@ import AppHeader from "./AppHeader.vue"
 <template>
   <div
     data-shell="mobile"
-    class="flex min-h-screen flex-col bg-white pb-[env(safe-area-inset-bottom,0px)] text-neutral-900 transition-colors dark:bg-neutral-950 dark:text-neutral-100"
+    class="flex min-h-screen flex-col bg-paper pb-[env(safe-area-inset-bottom,0px)] text-ink transition-colors"
   >
     <AppHeader compact />
     <RouterView />

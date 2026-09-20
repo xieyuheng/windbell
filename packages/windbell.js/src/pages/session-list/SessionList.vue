@@ -58,21 +58,19 @@ useHead(() => ({
 
 <template>
   <main class="flex flex-1 flex-col">
-    <header
-      class="flex flex-col gap-3 border-b border-neutral-200 px-5 py-5 dark:border-neutral-800"
-    >
+    <header class="flex flex-col gap-3 border-b border-line px-5 py-5">
       <RouterLink
-        class="text-sm text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+        class="text-sm text-ink-muted transition-colors hover:text-ink"
         :to="{ name: 'workspace-list' }"
       >
         ← {{ t("back") }}
       </RouterLink>
 
       <div class="flex flex-col gap-1">
-        <h1 class="text-2xl font-bold text-black dark:text-white">
+        <h1 class="text-2xl font-bold text-ink">
           {{ workspace?.name ?? t("title") }}
         </h1>
-        <p class="text-sm text-black dark:text-white">
+        <p class="text-sm text-ink">
           {{ t("description") }}
         </p>
       </div>
@@ -82,31 +80,29 @@ useHead(() => ({
       <li
         v-for="session in sessions"
         :key="session.id"
-        class="border-b border-neutral-200 dark:border-neutral-800"
+        class="border-b border-line"
       >
         <RouterLink
-          class="flex flex-col gap-2 px-5 py-4 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900"
+          class="flex flex-col gap-2 px-5 py-4 transition-colors hover:bg-paper-deep"
           :to="{
             name: 'session',
             params: { workspaceId: workspaceId, sessionId: session.id },
           }"
         >
           <div class="flex items-baseline justify-between gap-4">
-            <h2
-              class="truncate text-base font-medium text-black dark:text-white"
-            >
+            <h2 class="truncate text-base font-medium text-ink">
               {{ session.title }}
             </h2>
-            <span class="shrink-0 text-sm text-black dark:text-white">
+            <span class="shrink-0 text-sm text-ink">
               {{ formatUpdatedAt(session.updatedAt) }}
             </span>
           </div>
 
-          <p class="line-clamp-2 text-sm leading-7 text-black dark:text-white">
+          <p class="line-clamp-2 text-sm leading-7 text-ink">
             {{ preview(session) }}
           </p>
 
-          <p class="text-sm text-black dark:text-white">
+          <p class="text-sm text-ink">
             {{ t("signCount", { count: session.signs.length }) }}
           </p>
         </RouterLink>
@@ -115,16 +111,14 @@ useHead(() => ({
 
     <div
       v-else
-      class="flex flex-1 items-center justify-center px-6 text-sm text-black dark:text-white"
+      class="flex flex-1 items-center justify-center px-6 text-sm text-ink"
     >
       {{ t("empty") }}
     </div>
 
-    <footer
-      class="sticky bottom-0 border-t border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950"
-    >
+    <footer class="sticky bottom-0 border-t border-line bg-paper p-4">
       <button
-        class="w-full rounded-full bg-neutral-900 px-4 py-3 text-sm font-medium text-white transition-opacity hover:opacity-80 dark:bg-neutral-100 dark:text-neutral-900"
+        class="w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-paper transition-opacity hover:opacity-80"
         type="button"
       >
         {{ t("newSession") }}

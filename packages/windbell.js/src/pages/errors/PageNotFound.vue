@@ -21,8 +21,8 @@ useHead(() => ({
 
 <template>
   <main class="flex flex-1 flex-col items-center justify-center gap-3 px-6">
-    <h1 class="text-2xl font-bold text-black dark:text-white">404</h1>
-    <p class="text-sm text-black dark:text-white">
+    <h1 class="text-2xl font-bold text-ink">404</h1>
+    <p class="text-sm text-ink">
       {{ t("description") }}
     </p>
   </main>

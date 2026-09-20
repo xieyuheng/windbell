@@ -23,26 +23,24 @@ function onThemeChange(event: Event): void {
 
 <template>
   <header
-    class="flex items-center justify-between border-b border-neutral-200 py-3 dark:border-neutral-800"
+    class="flex items-center justify-between border-b border-line py-3"
     :class="compact ? 'px-4' : 'px-5'"
   >
-    <span class="font-semibold text-black dark:text-white">{{
-      t("app.name")
-    }}</span>
+    <span class="font-semibold text-ink">{{ t("app.name") }}</span>
 
     <div class="flex items-center text-sm" :class="compact ? 'gap-2' : 'gap-4'">
       <label class="flex items-center gap-2">
         <span v-if="!compact">{{ t("app.language") }}</span>
         <select
           :value="locale"
-          class="rounded border border-neutral-300 bg-white px-2 py-1 text-neutral-900 outline-none transition-colors dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+          class="rounded border border-line bg-paper px-2 py-1 text-ink outline-none transition-colors"
           @change="onLocaleChange"
         >
           <option
             v-for="item in supportedLocales"
             :key="item.value"
             :value="item.value"
-            class="bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100"
+            class="bg-paper text-ink"
           >
             {{ item.label }}
           </option>
@@ -53,25 +51,16 @@ function onThemeChange(event: Event): void {
         <span v-if="!compact">{{ t("app.theme") }}</span>
         <select
           :value="theme.mode"
-          class="rounded border border-neutral-300 bg-white px-2 py-1 text-neutral-900 outline-none transition-colors dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+          class="rounded border border-line bg-paper px-2 py-1 text-ink outline-none transition-colors"
           @change="onThemeChange"
         >
-          <option
-            value="system"
-            class="bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100"
-          >
+          <option value="system" class="bg-paper text-ink">
             {{ t("app.themeSystem") }}
           </option>
-          <option
-            value="light"
-            class="bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100"
-          >
+          <option value="light" class="bg-paper text-ink">
             {{ t("app.themeLight") }}
           </option>
-          <option
-            value="dark"
-            class="bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100"
-          >
+          <option value="dark" class="bg-paper text-ink">
             {{ t("app.themeDark") }}
           </option>
         </select>

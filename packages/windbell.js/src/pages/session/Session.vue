@@ -37,7 +37,7 @@ useHead(() => ({
   <main class="flex flex-1 flex-col gap-6 px-6 py-8">
     <header class="flex flex-col gap-3">
       <RouterLink
-        class="text-sm text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+        class="text-sm text-ink-muted transition-colors hover:text-ink"
         :to="{
           name: 'session-list',
           params: { workspaceId: String(route.params.workspaceId ?? '') },
@@ -46,10 +46,10 @@ useHead(() => ({
         ← {{ t("back") }}
       </RouterLink>
 
-      <p class="font-mono text-sm text-black dark:text-white">
+      <p class="font-mono text-sm text-ink">
         {{ state.sessionId }}
       </p>
-      <h1 class="text-2xl font-bold text-black dark:text-white">
+      <h1 class="text-2xl font-bold text-ink">
         {{ title }}
       </h1>
     </header>
