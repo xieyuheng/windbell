@@ -7,6 +7,9 @@ export const settingsMessages = {
     themeSystem: "跟随系统",
     themeLight: "浅色",
     themeDark: "深色",
+    font: "字体",
+    fontUnifont: "Unifont",
+    fontSystem: "系统字体",
   },
   "en-US": {
     title: "Settings",
@@ -16,5 +19,8 @@ export const settingsMessages = {
     themeSystem: "System",
     themeLight: "Light",
     themeDark: "Dark",
+    font: "Font",
+    fontUnifont: "Unifont",
+    fontSystem: "System font",
   },
 }

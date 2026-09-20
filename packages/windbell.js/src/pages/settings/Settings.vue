@@ -2,6 +2,7 @@
 import { useHead } from "@unhead/vue"
 import { useI18n } from "vue-i18n"
 import { useRouter } from "vue-router"
+import { useFont, type Font } from "../../app/font"
 import { setLocale, supportedLocales } from "../../app/i18n"
 import { useTheme, type ThemeMode } from "../../app/theme"
 import { settingsMessages } from "./Settings.i18n"
@@ -13,12 +14,18 @@ const { locale, t } = useI18n({
   useScope: "local",
 })
 const theme = useTheme()
+const font = useFont()
 const state = createSettingsState(router)
 
 const themeOptions: Array<{ value: ThemeMode; labelKey: string }> = [
   { value: "system", labelKey: "themeSystem" },
   { value: "light", labelKey: "themeLight" },
   { value: "dark", labelKey: "themeDark" },
+]
+
+const fontOptions: Array<{ value: Font; labelKey: string }> = [
+  { value: "unifont", labelKey: "fontUnifont" },
+  { value: "system", labelKey: "fontSystem" },
 ]
 
 useHead(() => ({
@@ -78,6 +85,28 @@ useHead(() => ({
             :value="item.value"
             :checked="theme.mode === item.value"
             @change="theme.setMode(item.value)"
+          />
+          <span>{{ t(item.labelKey) }}</span>
+        </label>
+      </fieldset>
+
+      <fieldset class="flex flex-col gap-3">
+        <legend class="text-sm font-medium text-ink">
+          {{ t("font") }}
+        </legend>
+
+        <label
+          v-for="item in fontOptions"
+          :key="item.value"
+          class="flex cursor-pointer items-center gap-2 text-sm text-ink"
+        >
+          <input
+            class="accent-ink"
+            type="radio"
+            name="font"
+            :value="item.value"
+            :checked="font.name === item.value"
+            @change="font.setFont(item.value)"
           />
           <span>{{ t(item.labelKey) }}</span>
         </label>

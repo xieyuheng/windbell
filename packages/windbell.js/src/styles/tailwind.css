@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Unifont";
+  src: url("/fonts/unifont-18.0.01.otf") format("opentype");
+  font-display: swap;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
@@ -32,9 +38,18 @@
   --color-danger: #d98c82;
 }
 
+:root {
+  --font-app: "Unifont", system-ui, sans-serif;
+}
+
+html[data-font="system"] {
+  --font-app: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
 body {
   background-color: var(--color-paper);
   color: var(--color-ink);
+  font-family: var(--font-app);
 }
 
 .dark select,

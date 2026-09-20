@@ -18,6 +18,10 @@
       if (locale) {
         document.documentElement.lang = locale
       }
+
+      const font = localStorage.getItem("windbell.font")
+      document.documentElement.dataset.font =
+        font === "system" ? "system" : "unifont"
     </script>
   </head>
   <body>

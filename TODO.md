@@ -1,22 +1,5 @@
 # windbell
 
-[windbell] unifont 字体
-
-下面我想要支持字体的选择，
-默认字体使用 unifont，
-也可以在设置中选择用系统字体。
-
-unifont 的文件在 ~/unifont-18.0.01.otf
-
-问题：
-
-- 应该如何使用这个字体？
-  是否应该设置：
-  - public/assets/fonts？
-  - 或 assets/fonts？
-  - 或 public/fonts？
-  - 或 fonts？
-
 [windbell] 我计划设计 从左到右四级页面
 
 (1) projects -- 项目列表，每个项目对应一个本地路径
