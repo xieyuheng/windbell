@@ -3,6 +3,10 @@ import { useI18n } from "vue-i18n"
 import { setLocale, supportedLocales, type Locale } from "./i18n"
 import { useTheme, type ThemeMode } from "./theme"
 
+defineProps<{
+  compact?: boolean
+}>()
+
 const { locale, t } = useI18n()
 const theme = useTheme()
 
@@ -19,13 +23,14 @@ function onThemeChange(event: Event): void {
 
 <template>
   <header
-    class="flex items-center justify-between border-b border-neutral-200 px-5 py-3 dark:border-neutral-800"
+    class="flex items-center justify-between border-b border-neutral-200 py-3 dark:border-neutral-800"
+    :class="compact ? 'px-4' : 'px-5'"
   >
     <span class="font-semibold">{{ t("app.name") }}</span>
 
-    <div class="flex items-center gap-4 text-sm">
+    <div class="flex items-center text-sm" :class="compact ? 'gap-2' : 'gap-4'">
       <label class="flex items-center gap-2">
-        <span>{{ t("app.language") }}</span>
+        <span v-if="!compact">{{ t("app.language") }}</span>
         <select
           :value="locale"
           class="rounded border border-neutral-300 bg-white px-2 py-1 text-neutral-900 outline-none transition-colors dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
@@ -43,7 +48,7 @@ function onThemeChange(event: Event): void {
       </label>
 
       <label class="flex items-center gap-2">
-        <span>{{ t("app.theme") }}</span>
+        <span v-if="!compact">{{ t("app.theme") }}</span>
         <select
           :value="theme.mode"
           class="rounded border border-neutral-300 bg-white px-2 py-1 text-neutral-900 outline-none transition-colors dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"

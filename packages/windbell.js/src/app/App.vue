@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
 import { useI18n } from "vue-i18n"
-import { RouterView } from "vue-router"
-import AppHeader from "./AppHeader.vue"
+import AppShellDesktop from "./AppShellDesktop.vue"
+import AppShellMobile from "./AppShellMobile.vue"
 import { useTheme } from "./theme"
+import { useMediaQuery } from "./useMediaQuery"
 
 const { locale } = useI18n()
 const theme = useTheme()
+const isMobile = useMediaQuery("(max-width: 767px)")
 
 useHead(() => ({
   htmlAttrs: {
@@ -22,10 +24,6 @@ useHead(() => ({
 </script>
 
 <template>
-  <div
-    class="flex min-h-screen flex-col bg-white text-neutral-900 transition-colors dark:bg-neutral-950 dark:text-neutral-100"
-  >
-    <AppHeader />
-    <RouterView />
-  </div>
+  <AppShellMobile v-if="isMobile" />
+  <AppShellDesktop v-else />
 </template>
