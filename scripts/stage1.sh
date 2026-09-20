@@ -10,6 +10,7 @@ set -e
 ./scripts/run-in.sh cli.js format.sh
 ./scripts/run-in.sh agent.js format.sh
 ./scripts/run-in.sh fs-api.js format.sh
+./scripts/run-in.sh windbell.js format.sh
 
 # ts check
 
@@ -17,6 +18,7 @@ set -e
 ./scripts/run-in.sh cli.js check.sh
 ./scripts/run-in.sh agent.js check.sh
 ./scripts/run-in.sh fs-api.js check.sh
+./scripts/run-in.sh windbell.js check.sh
 
 # ts test
 
@@ -24,3 +26,7 @@ set -e
 ./scripts/run-in.sh cli.js clean.sh test.sh
 ./scripts/run-in.sh agent.js clean.sh test.sh
 ./scripts/run-in.sh fs-api.js clean.sh test.sh
+
+# frontend build
+
+./scripts/run-in.sh windbell.js clean.sh build.sh
