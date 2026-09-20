@@ -11,7 +11,7 @@ import { startAgentRepl } from "./repl/index.ts"
 import { makeBashTool } from "./tools/index.ts"
 
 const { version } = getPackageJson(fileURLToPath(import.meta.url))
-const router = cli.createRouter("agent.js", version)
+const router = cli.createRouter("semiosis.js", version)
 
 router.defineRoutes([
   "repl --model <provider-name>/<model-name> -- start agent repl in current directory",

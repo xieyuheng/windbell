@@ -23,4 +23,4 @@
 
 # agent
 
-为 agent.js package 增加文学式编程文档
+为 semiosis.js package 增加文学式编程文档

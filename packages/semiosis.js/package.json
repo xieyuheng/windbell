@@ -1,5 +1,5 @@
 {
-  "name": "@xieyuheng/agent.js",
+  "name": "@xieyuheng/semiosis.js",
   "version": "0.1.0",
   "license": "GPL-3.0-or-later",
   "type": "module",
@@ -23,6 +23,6 @@
     "zod": "^4.6.5"
   },
   "bin": {
-    "agent.js": "src/main.ts"
+    "semiosis.js": "src/main.ts"
   }
 }

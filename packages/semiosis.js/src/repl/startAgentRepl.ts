@@ -26,7 +26,7 @@ export async function startAgentRepl(agent: Agent): Promise<void> {
     wake = undefined
   })
 
-  console.log("agent.js repl")
+  console.log("semiosis.js repl")
   console.log("commands: /exit /debug")
 
   readline.setPrompt("> ")

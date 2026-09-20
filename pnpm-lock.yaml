@@ -6,28 +6,6 @@ settings:
 
 importers:
 
-  packages/agent.js:
-    dependencies:
-      '@xieyuheng/cli.js':
-        specifier: workspace:*
-        version: link:../cli.js
-      '@xieyuheng/std.js':
-        specifier: workspace:*
-        version: link:../std.js
-      zod:
-        specifier: ^4.6.5
-        version: 4.6.5
-    devDependencies:
-      '@types/node':
-        specifier: ^26.6.1
-        version: 26.6.1
-      prettier:
-        specifier: ^3.9.8
-        version: 3.9.8
-      typescript:
-        specifier: ^7.0.2
-        version: 7.0.2
-
   packages/cli.js:
     dependencies:
       '@xieyuheng/std.js':
@@ -45,6 +23,28 @@ importers:
         version: 7.0.2
 
   packages/fs-api.js:
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.1
+        version: 26.6.1
+      prettier:
+        specifier: ^3.9.8
+        version: 3.9.8
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+
+  packages/semiosis.js:
+    dependencies:
+      '@xieyuheng/cli.js':
+        specifier: workspace:*
+        version: link:../cli.js
+      '@xieyuheng/std.js':
+        specifier: workspace:*
+        version: link:../std.js
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
     devDependencies:
       '@types/node':
         specifier: ^26.6.1
