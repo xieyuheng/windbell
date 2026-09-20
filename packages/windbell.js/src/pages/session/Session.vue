@@ -2,7 +2,7 @@
 import { useHead } from "@unhead/vue"
 import { computed, watch } from "vue"
 import { useI18n } from "vue-i18n"
-import { useRoute } from "vue-router"
+import { RouterLink, useRoute } from "vue-router"
 import SignList from "./components/SignList.vue"
 import { sessionMessages } from "./Session.i18n"
 import { createSessionState, loadSessionState } from "./SessionState"
@@ -35,7 +35,17 @@ useHead(() => ({
 
 <template>
   <main class="flex flex-1 flex-col gap-6 px-6 py-8">
-    <header class="flex flex-col gap-2">
+    <header class="flex flex-col gap-3">
+      <RouterLink
+        class="text-xs text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+        :to="{
+          name: 'session-list',
+          params: { workspaceId: String(route.params.workspaceId ?? '') },
+        }"
+      >
+        ← {{ t("back") }}
+      </RouterLink>
+
       <p class="font-mono text-xs text-neutral-500 dark:text-neutral-400">
         {{ state.sessionId }}
       </p>
