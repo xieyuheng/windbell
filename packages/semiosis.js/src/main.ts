@@ -21,6 +21,8 @@ router.defineRoutes([
   "batch --model <provider-name>/<model-name> --prompts <file> --cwd <dir> --max-steps <n> --max-output-chars <n> -- run prompts through agent",
 ])
 
+const defaultMaxSteps = 100
+
 router.defineHandlers({
   repl: ({ options }) => {
     const modelSpec = readRequiredOption(options, "--model")
@@ -31,7 +33,7 @@ router.defineHandlers({
       system: "You are a helpful software engineer assistant.",
       cwd: process.cwd(),
       tools: [makeBashTool()],
-      maxSteps: 8,
+      maxSteps: defaultMaxSteps,
     })
     return startAgentRepl(agent)
   },
@@ -44,7 +46,7 @@ router.defineHandlers({
     const [providerName, modelName] = parseQualifiedModelName(modelSpec)
     const model = makeModel(providerName, modelName)
     const cwd = options["--cwd"] ?? process.cwd()
-    const maxSteps = parsePositiveInt(options["--max-steps"], 8)
+    const maxSteps = parsePositiveInt(options["--max-steps"], defaultMaxSteps)
     const maxOutputChars = parsePositiveInt(
       options["--max-output-chars"],
       200_000,
