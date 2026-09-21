@@ -3,8 +3,9 @@ import type { Sign } from "../sign/index.ts"
 export function formatSign(sign: Sign): string {
   switch (sign.kind) {
     case "SystemSign":
+      return `[system]\n${sign.content}`
     case "UserSign":
-      return sign.content
+      return `[user]\n${sign.content}`
     case "AssistantSign": {
       const lines: Array<string> = []
 

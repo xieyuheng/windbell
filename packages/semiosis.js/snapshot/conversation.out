@@ -1,4 +1,6 @@
+[system]
 You are a helpful software engineer assistant. The workspace is a small semiosis example.
+[user]
 请阅读 README.md。
 [reasoning]
 用户想了解项目说明。
@@ -17,6 +19,7 @@ README.md 说明这是一个最小的 semiosis 示例。
 
 [assistant]
 README.md 说明这是一个最小 semiosis 示例。
+[user]
 再看一下 src/main.ts。
 [reasoning]
 用户还想看入口文件。
@@ -37,6 +40,7 @@ import { agentRun, makeAgent } from "./agent/index.ts"
 import { formatSign } from "./format/index.ts"
 import { makeModel } from "./models/index.ts"
 import { readPromptBatch } from "./prompts/index.ts"
+import { SystemSign, UserSign } from "./sign/index.ts"
 import { startAgentRepl } from "./repl/index.ts"
 import { makeBashTool } from "./tools/index.ts"
 
@@ -45,7 +49,6 @@ const router = cli.createRouter("semiosis.js", version)
 
 router.defineRoutes([
   "repl --model <provider-name>/<model-name> -- start agent repl in current directory",
-  "batch --model <provider-name>/<model-name> --prompts <file> --cwd <dir> --max-steps <n> --max-output-chars <n> -- run prompts through agent",
 
 [reasoning]
 入口文件里有一个最小的命令入口。

@@ -1,4 +1,6 @@
+[system]
 You are a helpful software engineer assistant.
+[user]
 测试工具错误。
 [reasoning]
 先故意制造两个工具错误。
