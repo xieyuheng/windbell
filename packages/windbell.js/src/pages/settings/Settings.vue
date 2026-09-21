@@ -1,22 +1,17 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
-import { ArrowLeft } from "@lucide/vue"
 import { useI18n } from "vue-i18n"
-import { useRouter } from "vue-router"
 import { useFont, type Font } from "../../app/font"
 import { setLocale, supportedLocales } from "../../app/i18n"
 import { useTheme, type ThemeMode } from "../../app/theme"
 import { settingsMessages } from "./Settings.i18n"
-import { createSettingsState } from "./SettingsState"
 
-const router = useRouter()
 const { locale, t } = useI18n({
   messages: settingsMessages,
   useScope: "local",
 })
 const theme = useTheme()
 const font = useFont()
-const state = createSettingsState(router)
 
 const themeOptions: Array<{ value: ThemeMode; labelKey: string }> = [
   { value: "system", labelKey: "themeSystem" },
@@ -36,16 +31,7 @@ useHead(() => ({
 
 <template>
   <main class="flex flex-1 flex-col gap-6 px-5 py-6">
-    <header class="flex flex-col gap-4">
-      <button
-        type="button"
-        class="inline-flex items-center gap-1.5 self-start text-sm text-ink-muted transition-colors hover:text-ink"
-        @click="state.goBack()"
-      >
-        <ArrowLeft :size="16" :stroke-width="1.5" aria-hidden="true" />
-        <span>{{ t("back") }}</span>
-      </button>
-
+    <header class="flex flex-col gap-2">
       <h1 class="text-2xl font-bold text-ink">{{ t("title") }}</h1>
     </header>
 

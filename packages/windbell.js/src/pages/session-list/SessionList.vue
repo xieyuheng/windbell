@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
-import { ArrowLeft, Plus } from "@lucide/vue"
+import { Plus } from "@lucide/vue"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink, useRoute } from "vue-router"
@@ -59,15 +59,7 @@ useHead(() => ({
 
 <template>
   <main class="flex flex-1 flex-col">
-    <header class="flex flex-col gap-3 border-b border-line px-5 py-6">
-      <RouterLink
-        class="inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
-        :to="{ name: 'workspace-list' }"
-      >
-        <ArrowLeft :size="16" :stroke-width="1.5" aria-hidden="true" />
-        <span>{{ t("back") }}</span>
-      </RouterLink>
-
+    <header class="flex flex-col gap-2 border-b border-line px-5 py-6">
       <div class="flex flex-col gap-1">
         <h1 class="text-2xl font-bold text-ink">
           {{ workspace?.name ?? t("title") }}
