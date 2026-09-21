@@ -1,0 +1,21 @@
+You are a helpful software engineer assistant.
+进入工具循环。
+[reasoning]
+继续调用 bash。
+
+[assistant]
+我再执行一次。
+[tool call] bash {"command":"printf loop"}
+[tool result] exit_code: 0
+stdout:
+loop
+[reasoning]
+继续调用 bash。
+
+[assistant]
+我再执行一次。
+[tool call] bash {"command":"printf loop"}
+[tool result] exit_code: 0
+stdout:
+loop
+[agentRun] max steps reached: 2

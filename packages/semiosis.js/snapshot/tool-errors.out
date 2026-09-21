@@ -1,0 +1,19 @@
+You are a helpful software engineer assistant.
+测试工具错误。
+[reasoning]
+先故意制造两个工具错误。
+
+[assistant]
+[tool call] missing {}
+[tool call] bash {"command":"printf out; printf err >&2; exit 3"}
+[tool result] [agentRun] unknown tool: missing
+[tool result] exit_code: 3
+stdout:
+out
+stderr:
+err
+[reasoning]
+已经收到两个工具错误。
+
+[assistant]
+missing 工具不存在，bash 命令以非零状态结束。

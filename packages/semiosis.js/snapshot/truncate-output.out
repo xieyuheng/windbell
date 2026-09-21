@@ -1,0 +1,17 @@
+You are a helpful software engineer assistant.
+测试输出截断。
+[reasoning]
+测试输出截断。
+
+[assistant]
+先打印一长串数字。
+[tool call] bash {"command":"printf 1234567890"}
+[tool result] exit_code: 0
+stdout:
+1234
+[output truncated]
+[reasoning]
+输出已经被截断。
+
+[assistant]
+已完成截断测试。

@@ -1,0 +1,37 @@
+You are a helpful software engineer assistant. The workspace is a small semiosis example.
+请阅读 README.md。
+[reasoning]
+用户想了解项目说明。
+
+[assistant]
+我先读取 README.md。
+[tool call] bash {"command":"sed -n 1,20p README.md"}
+[tool result] exit_code: 0
+stdout:
+# semiosis.js
+
+A small semiosis example for snapshot tests.
+
+[reasoning]
+README.md 说明这是一个最小的 semiosis 示例。
+
+[assistant]
+README.md 说明这是一个最小 semiosis 示例。
+再看一下 src/main.ts。
+[reasoning]
+用户还想看入口文件。
+
+[assistant]
+我再读取 src/main.ts。
+[tool call] bash {"command":"sed -n 1,20p src/main.ts"}
+[tool result] exit_code: 0
+stdout:
+export function main(): string {
+  return "hello semiosis"
+}
+
+[reasoning]
+入口文件里有一个最小的 main 函数。
+
+[assistant]
+src/main.ts 中只有一个最小的 main 函数。
