@@ -1,0 +1,28 @@
+{
+  "name": "@xieyuheng/windbell-server.js",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "files": [
+    "src"
+  ],
+  "prettier": {
+    "semi": false,
+    "trailingComma": "all"
+  },
+  "dependencies": {
+    "@hono/node-server": "2.1.1",
+    "@xieyuheng/fs-api.js": "workspace:*",
+    "@xieyuheng/semiosis.js": "workspace:*",
+    "hono": "4.13.8"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.1",
+    "prettier": "^3.9.8",
+    "typescript": "^7.0.2"
+  },
+  "bin": {
+    "windbell-server": "src/main.ts"
+  }
+}

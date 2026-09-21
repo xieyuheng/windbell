@@ -1,3 +1,8 @@
+# semiosis
+
+在 semiosis.js 中设置 makeMockModel，
+可否代替现在  Agent.test.ts 和  makeEchoTool？
+
 # windbell
 
 [windbell] workspace manager
