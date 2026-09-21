@@ -23,6 +23,17 @@ The client wraps the endpoints into a typed JavaScript interface.
 | `delete` | `{ path }` | `null` |
 | `rename` | `{ path, newPath }` | `null` |
 
+## Hono Router
+
+```typescript
+import { Hono } from "hono"
+import { createFileSystemRouter } from "@xieyuheng/fs-api.js"
+
+const app = new Hono()
+
+app.route("/api/fs", createFileSystemRouter())
+```
+
 ## Server
 
 ```typescript

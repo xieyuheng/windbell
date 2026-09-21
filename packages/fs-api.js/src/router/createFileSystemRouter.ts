@@ -1,6 +1,7 @@
-import type { IncomingMessage, ServerResponse } from "node:http"
+import { Hono, type Context } from "hono"
+import { cors } from "hono/cors"
 import * as service from "../service/index.ts"
-import type { FileSystemServerOptions } from "./FileSystemServerOptions.ts"
+import type { FileSystemRouterOptions } from "./FileSystemRouterOptions.ts"
 import { HttpError } from "./HttpError.ts"
 
 type Handler = (body: unknown) => Promise<unknown>
@@ -21,67 +22,38 @@ const handlers: Record<string, Handler> = {
   rename: async (body) => service.rename(readPath(body), readNewPath(body)),
 }
 
-export async function handleFileSystemRequest(
-  request: IncomingMessage,
-  response: ServerResponse,
-  options: FileSystemServerOptions = {},
-): Promise<void> {
-  setCorsHeaders(response, options.corsOrigin)
+export function createFileSystemRouter(
+  options: FileSystemRouterOptions = {},
+): Hono {
+  const app = new Hono()
 
-  if (request.method === "OPTIONS") {
-    response.statusCode = 204
-    response.end()
-    return
+  if (options.corsOrigin !== undefined) {
+    app.use("*", cors({ origin: options.corsOrigin }))
   }
 
-  try {
-    if (request.method !== "POST") {
-      throw new HttpError(405, `method not allowed: ${request.method}`)
-    }
-
-    const method = readMethodName(request.url, options.basePath)
+  app.post("/:method", async (c) => {
+    const method = c.req.param("method")
     const handler = handlers[method]
+
     if (handler === undefined) {
       throw new HttpError(404, `unknown method: ${method}`)
     }
 
-    const body = await readJsonBody(request)
+    const body = await readJsonBody(c)
     const result = await handler(body)
-    sendJson(response, 200, result)
-  } catch (error) {
-    sendError(response, error)
-  }
+
+    return sendJson(200, result)
+  })
+
+  app.onError((error, c) => sendError(error, c))
+
+  return app
 }
 
-function readMethodName(
-  url: string | undefined,
-  basePath: string | undefined,
-): string {
-  const parsed = new URL(url ?? "/", "http://localhost")
-  const normalizedBasePath = normalizeBasePath(basePath)
-  const pathname = parsed.pathname
+async function readJsonBody(c: Context): Promise<unknown> {
+  const text = await c.req.text()
+  if (text.trim() === "") return {}
 
-  if (!pathname.startsWith(normalizedBasePath)) {
-    throw new HttpError(404, `unknown path: ${pathname}`)
-  }
-
-  return pathname.slice(normalizedBasePath.length).replace(/^\/+/, "")
-}
-
-function normalizeBasePath(basePath: string | undefined): string {
-  if (basePath === undefined || basePath === "" || basePath === "/") return ""
-  return `/${basePath.replace(/^\/+|\/+$/g, "")}`
-}
-
-async function readJsonBody(request: IncomingMessage): Promise<unknown> {
-  const chunks: Array<Buffer> = []
-  for await (const chunk of request) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
-  }
-
-  if (chunks.length === 0) return {}
-
-  const text = Buffer.concat(chunks).toString("utf8")
   try {
     return JSON.parse(text)
   } catch {
@@ -92,27 +64,33 @@ async function readJsonBody(request: IncomingMessage): Promise<unknown> {
 function readPath(body: unknown): string {
   const record = readRecord(body)
   const path = record.path
+
   if (typeof path !== "string") {
     throw new HttpError(400, "field `path` must be a string")
   }
+
   return path
 }
 
 function readText(body: unknown): string {
   const record = readRecord(body)
   const text = record.text
+
   if (typeof text !== "string") {
     throw new HttpError(400, "field `text` must be a string")
   }
+
   return text
 }
 
 function readNewPath(body: unknown): string {
   const record = readRecord(body)
   const newPath = record.newPath
+
   if (typeof newPath !== "string") {
     throw new HttpError(400, "field `newPath` must be a string")
   }
+
   return newPath
 }
 
@@ -120,31 +98,26 @@ function readRecord(body: unknown): Record<string, unknown> {
   if (body === null || typeof body !== "object" || Array.isArray(body)) {
     throw new HttpError(400, "request body must be a JSON object")
   }
+
   return body as Record<string, unknown>
 }
 
-function sendJson(
-  response: ServerResponse,
-  statusCode: number,
-  value: unknown,
-): void {
-  response.statusCode = statusCode
-  response.setHeader("Content-Type", "application/json; charset=utf-8")
-  response.end(JSON.stringify(value ?? null))
+function sendJson(statusCode: number, value: unknown): Response {
+  return new Response(JSON.stringify(value ?? null), {
+    status: statusCode,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+    },
+  })
 }
 
-function sendError(response: ServerResponse, error: unknown): void {
+function sendError(error: unknown, _c: Context): Response {
   const httpError = error instanceof HttpError ? error : undefined
   const statusCode = httpError?.statusCode ?? statusCodeFromError(error)
   const code = httpError?.code ?? readErrorCode(error)
   const message = error instanceof Error ? error.message : String(error)
 
-  if (response.headersSent) {
-    response.end()
-    return
-  }
-
-  sendJson(response, statusCode, {
+  return sendJson(statusCode, {
     error: {
       code,
       message,
@@ -154,15 +127,21 @@ function sendError(response: ServerResponse, error: unknown): void {
 
 function statusCodeFromError(error: unknown): number {
   const code = readErrorCode(error)
+
   switch (code) {
     case "ENOENT":
       return 404
     case "EACCES":
     case "EPERM":
       return 403
+    case "EISDIR":
+    case "ENOTDIR":
+      return 400
     case "EEXIST":
     case "ENOTEMPTY":
       return 409
+    case "ENOSPC":
+      return 507
     default:
       return 500
   }
@@ -171,15 +150,4 @@ function statusCodeFromError(error: unknown): number {
 function readErrorCode(error: unknown): string | undefined {
   if (!(error instanceof Error)) return undefined
   return (error as NodeJS.ErrnoException).code
-}
-
-function setCorsHeaders(
-  response: ServerResponse,
-  origin: string | undefined,
-): void {
-  if (origin === undefined) return
-
-  response.setHeader("Access-Control-Allow-Origin", origin)
-  response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS")
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type")
 }
