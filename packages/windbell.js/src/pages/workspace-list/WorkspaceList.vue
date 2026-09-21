@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
+import { Settings } from "@lucide/vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
 import { mockSessions } from "../../mock/session"
@@ -42,11 +43,12 @@ useHead(() => ({
       </div>
 
       <RouterLink
-        class="rounded-full border border-line px-3 py-1.5 text-sm text-ink-muted transition-colors hover:border-ink-muted hover:text-ink"
+        class="flex h-8 w-8 items-center justify-center rounded-full border border-line text-ink-muted transition-colors hover:border-ink-muted hover:text-ink"
         :to="{ name: 'settings' }"
+        :aria-label="t('settings')"
         :title="t('settings')"
       >
-        ⚙
+        <Settings :size="16" :stroke-width="1.5" aria-hidden="true" />
       </RouterLink>
     </header>
 

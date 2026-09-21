@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChevronDown, ChevronRight, Settings } from "@lucide/vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
 import type { Workspace, WorkspaceId } from "../../models/Workspace"
@@ -33,11 +34,12 @@ const { t } = useI18n()
       </h2>
 
       <RouterLink
-        class="text-xs text-ink-muted transition-colors hover:text-ink"
+        class="flex h-5 w-5 items-center justify-center text-ink-muted transition-colors hover:text-ink"
         :to="{ name: 'settings' }"
+        :aria-label="t('sidebar.settings')"
         :title="t('sidebar.settings')"
       >
-        ⚙
+        <Settings :size="14" :stroke-width="1.5" aria-hidden="true" />
       </RouterLink>
     </div>
 
@@ -56,8 +58,21 @@ const { t } = useI18n()
         "
         @click="$emit('toggle', workspace.id)"
       >
-        <span class="w-3 text-xs text-ink-muted">
-          {{ expandedWorkspaceIds.has(workspace.id) ? "▾" : "▸" }}
+        <span
+          class="flex w-3 shrink-0 items-center justify-center text-ink-muted"
+        >
+          <ChevronDown
+            v-if="expandedWorkspaceIds.has(workspace.id)"
+            :size="14"
+            :stroke-width="1.5"
+            aria-hidden="true"
+          />
+          <ChevronRight
+            v-else
+            :size="14"
+            :stroke-width="1.5"
+            aria-hidden="true"
+          />
         </span>
         <span class="truncate">{{ workspace.name }}</span>
       </button>

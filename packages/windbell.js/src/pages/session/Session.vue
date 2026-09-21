@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
+import { ArrowLeft } from "@lucide/vue"
 import { computed, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink, useRoute } from "vue-router"
@@ -37,13 +38,14 @@ useHead(() => ({
   <main class="flex flex-1 flex-col gap-6 px-6 py-8">
     <header class="flex flex-col gap-3">
       <RouterLink
-        class="text-sm text-ink-muted transition-colors hover:text-ink"
+        class="inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
         :to="{
           name: 'session-list',
           params: { workspaceId: String(route.params.workspaceId ?? '') },
         }"
       >
-        ← {{ t("back") }}
+        <ArrowLeft :size="16" :stroke-width="1.5" aria-hidden="true" />
+        <span>{{ t("back") }}</span>
       </RouterLink>
 
       <p class="font-mono text-sm text-ink">

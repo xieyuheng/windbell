@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
+import { ArrowLeft } from "@lucide/vue"
 import { useI18n } from "vue-i18n"
 import { useRouter } from "vue-router"
 import { useFont, type Font } from "../../app/font"
@@ -37,10 +38,11 @@ useHead(() => ({
   <main class="flex flex-1 flex-col gap-8 px-5 py-8">
     <button
       type="button"
-      class="self-start text-sm text-ink-muted transition-colors hover:text-ink"
+      class="inline-flex items-center gap-1.5 self-start text-sm text-ink-muted transition-colors hover:text-ink"
       @click="state.goBack()"
     >
-      ← {{ t("back") }}
+      <ArrowLeft :size="16" :stroke-width="1.5" aria-hidden="true" />
+      <span>{{ t("back") }}</span>
     </button>
 
     <h1 class="text-2xl font-bold text-ink">{{ t("title") }}</h1>

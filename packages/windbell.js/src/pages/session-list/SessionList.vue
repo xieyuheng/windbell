@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
+import { ArrowLeft, Plus } from "@lucide/vue"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink, useRoute } from "vue-router"
@@ -60,10 +61,11 @@ useHead(() => ({
   <main class="flex flex-1 flex-col">
     <header class="flex flex-col gap-3 border-b border-line px-5 py-5">
       <RouterLink
-        class="text-sm text-ink-muted transition-colors hover:text-ink"
+        class="inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
         :to="{ name: 'workspace-list' }"
       >
-        ← {{ t("back") }}
+        <ArrowLeft :size="16" :stroke-width="1.5" aria-hidden="true" />
+        <span>{{ t("back") }}</span>
       </RouterLink>
 
       <div class="flex flex-col gap-1">
@@ -118,10 +120,11 @@ useHead(() => ({
 
     <footer class="sticky bottom-0 border-t border-line bg-paper p-4">
       <button
-        class="w-full rounded-full bg-ink px-4 py-3 text-sm font-medium text-paper transition-opacity hover:opacity-80"
+        class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-4 py-3 text-sm font-medium text-paper transition-opacity hover:opacity-80"
         type="button"
       >
-        {{ t("newSession") }}
+        <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
+        <span>{{ t("newSession") }}</span>
       </button>
     </footer>
   </main>

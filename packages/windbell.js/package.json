@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "dependencies": {
+    "@lucide/vue": "1.47.0",
     "@unhead/vue": "3.4.1",
     "@xieyuheng/semiosis.js": "workspace:*",
     "markdown-it": "15.0.2",
