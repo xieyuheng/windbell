@@ -20,7 +20,7 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="flex flex-1 flex-col items-center justify-center gap-3 px-6">
+  <main class="flex flex-1 flex-col gap-3 px-5 py-6">
     <h1 class="text-2xl font-bold text-ink">
       {{ t("title") }}
     </h1>

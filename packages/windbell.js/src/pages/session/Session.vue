@@ -35,7 +35,7 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="flex flex-1 flex-col gap-6 px-6 py-8">
+  <main class="flex flex-1 flex-col gap-6 px-5 py-6">
     <header class="flex flex-col gap-3">
       <RouterLink
         class="inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"

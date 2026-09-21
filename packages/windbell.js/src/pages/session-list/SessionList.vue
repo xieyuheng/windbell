@@ -59,7 +59,7 @@ useHead(() => ({
 
 <template>
   <main class="flex flex-1 flex-col">
-    <header class="flex flex-col gap-3 border-b border-line px-5 py-5">
+    <header class="flex flex-col gap-3 border-b border-line px-5 py-6">
       <RouterLink
         class="inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
         :to="{ name: 'workspace-list' }"

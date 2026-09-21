@@ -35,20 +35,24 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="flex flex-1 flex-col gap-8 px-5 py-8">
-    <button
-      type="button"
-      class="inline-flex items-center gap-1.5 self-start text-sm text-ink-muted transition-colors hover:text-ink"
-      @click="state.goBack()"
-    >
-      <ArrowLeft :size="16" :stroke-width="1.5" aria-hidden="true" />
-      <span>{{ t("back") }}</span>
-    </button>
+  <main class="flex flex-1 flex-col gap-6 px-5 py-6">
+    <header class="flex flex-col gap-4">
+      <button
+        type="button"
+        class="inline-flex items-center gap-1.5 self-start text-sm text-ink-muted transition-colors hover:text-ink"
+        @click="state.goBack()"
+      >
+        <ArrowLeft :size="16" :stroke-width="1.5" aria-hidden="true" />
+        <span>{{ t("back") }}</span>
+      </button>
 
-    <h1 class="text-2xl font-bold text-ink">{{ t("title") }}</h1>
+      <h1 class="text-2xl font-bold text-ink">{{ t("title") }}</h1>
+    </header>
 
     <section class="flex flex-col gap-6">
-      <fieldset class="flex flex-col gap-3">
+      <fieldset
+        class="flex flex-col gap-3 border-b border-line pb-6 last:border-b-0"
+      >
         <legend class="text-sm font-medium text-ink">
           {{ t("language") }}
         </legend>
@@ -70,7 +74,9 @@ useHead(() => ({
         </label>
       </fieldset>
 
-      <fieldset class="flex flex-col gap-3">
+      <fieldset
+        class="flex flex-col gap-3 border-b border-line pb-6 last:border-b-0"
+      >
         <legend class="text-sm font-medium text-ink">
           {{ t("theme") }}
         </legend>
@@ -92,7 +98,9 @@ useHead(() => ({
         </label>
       </fieldset>
 
-      <fieldset class="flex flex-col gap-3">
+      <fieldset
+        class="flex flex-col gap-3 border-b border-line pb-6 last:border-b-0"
+      >
         <legend class="text-sm font-medium text-ink">
           {{ t("font") }}
         </legend>

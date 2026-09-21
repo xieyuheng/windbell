@@ -31,7 +31,7 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="flex flex-1 flex-col gap-6 px-5 py-8">
+  <main class="flex flex-1 flex-col gap-6 px-5 py-6">
     <header class="flex items-start justify-between gap-4">
       <div class="flex flex-col gap-2">
         <h1 class="text-2xl font-bold text-ink">
