@@ -12,3 +12,19 @@ test("GET /health", async () => {
     service: "windbell-server",
   })
 })
+
+test("POST /api/fs/exists", async () => {
+  const app = createApp()
+  const response = await app.request("/api/fs/exists", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      path: process.cwd(),
+    }),
+  })
+
+  assert.equal(response.status, 200)
+  assert.equal(await response.json(), true)
+})

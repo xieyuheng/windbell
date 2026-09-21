@@ -1,3 +1,4 @@
+import { createFileSystemRouter } from "@xieyuheng/fs-api.js"
 import { Hono } from "hono"
 
 export function createApp(): Hono {
@@ -9,6 +10,8 @@ export function createApp(): Hono {
       service: "windbell-server",
     }),
   )
+
+  app.route("/api/fs", createFileSystemRouter())
 
   return app
 }
