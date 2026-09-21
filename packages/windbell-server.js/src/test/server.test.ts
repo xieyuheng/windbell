@@ -2,9 +2,9 @@ import assert from "node:assert/strict"
 import { test } from "node:test"
 import { createApp } from "../app.ts"
 
-test("GET /health", async () => {
+test("GET /api/health", async () => {
   const app = createApp()
-  const response = await app.request("/health")
+  const response = await app.request("/api/health")
 
   assert.equal(response.status, 200)
   assert.deepEqual(await response.json(), {
