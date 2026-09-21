@@ -1,0 +1,2 @@
+{"kind":"AssistantSign","reasoning":"测试输出截断。","content":"先打印一长串数字。","toolCalls":[{"id":"call-truncate","name":"bash","arguments":"{\"command\":\"printf 1234567890\"}"}]}
+{"kind":"AssistantSign","reasoning":"输出已经被截断。","content":"已完成截断测试。","toolCalls":[]}

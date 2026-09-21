@@ -1,0 +1,2 @@
+{"kind":"AssistantSign","reasoning":"先故意制造两个工具错误。","content":"","toolCalls":[{"id":"call-missing","name":"missing","arguments":"{}"},{"id":"call-fail","name":"bash","arguments":"{\"command\":\"printf out; printf err >&2; exit 3\"}"}]}
+{"kind":"AssistantSign","reasoning":"已经收到两个工具错误。","content":"missing 工具不存在，bash 命令以非零状态结束。","toolCalls":[]}

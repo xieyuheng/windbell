@@ -1,0 +1,4 @@
+{"kind":"AssistantSign","reasoning":"用户想了解项目说明。","content":"我先读取 README.md。","toolCalls":[{"id":"call-readme","name":"bash","arguments":"{\"command\":\"sed -n 1,20p README.md\"}"}]}
+{"kind":"AssistantSign","reasoning":"README.md 说明这是一个最小的 semiosis 示例。","content":"README.md 说明这是一个最小 semiosis 示例。","toolCalls":[]}
+{"kind":"AssistantSign","reasoning":"用户还想看入口文件。","content":"我再读取 src/main.ts。","toolCalls":[{"id":"call-main","name":"bash","arguments":"{\"command\":\"sed -n 1,20p src/main.ts\"}"}]}
+{"kind":"AssistantSign","reasoning":"入口文件里有一个最小的命令入口。","content":"src/main.ts 中定义了命令行工具入口。","toolCalls":[]}
