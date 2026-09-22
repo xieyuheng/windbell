@@ -27,8 +27,8 @@ export function formatSign(sign: Sign): string {
 
       return lines.join("\n")
     }
-    case "ToolSign":
-      return `[tool result] ${sign.content}`
+    case "ToolOutputSign":
+      return `[tool output] ${sign.content}`
     case "ErrorSign":
       return sign.message
   }

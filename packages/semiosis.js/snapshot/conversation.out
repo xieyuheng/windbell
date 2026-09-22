@@ -8,7 +8,7 @@ You are a helpful software engineer assistant. The workspace is a small semiosis
 [assistant]
 我先读取 README.md。
 [tool call] bash {"command":"sed -n 1,20p README.md"}
-[tool result] exit_code: 0
+[tool output] exit_code: 0
 stdout:
 # semiosis.js
 
@@ -27,7 +27,7 @@ README.md 说明这是一个最小 semiosis 示例。
 [assistant]
 我再读取 src/main.ts。
 [tool call] bash {"command":"sed -n 1,20p src/main.ts"}
-[tool result] exit_code: 0
+[tool output] exit_code: 0
 stdout:
 #!/usr/bin/env -S node
 

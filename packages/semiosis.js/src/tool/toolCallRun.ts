@@ -1,6 +1,6 @@
 import { errorReport } from "@xieyuheng/std.js/error"
 import type { Agent } from "../agent/Agent.ts"
-import { ToolSign, type Sign } from "../sign/index.ts"
+import { ToolOutputSign, type Sign } from "../sign/index.ts"
 import type { ToolCall } from "./Tool.ts"
 
 export async function toolCallRun(
@@ -11,15 +11,18 @@ export async function toolCallRun(
     (tool) => tool.spec.name === toolCall.name,
   )
   if (tool === undefined) {
-    return ToolSign(toolCall.id, `[agentRun] unknown tool: ${toolCall.name}`)
+    return ToolOutputSign(
+      toolCall.id,
+      `[agentRun] unknown tool: ${toolCall.name}`,
+    )
   }
 
   try {
     const args = toolArgumentsParse(toolCall)
     const content = await tool.handler(agent, args)
-    return ToolSign(toolCall.id, content)
+    return ToolOutputSign(toolCall.id, content)
   } catch (error) {
-    return ToolSign(toolCall.id, errorReport(error))
+    return ToolOutputSign(toolCall.id, errorReport(error))
   }
 }
 

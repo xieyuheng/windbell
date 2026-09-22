@@ -1,8 +1,10 @@
 # semiosis
 
-[semiosis.js] 增加 ToolSign，用 Sign 的形式来表达 Tool
+[semiosis.js] 增加 ToolSign，用 Sign 的形式来表达 ToolSpec
 
-现在的 "ToolSign" 改为 "ToolOutputSign"
+每次调用 model api 的时候，从 signs 中取 ToolSign 来构成 tools。
+
+先不要写代码，先讨论方案。
 
 # windbell
 

@@ -59,7 +59,7 @@ function makeDeepSeekMessage(sign: Sign): DeepSeekMessage {
 
       return message
     }
-    case "ToolSign":
+    case "ToolOutputSign":
       return {
         role: "tool",
         tool_call_id: sign.toolCallId,

@@ -31,7 +31,7 @@ function preview(session: Session): string {
   switch (sign.kind) {
     case "UserSign":
     case "AssistantSign":
-    case "ToolSign":
+    case "ToolOutputSign":
     case "PersonaSign":
       return sign.content
     case "ErrorSign":

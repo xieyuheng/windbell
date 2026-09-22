@@ -8,7 +8,7 @@ export const sessionMessages = {
     signKind: {
       user: "用户",
       assistant: "助手",
-      tool: "工具",
+      toolOutput: "工具输出",
       persona: "人设",
       error: "错误",
     },
@@ -22,7 +22,7 @@ export const sessionMessages = {
     signKind: {
       user: "User",
       assistant: "Assistant",
-      tool: "Tool",
+      toolOutput: "Tool Output",
       persona: "Persona",
       error: "Error",
     },

@@ -1,6 +1,7 @@
 import type { ToolCall } from "../tool/index.ts"
 
-export type Sign = PersonaSign | UserSign | AssistantSign | ToolSign | ErrorSign
+export type Sign =
+  PersonaSign | UserSign | AssistantSign | ToolOutputSign | ErrorSign
 
 export type PersonaSign = {
   kind: "PersonaSign"
@@ -73,27 +74,30 @@ export function asAssistantSign(value: Sign): AssistantSign {
   throw new Error(`[asAssistantSign] fail on: ${value.kind}`)
 }
 
-export type ToolSign = {
-  kind: "ToolSign"
+export type ToolOutputSign = {
+  kind: "ToolOutputSign"
   toolCallId: string
   content: string
 }
 
-export function ToolSign(toolCallId: string, content: string): ToolSign {
+export function ToolOutputSign(
+  toolCallId: string,
+  content: string,
+): ToolOutputSign {
   return {
-    kind: "ToolSign",
+    kind: "ToolOutputSign",
     toolCallId,
     content,
   }
 }
 
-export function isToolSign(value: Sign): value is ToolSign {
-  return value.kind === "ToolSign"
+export function isToolOutputSign(value: Sign): value is ToolOutputSign {
+  return value.kind === "ToolOutputSign"
 }
 
-export function asToolSign(value: Sign): ToolSign {
-  if (isToolSign(value)) return value
-  throw new Error(`[asToolSign] fail on: ${value.kind}`)
+export function asToolOutputSign(value: Sign): ToolOutputSign {
+  if (isToolOutputSign(value)) return value
+  throw new Error(`[asToolOutputSign] fail on: ${value.kind}`)
 }
 
 export type ErrorSign = {

@@ -66,7 +66,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-read-eval",
         content:
           'export function evaluate(input: string): unknown {\n  throw new Error("not implemented")\n}',
@@ -113,7 +113,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-list",
         content:
           "src/client/FileSystemClient.ts\nsrc/index.ts\nsrc/server/handleFileSystemRequest.ts",
@@ -163,7 +163,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-windbell-1",
         content: "bash 输出：第 1 轮。",
       },
@@ -199,7 +199,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-windbell-2",
         content: "bash 输出：第 2 轮。",
       },
@@ -235,7 +235,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-windbell-3",
         content: "bash 输出：第 3 轮。",
       },
@@ -271,7 +271,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-windbell-4",
         content: "bash 输出：第 4 轮。",
       },
@@ -307,7 +307,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-meta-lisp-1",
         content: "bash 输出：meta-lisp 第 1 轮。",
       },
@@ -337,7 +337,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-meta-lisp-2",
         content: "bash 输出：meta-lisp 第 2 轮。",
       },
@@ -367,7 +367,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-fs-api-1",
         content: "bash 输出：fs-api 第 1 轮。",
       },
@@ -397,7 +397,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-fs-api-2",
         content: "bash 输出：fs-api 第 2 轮。",
       },
@@ -427,7 +427,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-std-1",
         content: "bash 输出：std 第 1 轮。",
       },
@@ -457,7 +457,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-std-2",
         content: "bash 输出：std 第 2 轮。",
       },
@@ -487,7 +487,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-literate-1",
         content: "bash 输出：literate 第 1 轮。",
       },
@@ -517,7 +517,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-literate-2",
         content: "bash 输出：literate 第 2 轮。",
       },
@@ -547,7 +547,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-semiosis-1",
         content: "bash 输出：semiosis 第 1 轮。",
       },
@@ -577,7 +577,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-semiosis-2",
         content: "bash 输出：semiosis 第 2 轮。",
       },
@@ -647,7 +647,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-long-5",
         content: "bash 输出：第 5 轮。",
       },
@@ -708,7 +708,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-long-10",
         content: "bash 输出：第 10 轮。",
       },
@@ -769,7 +769,7 @@ export const mockSessions: Array<Session> = [
         ],
       },
       {
-        kind: "ToolSign",
+        kind: "ToolOutputSign",
         toolCallId: "call-long-15",
         content: "bash 输出：第 15 轮。",
       },
