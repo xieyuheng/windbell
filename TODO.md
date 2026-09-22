@@ -1,5 +1,16 @@
 # semiosis
 
+[semiosis.js] 设计 ToolRouter 与 ToolRoute
+
+并且用 router.defineTool(sign, handler) 的方式注册 tool。
+
+agent 带有 toolRouter 字段。
+
+我们可以设置 defaultToolRouter，
+在构造 agent 的时候传入。
+
+
+
 [semiosis.js] assistant sign 也许应该被分解为
 
 - inquiry sign -- 带有 tool call 的

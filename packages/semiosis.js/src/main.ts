@@ -81,6 +81,9 @@ router.defineHandlers({
       },
     )
 
+    for (const tool of tools) {
+      console.log(formatSign(tool.sign))
+    }
     console.log(formatSign(personaSign))
 
     for (const prompt of promptBatch.prompts) {
