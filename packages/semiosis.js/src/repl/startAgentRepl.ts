@@ -3,6 +3,7 @@ import process from "node:process"
 import { errorReport } from "@xieyuheng/std.js/error"
 import { agentRun, type Agent } from "../agent/index.ts"
 import { formatSign } from "../format/index.ts"
+import { UserSign } from "../sign/index.ts"
 
 export async function startAgentRepl(agent: Agent): Promise<void> {
   const readline = Readline.createInterface({
@@ -58,11 +59,8 @@ export async function startAgentRepl(agent: Agent): Promise<void> {
     }
 
     try {
-      for await (const sign of agentRun(agent, input)) {
-        const output = formatSign(sign)
-        if (output !== "") {
-          console.log(output)
-        }
+      for await (const sign of agentRun(agent, UserSign(input))) {
+        console.log(formatSign(sign))
       }
     } catch (error) {
       console.log(errorReport(error))

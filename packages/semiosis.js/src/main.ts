@@ -68,13 +68,11 @@ router.defineHandlers({
     console.log(formatSign(PersonaSign(promptBatch.system)))
 
     for (const prompt of promptBatch.prompts) {
-      console.log(formatSign(UserSign(prompt)))
+      const userSign = UserSign(prompt)
+      console.log(formatSign(userSign))
 
-      for await (const sign of agentRun(agent, prompt)) {
-        const output = formatSign(sign)
-        if (output !== "") {
-          console.log(output)
-        }
+      for await (const sign of agentRun(agent, userSign)) {
+        console.log(formatSign(sign))
       }
     }
   },

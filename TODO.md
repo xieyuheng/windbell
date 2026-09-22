@@ -1,6 +1,5 @@
 # semiosis
 
-[semiosis.js] agentRun 的输入从 string 改为任意的 Sign
 [semiosis.js] AgentConfig 不再有 system 字段，改为调用 agentRun 时传入 SystemSign
 
 目前 makeBashTool 这个函数的设计有问题，

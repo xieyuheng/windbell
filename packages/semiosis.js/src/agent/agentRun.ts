@@ -1,6 +1,5 @@
 import {
   ErrorSign,
-  UserSign,
   isAssistantSign,
   isErrorSign,
   type Sign,
@@ -10,10 +9,9 @@ import type { Agent } from "./Agent.ts"
 
 export async function* agentRun(
   agent: Agent,
-  input: string,
+  input: Sign,
 ): AsyncGenerator<Sign> {
-  const userSign = UserSign(input)
-  agent.context.signs.push(userSign)
+  agent.context.signs.push(input)
 
   let step = 0
   while (true) {
