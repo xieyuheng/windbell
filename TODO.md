@@ -1,10 +1,5 @@
 # semiosis
 
-[semiosis.js] 中 tool sign 的 parameters 描述使用了 json-schema，
-是否可以对 parameters 的 schema 定义本身进行检查？
-我们可否在 handler 里对这个 schema 进行检查？
-zod 可否做到这些功能？
-
 [semiosis.js] assistant sign 也许应该被分解为
 
 - inquiry sign -- 带有 tool call 的

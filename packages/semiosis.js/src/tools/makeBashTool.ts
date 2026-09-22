@@ -56,10 +56,7 @@ export function makeBashToolHandler(
   options: BashToolHandlerOptions,
 ): ToolHandler {
   return async (agent, args) => {
-    const command = args.command
-    if (typeof command !== "string") {
-      throw new Error("[makeBashToolHandler] command must be a string")
-    }
+    const command = args.command as string
 
     const result = await bashRun(command, {
       cwd: agent.config.cwd,

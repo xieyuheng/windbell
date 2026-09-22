@@ -4,7 +4,6 @@ import {
   isErrorSign,
   type Sign,
 } from "../sign/index.ts"
-import { toolCallRun } from "../tool/index.ts"
 import type { Agent } from "./Agent.ts"
 
 export async function* agentRun(
@@ -46,7 +45,7 @@ export async function* agentRun(
     }
 
     for (const toolCall of sign.toolCalls) {
-      const sign = await toolCallRun(toolCall, agent)
+      const sign = await agent.config.toolRouter.run(agent, toolCall)
 
       if (isErrorSign(sign)) {
         yield sign
