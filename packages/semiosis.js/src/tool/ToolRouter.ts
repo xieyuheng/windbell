@@ -30,7 +30,7 @@ export class ToolRouter {
     const route = this.routes[toolCall.name]
     if (route === undefined) {
       return ToolOutputSign(
-        toolCall.id,
+        toolCall.callId,
         `[ToolRouter] unknown tool: ${toolCall.name}`,
       )
     }
@@ -50,9 +50,9 @@ export class ToolRouter {
       }
 
       const content = await route.handler(agent, args)
-      return ToolOutputSign(toolCall.id, content)
+      return ToolOutputSign(toolCall.callId, content)
     } catch (error) {
-      return ToolOutputSign(toolCall.id, errorReport(error))
+      return ToolOutputSign(toolCall.callId, errorReport(error))
     }
   }
 

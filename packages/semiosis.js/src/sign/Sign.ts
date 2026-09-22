@@ -94,7 +94,7 @@ export function asAssistantSign(value: Sign): AssistantSign {
 
 export type ToolCallSign = {
   kind: "ToolCallSign"
-  id: string
+  callId: string
   name: string
   arguments: string
 }
@@ -146,17 +146,17 @@ export function asToolSign(value: Sign): ToolSign {
 
 export type ToolOutputSign = {
   kind: "ToolOutputSign"
-  toolCallId: string
+  callId: string
   content: string
 }
 
 export function ToolOutputSign(
-  toolCallId: string,
+  callId: string,
   content: string,
 ): ToolOutputSign {
   return {
     kind: "ToolOutputSign",
-    toolCallId,
+    callId,
     content,
   }
 }

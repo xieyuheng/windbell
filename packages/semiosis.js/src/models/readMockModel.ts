@@ -24,7 +24,7 @@ const signSchema = z.discriminatedUnion("kind", [
   }),
   z.object({
     kind: z.literal("ToolCallSign"),
-    id: z.string(),
+    callId: z.string(),
     name: z.string(),
     arguments: z.string(),
   }),
@@ -36,7 +36,7 @@ const signSchema = z.discriminatedUnion("kind", [
   }),
   z.object({
     kind: z.literal("ToolOutputSign"),
-    toolCallId: z.string(),
+    callId: z.string(),
     content: z.string(),
   }),
   z.object({

@@ -1,2 +1,2 @@
-[{"kind":"ReasoningSign","content":"继续调用 bash。"},{"kind":"AssistantSign","content":"我再执行一次。"},{"kind":"ToolCallSign","id":"call-loop-1","name":"bash","arguments":"{\"command\":\"printf loop\"}"}]
-[{"kind":"ReasoningSign","content":"继续调用 bash。"},{"kind":"AssistantSign","content":"我再执行一次。"},{"kind":"ToolCallSign","id":"call-loop-2","name":"bash","arguments":"{\"command\":\"printf loop\"}"}]
+[{"kind":"ReasoningSign","content":"继续调用 bash。"},{"kind":"AssistantSign","content":"我再执行一次。"},{"kind":"ToolCallSign","callId":"call-loop-1","name":"bash","arguments":"{\"command\":\"printf loop\"}"}]
+[{"kind":"ReasoningSign","content":"继续调用 bash。"},{"kind":"AssistantSign","content":"我再执行一次。"},{"kind":"ToolCallSign","callId":"call-loop-2","name":"bash","arguments":"{\"command\":\"printf loop\"}"}]

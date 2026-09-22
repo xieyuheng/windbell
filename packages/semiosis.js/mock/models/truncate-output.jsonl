@@ -1,2 +1,2 @@
-[{"kind":"ReasoningSign","content":"测试输出截断。"},{"kind":"AssistantSign","content":"先打印一长串数字。"},{"kind":"ToolCallSign","id":"call-truncate","name":"bash","arguments":"{\"command\":\"printf 1234567890\"}"}]
+[{"kind":"ReasoningSign","content":"测试输出截断。"},{"kind":"AssistantSign","content":"先打印一长串数字。"},{"kind":"ToolCallSign","callId":"call-truncate","name":"bash","arguments":"{\"command\":\"printf 1234567890\"}"}]
 [{"kind":"ReasoningSign","content":"输出已经被截断。"},{"kind":"AssistantSign","content":"已完成截断测试。"}]

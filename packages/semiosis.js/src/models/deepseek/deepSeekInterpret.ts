@@ -125,7 +125,7 @@ function makeDeepSeekMessage(sign: Sign): DeepSeekMessage {
   if (isToolOutputSign(sign)) {
     return {
       role: "tool",
-      tool_call_id: sign.toolCallId,
+      tool_call_id: sign.callId,
       content: sign.content,
     }
   }
@@ -164,7 +164,7 @@ function makeOutputSigns(message: DeepSeekMessage): Array<Sign> {
   for (const toolCall of message.tool_calls ?? []) {
     signs.push(
       ToolCallSign({
-        id: toolCall.id,
+        callId: toolCall.id,
         name: toolCall.function.name,
         arguments: toolCall.function.arguments,
       }),
@@ -187,7 +187,7 @@ function makeDeepSeekTool(sign: ToolSign): DeepSeekTool {
 
 function makeDeepSeekToolCall(toolCall: ToolCallSign) {
   return {
-    id: toolCall.id,
+    id: toolCall.callId,
     type: "function" as const,
     function: {
       name: toolCall.name,

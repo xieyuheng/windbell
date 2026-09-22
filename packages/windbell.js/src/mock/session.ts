@@ -61,13 +61,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先读取 src/eval.ts。" },
       {
         kind: "ToolCallSign",
-        id: "call-read-eval",
+        callId: "call-read-eval",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-read-eval",
+        callId: "call-read-eval",
         content:
           'export function evaluate(input: string): unknown {\n  throw new Error("not implemented")\n}',
       },
@@ -102,13 +102,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我列出 src 下的目录结构。" },
       {
         kind: "ToolCallSign",
-        id: "call-list",
+        callId: "call-list",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-list",
+        callId: "call-list",
         content:
           "src/client/FileSystemClient.ts\nsrc/index.ts\nsrc/server/handleFileSystemRequest.ts",
       },
@@ -147,13 +147,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
         kind: "ToolCallSign",
-        id: "call-windbell-1",
+        callId: "call-windbell-1",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-windbell-1",
+        callId: "call-windbell-1",
         content: "bash 输出：第 1 轮。",
       },
       {
@@ -178,13 +178,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
         kind: "ToolCallSign",
-        id: "call-windbell-2",
+        callId: "call-windbell-2",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-windbell-2",
+        callId: "call-windbell-2",
         content: "bash 输出：第 2 轮。",
       },
       {
@@ -209,13 +209,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
         kind: "ToolCallSign",
-        id: "call-windbell-3",
+        callId: "call-windbell-3",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-windbell-3",
+        callId: "call-windbell-3",
         content: "bash 输出：第 3 轮。",
       },
       {
@@ -240,13 +240,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
         kind: "ToolCallSign",
-        id: "call-windbell-4",
+        callId: "call-windbell-4",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-windbell-4",
+        callId: "call-windbell-4",
         content: "bash 输出：第 4 轮。",
       },
       {
@@ -274,13 +274,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
         kind: "ToolCallSign",
-        id: "call-meta-lisp-1",
+        callId: "call-meta-lisp-1",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-meta-lisp-1",
+        callId: "call-meta-lisp-1",
         content: "bash 输出：meta-lisp 第 1 轮。",
       },
     ],
@@ -303,13 +303,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
         kind: "ToolCallSign",
-        id: "call-meta-lisp-2",
+        callId: "call-meta-lisp-2",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-meta-lisp-2",
+        callId: "call-meta-lisp-2",
         content: "bash 输出：meta-lisp 第 2 轮。",
       },
     ],
@@ -332,13 +332,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
         kind: "ToolCallSign",
-        id: "call-fs-api-1",
+        callId: "call-fs-api-1",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-fs-api-1",
+        callId: "call-fs-api-1",
         content: "bash 输出：fs-api 第 1 轮。",
       },
     ],
@@ -361,13 +361,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
         kind: "ToolCallSign",
-        id: "call-fs-api-2",
+        callId: "call-fs-api-2",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-fs-api-2",
+        callId: "call-fs-api-2",
         content: "bash 输出：fs-api 第 2 轮。",
       },
     ],
@@ -390,13 +390,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
         kind: "ToolCallSign",
-        id: "call-std-1",
+        callId: "call-std-1",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-std-1",
+        callId: "call-std-1",
         content: "bash 输出：std 第 1 轮。",
       },
     ],
@@ -419,13 +419,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
         kind: "ToolCallSign",
-        id: "call-std-2",
+        callId: "call-std-2",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-std-2",
+        callId: "call-std-2",
         content: "bash 输出：std 第 2 轮。",
       },
     ],
@@ -448,13 +448,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
         kind: "ToolCallSign",
-        id: "call-literate-1",
+        callId: "call-literate-1",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-literate-1",
+        callId: "call-literate-1",
         content: "bash 输出：literate 第 1 轮。",
       },
     ],
@@ -477,13 +477,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
         kind: "ToolCallSign",
-        id: "call-literate-2",
+        callId: "call-literate-2",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-literate-2",
+        callId: "call-literate-2",
         content: "bash 输出：literate 第 2 轮。",
       },
     ],
@@ -506,13 +506,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
         kind: "ToolCallSign",
-        id: "call-semiosis-1",
+        callId: "call-semiosis-1",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-semiosis-1",
+        callId: "call-semiosis-1",
         content: "bash 输出：semiosis 第 1 轮。",
       },
     ],
@@ -535,13 +535,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
         kind: "ToolCallSign",
-        id: "call-semiosis-2",
+        callId: "call-semiosis-2",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-semiosis-2",
+        callId: "call-semiosis-2",
         content: "bash 输出：semiosis 第 2 轮。",
       },
     ],
@@ -609,13 +609,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看相关文件。" },
       {
         kind: "ToolCallSign",
-        id: "call-long-5",
+        callId: "call-long-5",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-long-5",
+        callId: "call-long-5",
         content: "bash 输出：第 5 轮。",
       },
       {
@@ -674,13 +674,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看相关文件。" },
       {
         kind: "ToolCallSign",
-        id: "call-long-10",
+        callId: "call-long-10",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-long-10",
+        callId: "call-long-10",
         content: "bash 输出：第 10 轮。",
       },
       {
@@ -739,13 +739,13 @@ export const mockSessions: Array<Session> = [
       { kind: "AssistantSign", content: "我先用 bash 查看相关文件。" },
       {
         kind: "ToolCallSign",
-        id: "call-long-15",
+        callId: "call-long-15",
         name: "bash",
         arguments: '{"command":"ls -la"}',
       },
       {
         kind: "ToolOutputSign",
-        toolCallId: "call-long-15",
+        callId: "call-long-15",
         content: "bash 输出：第 15 轮。",
       },
       {

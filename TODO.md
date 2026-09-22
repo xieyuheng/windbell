@@ -1,6 +1,15 @@
 # semiosis
 
-[semiosis.js] Model 增加 qualifiedName 字段
+[semiosis.js] 下面我要设计 Session 类型
+
+- ~/.windbell/database/sessions/<session-id>/
+
+  - index.json -- 保存 Session 类型相关的数据
+
+  - context/ -- 一个 .md 或 .json 文件，一个 sign。
+    文件名前缀为长度为 4 的序号，从 0000 开始，
+    0000-<sign-type-name>.md 或 .json -- 比如 PersonaSign 就是 persona，
+    ToolCallSign 就是 tool-call。
 
 # windbell
 
