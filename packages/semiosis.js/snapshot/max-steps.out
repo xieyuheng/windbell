@@ -1,7 +1,5 @@
 [tool] bash
-
 Run commands in a bash shell.
-
 {
   "type": "object",
   "properties": {
@@ -21,20 +19,23 @@ You are a helpful software engineer assistant.
 进入工具循环。
 [reasoning]
 继续调用 bash。
-
 [assistant]
 我再执行一次。
-[tool call] bash {"command":"printf loop"}
-[tool output] exit_code: 0
+[tool-call] bash
+{"command":"printf loop"}
+[tool-output]
+exit_code: 0
 stdout:
 loop
 [reasoning]
 继续调用 bash。
-
 [assistant]
 我再执行一次。
-[tool call] bash {"command":"printf loop"}
-[tool output] exit_code: 0
+[tool-call] bash
+{"command":"printf loop"}
+[tool-output]
+exit_code: 0
 stdout:
 loop
+[error]
 [agentRun] max steps reached: 2
