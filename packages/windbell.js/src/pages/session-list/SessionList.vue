@@ -30,10 +30,13 @@ function preview(session: Session): string {
 
   switch (sign.kind) {
     case "UserSign":
+    case "ReasoningSign":
     case "AssistantSign":
     case "ToolOutputSign":
     case "PersonaSign":
       return sign.content
+    case "ToolCallSign":
+      return `${sign.toolCall.name} ${sign.toolCall.arguments}`
     case "ToolSign":
       return sign.name
     case "ErrorSign":

@@ -22,10 +22,16 @@ const signSchema = z.discriminatedUnion("kind", [
     content: z.string(),
   }),
   z.object({
-    kind: z.literal("AssistantSign"),
-    reasoning: z.string(),
+    kind: z.literal("ReasoningSign"),
     content: z.string(),
-    toolCalls: z.array(toolCallSchema),
+  }),
+  z.object({
+    kind: z.literal("AssistantSign"),
+    content: z.string(),
+  }),
+  z.object({
+    kind: z.literal("ToolCallSign"),
+    toolCall: toolCallSchema,
   }),
   z.object({
     kind: z.literal("ToolSign"),
@@ -44,6 +50,8 @@ const signSchema = z.discriminatedUnion("kind", [
   }),
 ])
 
+const modelOutputSchema = z.array(signSchema)
+
 export function readMockModel(name: string): MockModel {
   if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
     throw new Error(`[readMockModel] invalid model name: ${name}`)
@@ -56,7 +64,7 @@ export function readMockModel(name: string): MockModel {
     .map((line) => line.trim())
     .filter((line) => line !== "")
     .map((line, index) => ({
-      sign: parseMockSign(path, line, index + 1),
+      signs: parseMockSigns(path, line, index + 1),
     }))
 
   return makeMockModel(outputs)
@@ -78,20 +86,24 @@ function readMockModelFile(path: string): string {
   }
 }
 
-function parseMockSign(path: string, text: string, lineNumber: number): Sign {
-  const value = parseMockSignJson(path, text, lineNumber)
-  const result = signSchema.safeParse(value)
+function parseMockSigns(
+  path: string,
+  text: string,
+  lineNumber: number,
+): Array<Sign> {
+  const value = parseMockSignsJson(path, text, lineNumber)
+  const result = modelOutputSchema.safeParse(value)
 
   if (!result.success) {
     throw new Error(
-      `[readMockModel] invalid sign: ${path}:${lineNumber}\n  ${result.error.message}`,
+      `[readMockModel] invalid model output: ${path}:${lineNumber}\n  ${result.error.message}`,
     )
   }
 
   return result.data
 }
 
-function parseMockSignJson(
+function parseMockSignsJson(
   path: string,
   text: string,
   lineNumber: number,

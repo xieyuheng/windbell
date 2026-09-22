@@ -6,27 +6,19 @@ export function formatSign(sign: Sign): string {
       return `[persona]\n${sign.content}`
     case "UserSign":
       return `[user]\n${sign.content}`
+    case "ReasoningSign":
+      return `[reasoning]\n${sign.content}\n`
     case "AssistantSign": {
-      const lines: Array<string> = []
-
-      if (sign.reasoning !== "") {
-        lines.push("[reasoning]")
-        lines.push(sign.reasoning)
-        lines.push("")
-      }
-
-      lines.push("[assistant]")
+      const lines = ["[assistant]"]
 
       if (sign.content !== "") {
         lines.push(sign.content)
       }
 
-      for (const toolCall of sign.toolCalls) {
-        lines.push(`[tool call] ${toolCall.name} ${toolCall.arguments}`)
-      }
-
       return lines.join("\n")
     }
+    case "ToolCallSign":
+      return `[tool call] ${sign.toolCall.name} ${sign.toolCall.arguments}`
     case "ToolSign":
       return [
         `[tool] ${sign.name}`,

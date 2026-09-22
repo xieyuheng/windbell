@@ -16,10 +16,12 @@ export const mockSessions: Array<Session> = [
         content: "请解释风铃和符号过程的关系。",
       },
       {
+        kind: "ReasoningSign",
+        content: "风铃不是一个对象，而是一个把风转译为声音的符号过程。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "风铃不是一个对象，而是一个把风转译为声音的符号过程。",
         content: "风本身不可见，它必须经过风铃才能被听见。",
-        toolCalls: [],
       },
     ],
     createdAt: 1710000000000,
@@ -35,10 +37,12 @@ export const mockSessions: Array<Session> = [
         content: "移动端选择工作区和对话的界面，应该用卡片还是列表？",
       },
       {
+        kind: "ReasoningSign",
+        content: "工作区数量少，适合卡片；对话数量会增长，适合列表行。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "工作区数量少，适合卡片；对话数量会增长，适合列表行。",
         content: "建议移动端用堆栈导航：工作区 -> 对话列表 -> 对话页面。",
-        toolCalls: [],
       },
     ],
     createdAt: 1710000000000,
@@ -53,17 +57,15 @@ export const mockSessions: Array<Session> = [
         kind: "UserSign",
         content: "帮我设计一个最小的表达式求值器。",
       },
+      { kind: "ReasoningSign", content: "先看当前实现。" },
+      { kind: "AssistantSign", content: "我先读取 src/eval.ts。" },
       {
-        kind: "AssistantSign",
-        reasoning: "先看当前实现。",
-        content: "我先读取 src/eval.ts。",
-        toolCalls: [
-          {
-            id: "call-read-eval",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-read-eval",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -71,11 +73,10 @@ export const mockSessions: Array<Session> = [
         content:
           'export function evaluate(input: string): unknown {\n  throw new Error("not implemented")\n}',
       },
+      { kind: "ReasoningSign", content: "当前实现只有入口函数。" },
       {
         kind: "AssistantSign",
-        reasoning: "当前实现只有入口函数。",
         content: "可以先做字面量、变量和函数调用三种节点。",
-        toolCalls: [],
       },
     ],
     createdAt: 1710000000000,
@@ -90,27 +91,24 @@ export const mockSessions: Array<Session> = [
         kind: "UserSign",
         content: "fs-api 应该用 REST 还是 RPC？",
       },
+      { kind: "ReasoningSign", content: "文件系统操作更像 RPC。" },
       {
         kind: "AssistantSign",
-        reasoning: "文件系统操作更像 RPC。",
         content: "建议每个方法一个 POST endpoint，参数放 JSON body。",
-        toolCalls: [],
       },
       {
         kind: "UserSign",
         content: "先看一下当前的文件结构。",
       },
+      { kind: "ReasoningSign", content: "用 bash 快速查看目录。" },
+      { kind: "AssistantSign", content: "我列出 src 下的目录结构。" },
       {
-        kind: "AssistantSign",
-        reasoning: "用 bash 快速查看目录。",
-        content: "我列出 src 下的目录结构。",
-        toolCalls: [
-          {
-            id: "call-list",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-list",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -131,11 +129,10 @@ export const mockSessions: Array<Session> = [
         kind: "UserSign",
         content: "std 里的测试应该如何组织？",
       },
+      { kind: "ReasoningSign", content: "测试应该跟实现放在同一个目录。" },
       {
         kind: "AssistantSign",
-        reasoning: "测试应该跟实现放在同一个目录。",
         content: "建议每个模块一个 .test.ts，使用 node --test 运行。",
-        toolCalls: [],
       },
     ],
     createdAt: 1710000000000,
@@ -150,17 +147,15 @@ export const mockSessions: Array<Session> = [
         kind: "UserSign",
         content: "第 1 轮：windbell 的界面应该如何继续迭代？",
       },
+      { kind: "ReasoningSign", content: "第 1 轮思考：先查看当前文件结构。" },
+      { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
-        kind: "AssistantSign",
-        reasoning: "第 1 轮思考：先查看当前文件结构。",
-        content: "我先用 bash 查看当前目录。",
-        toolCalls: [
-          {
-            id: "call-windbell-1",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-windbell-1",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -168,11 +163,10 @@ export const mockSessions: Array<Session> = [
         content: "bash 输出：第 1 轮。",
       },
       {
-        kind: "AssistantSign",
-        reasoning: "第 1 轮总结：界面应该保持轻、静、透。",
-        content: "第 1 轮结论：先减少固定结构。",
-        toolCalls: [],
+        kind: "ReasoningSign",
+        content: "第 1 轮总结：界面应该保持轻、静、透。",
       },
+      { kind: "AssistantSign", content: "第 1 轮结论：先减少固定结构。" },
     ],
     createdAt: 1710000100000,
     updatedAt: 1710000100000,
@@ -186,17 +180,15 @@ export const mockSessions: Array<Session> = [
         kind: "UserSign",
         content: "第 2 轮：windbell 的界面应该如何继续迭代？",
       },
+      { kind: "ReasoningSign", content: "第 2 轮思考：先查看当前文件结构。" },
+      { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
-        kind: "AssistantSign",
-        reasoning: "第 2 轮思考：先查看当前文件结构。",
-        content: "我先用 bash 查看当前目录。",
-        toolCalls: [
-          {
-            id: "call-windbell-2",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-windbell-2",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -204,11 +196,10 @@ export const mockSessions: Array<Session> = [
         content: "bash 输出：第 2 轮。",
       },
       {
-        kind: "AssistantSign",
-        reasoning: "第 2 轮总结：界面应该保持轻、静、透。",
-        content: "第 2 轮结论：先减少固定结构。",
-        toolCalls: [],
+        kind: "ReasoningSign",
+        content: "第 2 轮总结：界面应该保持轻、静、透。",
       },
+      { kind: "AssistantSign", content: "第 2 轮结论：先减少固定结构。" },
     ],
     createdAt: 1710000200000,
     updatedAt: 1710000200000,
@@ -222,17 +213,15 @@ export const mockSessions: Array<Session> = [
         kind: "UserSign",
         content: "第 3 轮：windbell 的界面应该如何继续迭代？",
       },
+      { kind: "ReasoningSign", content: "第 3 轮思考：先查看当前文件结构。" },
+      { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
-        kind: "AssistantSign",
-        reasoning: "第 3 轮思考：先查看当前文件结构。",
-        content: "我先用 bash 查看当前目录。",
-        toolCalls: [
-          {
-            id: "call-windbell-3",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-windbell-3",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -240,11 +229,10 @@ export const mockSessions: Array<Session> = [
         content: "bash 输出：第 3 轮。",
       },
       {
-        kind: "AssistantSign",
-        reasoning: "第 3 轮总结：界面应该保持轻、静、透。",
-        content: "第 3 轮结论：先减少固定结构。",
-        toolCalls: [],
+        kind: "ReasoningSign",
+        content: "第 3 轮总结：界面应该保持轻、静、透。",
       },
+      { kind: "AssistantSign", content: "第 3 轮结论：先减少固定结构。" },
     ],
     createdAt: 1710000300000,
     updatedAt: 1710000300000,
@@ -258,17 +246,15 @@ export const mockSessions: Array<Session> = [
         kind: "UserSign",
         content: "第 4 轮：windbell 的界面应该如何继续迭代？",
       },
+      { kind: "ReasoningSign", content: "第 4 轮思考：先查看当前文件结构。" },
+      { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
       {
-        kind: "AssistantSign",
-        reasoning: "第 4 轮思考：先查看当前文件结构。",
-        content: "我先用 bash 查看当前目录。",
-        toolCalls: [
-          {
-            id: "call-windbell-4",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-windbell-4",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -276,11 +262,10 @@ export const mockSessions: Array<Session> = [
         content: "bash 输出：第 4 轮。",
       },
       {
-        kind: "AssistantSign",
-        reasoning: "第 4 轮总结：界面应该保持轻、静、透。",
-        content: "第 4 轮结论：先减少固定结构。",
-        toolCalls: [],
+        kind: "ReasoningSign",
+        content: "第 4 轮总结：界面应该保持轻、静、透。",
       },
+      { kind: "AssistantSign", content: "第 4 轮结论：先减少固定结构。" },
     ],
     createdAt: 1710000400000,
     updatedAt: 1710000400000,
@@ -295,16 +280,17 @@ export const mockSessions: Array<Session> = [
         content: "第 1 轮：meta-lisp 当前最重要的问题是什么？",
       },
       {
-        kind: "AssistantSign",
-        reasoning: "第 1 轮思考：先查看 meta-lisp 的目录结构。",
-        content: "我先用 bash 查看当前目录。",
-        toolCalls: [
-          {
-            id: "call-meta-lisp-1",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ReasoningSign",
+        content: "第 1 轮思考：先查看 meta-lisp 的目录结构。",
+      },
+      { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
+      {
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-meta-lisp-1",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -325,16 +311,17 @@ export const mockSessions: Array<Session> = [
         content: "第 2 轮：meta-lisp 当前最重要的问题是什么？",
       },
       {
-        kind: "AssistantSign",
-        reasoning: "第 2 轮思考：先查看 meta-lisp 的目录结构。",
-        content: "我先用 bash 查看当前目录。",
-        toolCalls: [
-          {
-            id: "call-meta-lisp-2",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ReasoningSign",
+        content: "第 2 轮思考：先查看 meta-lisp 的目录结构。",
+      },
+      { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
+      {
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-meta-lisp-2",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -355,16 +342,17 @@ export const mockSessions: Array<Session> = [
         content: "第 1 轮：fs-api 当前最重要的问题是什么？",
       },
       {
-        kind: "AssistantSign",
-        reasoning: "第 1 轮思考：先查看 fs-api 的目录结构。",
-        content: "我先用 bash 查看当前目录。",
-        toolCalls: [
-          {
-            id: "call-fs-api-1",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ReasoningSign",
+        content: "第 1 轮思考：先查看 fs-api 的目录结构。",
+      },
+      { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
+      {
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-fs-api-1",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -385,16 +373,17 @@ export const mockSessions: Array<Session> = [
         content: "第 2 轮：fs-api 当前最重要的问题是什么？",
       },
       {
-        kind: "AssistantSign",
-        reasoning: "第 2 轮思考：先查看 fs-api 的目录结构。",
-        content: "我先用 bash 查看当前目录。",
-        toolCalls: [
-          {
-            id: "call-fs-api-2",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ReasoningSign",
+        content: "第 2 轮思考：先查看 fs-api 的目录结构。",
+      },
+      { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
+      {
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-fs-api-2",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -415,16 +404,17 @@ export const mockSessions: Array<Session> = [
         content: "第 1 轮：std 当前最重要的问题是什么？",
       },
       {
-        kind: "AssistantSign",
-        reasoning: "第 1 轮思考：先查看 std 的目录结构。",
-        content: "我先用 bash 查看当前目录。",
-        toolCalls: [
-          {
-            id: "call-std-1",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ReasoningSign",
+        content: "第 1 轮思考：先查看 std 的目录结构。",
+      },
+      { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
+      {
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-std-1",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -445,16 +435,17 @@ export const mockSessions: Array<Session> = [
         content: "第 2 轮：std 当前最重要的问题是什么？",
       },
       {
-        kind: "AssistantSign",
-        reasoning: "第 2 轮思考：先查看 std 的目录结构。",
-        content: "我先用 bash 查看当前目录。",
-        toolCalls: [
-          {
-            id: "call-std-2",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ReasoningSign",
+        content: "第 2 轮思考：先查看 std 的目录结构。",
+      },
+      { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
+      {
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-std-2",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -475,16 +466,17 @@ export const mockSessions: Array<Session> = [
         content: "第 1 轮：literate 当前最重要的问题是什么？",
       },
       {
-        kind: "AssistantSign",
-        reasoning: "第 1 轮思考：先查看 literate 的目录结构。",
-        content: "我先用 bash 查看当前目录。",
-        toolCalls: [
-          {
-            id: "call-literate-1",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ReasoningSign",
+        content: "第 1 轮思考：先查看 literate 的目录结构。",
+      },
+      { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
+      {
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-literate-1",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -505,16 +497,17 @@ export const mockSessions: Array<Session> = [
         content: "第 2 轮：literate 当前最重要的问题是什么？",
       },
       {
-        kind: "AssistantSign",
-        reasoning: "第 2 轮思考：先查看 literate 的目录结构。",
-        content: "我先用 bash 查看当前目录。",
-        toolCalls: [
-          {
-            id: "call-literate-2",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ReasoningSign",
+        content: "第 2 轮思考：先查看 literate 的目录结构。",
+      },
+      { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
+      {
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-literate-2",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -535,16 +528,17 @@ export const mockSessions: Array<Session> = [
         content: "第 1 轮：semiosis 当前最重要的问题是什么？",
       },
       {
-        kind: "AssistantSign",
-        reasoning: "第 1 轮思考：先查看 semiosis 的目录结构。",
-        content: "我先用 bash 查看当前目录。",
-        toolCalls: [
-          {
-            id: "call-semiosis-1",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ReasoningSign",
+        content: "第 1 轮思考：先查看 semiosis 的目录结构。",
+      },
+      { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
+      {
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-semiosis-1",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -565,16 +559,17 @@ export const mockSessions: Array<Session> = [
         content: "第 2 轮：semiosis 当前最重要的问题是什么？",
       },
       {
-        kind: "AssistantSign",
-        reasoning: "第 2 轮思考：先查看 semiosis 的目录结构。",
-        content: "我先用 bash 查看当前目录。",
-        toolCalls: [
-          {
-            id: "call-semiosis-2",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ReasoningSign",
+        content: "第 2 轮思考：先查看 semiosis 的目录结构。",
+      },
+      { kind: "AssistantSign", content: "我先用 bash 查看当前目录。" },
+      {
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-semiosis-2",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -595,56 +590,62 @@ export const mockSessions: Array<Session> = [
         content: "第 1 轮：继续展开这个符号过程。",
       },
       {
+        kind: "ReasoningSign",
+        content: "第 1 轮思考：符号不是终点，而是下一个解释的起点。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "第 1 轮思考：符号不是终点，而是下一个解释的起点。",
         content: "第 1 轮回答：风经过风铃时，声音是新的符号。",
-        toolCalls: [],
       },
       {
         kind: "UserSign",
         content: "第 2 轮：继续展开这个符号过程。",
       },
       {
+        kind: "ReasoningSign",
+        content: "第 2 轮思考：符号不是终点，而是下一个解释的起点。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "第 2 轮思考：符号不是终点，而是下一个解释的起点。",
         content: "第 2 轮回答：风经过风铃时，声音是新的符号。",
-        toolCalls: [],
       },
       {
         kind: "UserSign",
         content: "第 3 轮：继续展开这个符号过程。",
       },
       {
+        kind: "ReasoningSign",
+        content: "第 3 轮思考：符号不是终点，而是下一个解释的起点。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "第 3 轮思考：符号不是终点，而是下一个解释的起点。",
         content: "第 3 轮回答：风经过风铃时，声音是新的符号。",
-        toolCalls: [],
       },
       {
         kind: "UserSign",
         content: "第 4 轮：继续展开这个符号过程。",
       },
       {
+        kind: "ReasoningSign",
+        content: "第 4 轮思考：符号不是终点，而是下一个解释的起点。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "第 4 轮思考：符号不是终点，而是下一个解释的起点。",
         content: "第 4 轮回答：风经过风铃时，声音是新的符号。",
-        toolCalls: [],
       },
       {
         kind: "UserSign",
         content: "第 5 轮：继续展开这个符号过程。",
       },
+      { kind: "ReasoningSign", content: "第 5 轮思考：先查看当前上下文。" },
+      { kind: "AssistantSign", content: "我先用 bash 查看相关文件。" },
       {
-        kind: "AssistantSign",
-        reasoning: "第 5 轮思考：先查看当前上下文。",
-        content: "我先用 bash 查看相关文件。",
-        toolCalls: [
-          {
-            id: "call-long-5",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-long-5",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -656,56 +657,62 @@ export const mockSessions: Array<Session> = [
         content: "第 6 轮：继续展开这个符号过程。",
       },
       {
+        kind: "ReasoningSign",
+        content: "第 6 轮思考：符号不是终点，而是下一个解释的起点。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "第 6 轮思考：符号不是终点，而是下一个解释的起点。",
         content: "第 6 轮回答：风经过风铃时，声音是新的符号。",
-        toolCalls: [],
       },
       {
         kind: "UserSign",
         content: "第 7 轮：继续展开这个符号过程。",
       },
       {
+        kind: "ReasoningSign",
+        content: "第 7 轮思考：符号不是终点，而是下一个解释的起点。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "第 7 轮思考：符号不是终点，而是下一个解释的起点。",
         content: "第 7 轮回答：风经过风铃时，声音是新的符号。",
-        toolCalls: [],
       },
       {
         kind: "UserSign",
         content: "第 8 轮：继续展开这个符号过程。",
       },
       {
+        kind: "ReasoningSign",
+        content: "第 8 轮思考：符号不是终点，而是下一个解释的起点。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "第 8 轮思考：符号不是终点，而是下一个解释的起点。",
         content: "第 8 轮回答：风经过风铃时，声音是新的符号。",
-        toolCalls: [],
       },
       {
         kind: "UserSign",
         content: "第 9 轮：继续展开这个符号过程。",
       },
       {
+        kind: "ReasoningSign",
+        content: "第 9 轮思考：符号不是终点，而是下一个解释的起点。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "第 9 轮思考：符号不是终点，而是下一个解释的起点。",
         content: "第 9 轮回答：风经过风铃时，声音是新的符号。",
-        toolCalls: [],
       },
       {
         kind: "UserSign",
         content: "第 10 轮：继续展开这个符号过程。",
       },
+      { kind: "ReasoningSign", content: "第 10 轮思考：先查看当前上下文。" },
+      { kind: "AssistantSign", content: "我先用 bash 查看相关文件。" },
       {
-        kind: "AssistantSign",
-        reasoning: "第 10 轮思考：先查看当前上下文。",
-        content: "我先用 bash 查看相关文件。",
-        toolCalls: [
-          {
-            id: "call-long-10",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-long-10",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -717,56 +724,62 @@ export const mockSessions: Array<Session> = [
         content: "第 11 轮：继续展开这个符号过程。",
       },
       {
+        kind: "ReasoningSign",
+        content: "第 11 轮思考：符号不是终点，而是下一个解释的起点。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "第 11 轮思考：符号不是终点，而是下一个解释的起点。",
         content: "第 11 轮回答：风经过风铃时，声音是新的符号。",
-        toolCalls: [],
       },
       {
         kind: "UserSign",
         content: "第 12 轮：继续展开这个符号过程。",
       },
       {
+        kind: "ReasoningSign",
+        content: "第 12 轮思考：符号不是终点，而是下一个解释的起点。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "第 12 轮思考：符号不是终点，而是下一个解释的起点。",
         content: "第 12 轮回答：风经过风铃时，声音是新的符号。",
-        toolCalls: [],
       },
       {
         kind: "UserSign",
         content: "第 13 轮：继续展开这个符号过程。",
       },
       {
+        kind: "ReasoningSign",
+        content: "第 13 轮思考：符号不是终点，而是下一个解释的起点。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "第 13 轮思考：符号不是终点，而是下一个解释的起点。",
         content: "第 13 轮回答：风经过风铃时，声音是新的符号。",
-        toolCalls: [],
       },
       {
         kind: "UserSign",
         content: "第 14 轮：继续展开这个符号过程。",
       },
       {
+        kind: "ReasoningSign",
+        content: "第 14 轮思考：符号不是终点，而是下一个解释的起点。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "第 14 轮思考：符号不是终点，而是下一个解释的起点。",
         content: "第 14 轮回答：风经过风铃时，声音是新的符号。",
-        toolCalls: [],
       },
       {
         kind: "UserSign",
         content: "第 15 轮：继续展开这个符号过程。",
       },
+      { kind: "ReasoningSign", content: "第 15 轮思考：先查看当前上下文。" },
+      { kind: "AssistantSign", content: "我先用 bash 查看相关文件。" },
       {
-        kind: "AssistantSign",
-        reasoning: "第 15 轮思考：先查看当前上下文。",
-        content: "我先用 bash 查看相关文件。",
-        toolCalls: [
-          {
-            id: "call-long-15",
-            name: "bash",
-            arguments: '{"command":"ls -la"}',
-          },
-        ],
+        kind: "ToolCallSign",
+        toolCall: {
+          id: "call-long-15",
+          name: "bash",
+          arguments: '{"command":"ls -la"}',
+        },
       },
       {
         kind: "ToolOutputSign",
@@ -778,10 +791,12 @@ export const mockSessions: Array<Session> = [
         content: "第 16 轮：继续展开这个符号过程。",
       },
       {
+        kind: "ReasoningSign",
+        content: "第 16 轮思考：符号不是终点，而是下一个解释的起点。",
+      },
+      {
         kind: "AssistantSign",
-        reasoning: "第 16 轮思考：符号不是终点，而是下一个解释的起点。",
         content: "第 16 轮回答：风经过风铃时，声音是新的符号。",
-        toolCalls: [],
       },
     ],
     createdAt: 1710300000000,

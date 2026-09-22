@@ -2,7 +2,10 @@ import {
   ErrorSign,
   isAssistantSign,
   isErrorSign,
+  isReasoningSign,
+  isToolCallSign,
   type Sign,
+  type ToolCallSign,
 } from "../sign/index.ts"
 import type { Agent } from "./Agent.ts"
 
@@ -25,27 +28,40 @@ export async function* agentRun(
       context: agent.context,
     })
 
-    const sign = output.sign
+    const toolCallSigns: Array<ToolCallSign> = []
 
-    if (isErrorSign(sign)) {
+    for (const sign of output.signs) {
+      if (isErrorSign(sign)) {
+        yield sign
+        return
+      }
+
+      if (
+        !isReasoningSign(sign) &&
+        !isAssistantSign(sign) &&
+        !isToolCallSign(sign)
+      ) {
+        yield ErrorSign(`[agentRun] unexpected model output sign: ${sign.kind}`)
+        return
+      }
+
+      agent.context.signs.push(sign)
       yield sign
+
+      if (isToolCallSign(sign)) {
+        toolCallSigns.push(sign)
+      }
+    }
+
+    if (toolCallSigns.length === 0) {
       return
     }
 
-    if (!isAssistantSign(sign)) {
-      yield ErrorSign(`[agentRun] unexpected model output sign: ${sign.kind}`)
-      return
-    }
-
-    agent.context.signs.push(sign)
-    yield sign
-
-    if (sign.toolCalls.length === 0) {
-      return
-    }
-
-    for (const toolCall of sign.toolCalls) {
-      const sign = await agent.config.toolRouter.run(agent, toolCall)
+    for (const toolCallSign of toolCallSigns) {
+      const sign = await agent.config.toolRouter.run(
+        agent,
+        toolCallSign.toolCall,
+      )
 
       if (isErrorSign(sign)) {
         yield sign

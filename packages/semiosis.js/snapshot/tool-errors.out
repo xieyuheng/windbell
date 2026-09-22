@@ -22,7 +22,6 @@ You are a helpful software engineer assistant.
 [reasoning]
 先故意制造两个工具错误。
 
-[assistant]
 [tool call] missing {}
 [tool call] bash {"command":"printf out; printf err >&2; exit 3"}
 [tool output] [ToolRouter] unknown tool: missing

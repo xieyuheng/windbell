@@ -7,7 +7,15 @@ import type {
 import type { ModelInput, ModelOutput } from "../../model/index.ts"
 import {
   AssistantSign,
+  ReasoningSign,
+  ToolCallSign,
+  isAssistantSign,
+  isPersonaSign,
+  isReasoningSign,
+  isToolCallSign,
+  isToolOutputSign,
   isToolSign,
+  isUserSign,
   type Sign,
   type ToolSign,
 } from "../../sign/index.ts"
@@ -19,13 +27,10 @@ export async function deepSeekInterpret(
   config: DeepSeekModelConfig,
   input: ModelInput,
 ): Promise<ModelOutput> {
-  const messageSigns = input.context.signs.filter((sign) => !isToolSign(sign))
-  const toolSigns = input.context.signs.filter(isToolSign)
-
   const request: DeepSeekChatCompletionInput = {
     model: config.name,
-    messages: messageSigns.map(makeDeepSeekMessage),
-    tools: toolSigns.map(makeDeepSeekTool),
+    messages: Array.from(parseDeepSeekMessage(input.context.signs)),
+    tools: input.context.signs.filter(isToolSign).map(makeDeepSeekTool),
     thinking: {
       type: config.thinking,
     },
@@ -41,43 +46,136 @@ export async function deepSeekInterpret(
   }
 
   return {
-    sign: makeAssistantSign(message),
+    signs: makeOutputSigns(message),
   }
 }
 
-function makeDeepSeekMessage(sign: Sign): DeepSeekMessage {
-  switch (sign.kind) {
-    case "PersonaSign":
-      return { role: "system", content: sign.content }
-    case "UserSign":
-      return { role: "user", content: sign.content }
-    case "AssistantSign": {
+function* parseDeepSeekMessage(signs: Array<Sign>): Generator<DeepSeekMessage> {
+  let index = 0
+
+  while (index < signs.length) {
+    const sign = signs[index]
+    if (sign === undefined) break
+
+    if (isToolSign(sign)) {
+      index += 1
+      continue
+    }
+
+    if (isAssistantPartSign(sign)) {
+      let reasoning = ""
+      let content = ""
+      const toolCalls: Array<ToolCall> = []
+
+      while (index < signs.length) {
+        const part = signs[index]
+        if (part === undefined) break
+
+        if (isToolSign(part)) {
+          index += 1
+          continue
+        }
+
+        if (!isAssistantPartSign(part)) break
+
+        if (isReasoningSign(part)) {
+          reasoning += part.content
+        } else if (isAssistantSign(part)) {
+          content += part.content
+        } else if (isToolCallSign(part)) {
+          toolCalls.push(part.toolCall)
+        }
+
+        index += 1
+      }
+
       const message: DeepSeekMessage = {
         role: "assistant",
-        content: sign.content,
+        content,
       }
 
-      if (sign.reasoning !== "") {
-        message.reasoning_content = sign.reasoning
+      if (reasoning !== "") {
+        message.reasoning_content = reasoning
       }
 
-      if (sign.toolCalls.length !== 0) {
-        message.tool_calls = sign.toolCalls.map(makeDeepSeekToolCall)
+      if (toolCalls.length !== 0) {
+        message.tool_calls = toolCalls.map(makeDeepSeekToolCall)
       }
 
-      return message
+      yield message
+      continue
     }
-    case "ToolSign":
-      throw new Error("[deepSeekInterpret] cannot send ToolSign")
-    case "ToolOutputSign":
-      return {
-        role: "tool",
-        tool_call_id: sign.toolCallId,
-        content: sign.content,
-      }
-    case "ErrorSign":
-      throw new Error("[deepSeekInterpret] cannot send ErrorSign")
+
+    yield makeDeepSeekMessage(sign)
+    index += 1
   }
+}
+
+function isAssistantPartSign(
+  sign: Sign,
+): sign is ReasoningSign | AssistantSign | ToolCallSign {
+  return isReasoningSign(sign) || isAssistantSign(sign) || isToolCallSign(sign)
+}
+
+function makeDeepSeekMessage(sign: Sign): DeepSeekMessage {
+  if (isPersonaSign(sign)) {
+    return { role: "system", content: sign.content }
+  }
+
+  if (isUserSign(sign)) {
+    return { role: "user", content: sign.content }
+  }
+
+  if (isToolOutputSign(sign)) {
+    return {
+      role: "tool",
+      tool_call_id: sign.toolCallId,
+      content: sign.content,
+    }
+  }
+
+  if (
+    isReasoningSign(sign) ||
+    isAssistantSign(sign) ||
+    isToolCallSign(sign) ||
+    isToolSign(sign)
+  ) {
+    throw new Error(`[deepSeekInterpret] unexpected message sign: ${sign.kind}`)
+  }
+
+  throw new Error(`[deepSeekInterpret] cannot send ${sign.kind}`)
+}
+
+function makeOutputSigns(message: DeepSeekMessage): Array<Sign> {
+  const signs: Array<Sign> = []
+
+  if (
+    message.reasoning_content !== undefined &&
+    message.reasoning_content !== null &&
+    message.reasoning_content !== ""
+  ) {
+    signs.push(ReasoningSign(message.reasoning_content))
+  }
+
+  if (
+    message.content !== undefined &&
+    message.content !== null &&
+    message.content !== ""
+  ) {
+    signs.push(AssistantSign(message.content))
+  }
+
+  for (const toolCall of message.tool_calls ?? []) {
+    signs.push(
+      ToolCallSign({
+        id: toolCall.id,
+        name: toolCall.function.name,
+        arguments: toolCall.function.arguments,
+      }),
+    )
+  }
+
+  return signs
 }
 
 function makeDeepSeekTool(sign: ToolSign): DeepSeekTool {
@@ -100,21 +198,4 @@ function makeDeepSeekToolCall(toolCall: ToolCall) {
       arguments: toolCall.arguments,
     },
   }
-}
-
-function makeAssistantSign(
-  message: DeepSeekMessage,
-): ReturnType<typeof AssistantSign> {
-  const toolCalls =
-    message.tool_calls?.map((toolCall) => ({
-      id: toolCall.id,
-      name: toolCall.function.name,
-      arguments: toolCall.function.arguments,
-    })) ?? []
-
-  return AssistantSign(
-    message.reasoning_content ?? "",
-    message.content ?? "",
-    toolCalls,
-  )
 }

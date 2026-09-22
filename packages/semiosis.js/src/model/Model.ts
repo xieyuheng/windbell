@@ -12,5 +12,5 @@ export type ModelInput = {
 }
 
 export type ModelOutput = {
-  sign: Sign
+  signs: Array<Sign>
 }

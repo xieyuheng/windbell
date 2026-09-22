@@ -16,8 +16,12 @@ function kindLabel(kind: Sign["kind"]): string {
   switch (kind) {
     case "UserSign":
       return t("signKind.user")
+    case "ReasoningSign":
+      return t("signKind.reasoning")
     case "AssistantSign":
       return t("signKind.assistant")
+    case "ToolCallSign":
+      return t("signKind.toolCall")
     case "ToolSign":
       return t("signKind.tool")
     case "ToolOutputSign":
@@ -32,10 +36,13 @@ function kindLabel(kind: Sign["kind"]): string {
 function body(sign: Sign): string {
   switch (sign.kind) {
     case "UserSign":
+    case "ReasoningSign":
     case "AssistantSign":
     case "ToolOutputSign":
     case "PersonaSign":
       return sign.content
+    case "ToolCallSign":
+      return `${sign.toolCall.name} ${sign.toolCall.arguments}`
     case "ToolSign":
       return sign.name
     case "ErrorSign":
@@ -47,8 +54,10 @@ function borderClass(kind: Sign["kind"]): string {
   switch (kind) {
     case "UserSign":
       return "border-ink-muted"
+    case "ReasoningSign":
     case "AssistantSign":
       return "border-accent"
+    case "ToolCallSign":
     case "ToolSign":
     case "PersonaSign":
       return "border-info"
@@ -63,8 +72,10 @@ function textClass(kind: Sign["kind"]): string {
   switch (kind) {
     case "UserSign":
       return "text-ink"
+    case "ReasoningSign":
     case "AssistantSign":
       return "text-accent"
+    case "ToolCallSign":
     case "ToolSign":
     case "PersonaSign":
       return "text-info"
@@ -90,19 +101,6 @@ function textClass(kind: Sign["kind"]): string {
       >
         {{ kindLabel(sign.kind) }}
       </p>
-
-      <details
-        v-if="sign.kind === 'AssistantSign' && sign.reasoning !== ''"
-        class="mb-3 rounded border border-line bg-paper-deep px-3 py-2"
-        open
-      >
-        <summary class="cursor-pointer text-sm font-medium text-ink">
-          {{ t("thinking") }}
-        </summary>
-        <p class="mt-2 whitespace-pre-wrap text-sm leading-7 text-ink">
-          {{ sign.reasoning }}
-        </p>
-      </details>
 
       <p class="whitespace-pre-wrap text-sm leading-7 text-ink">
         {{ body(sign) }}

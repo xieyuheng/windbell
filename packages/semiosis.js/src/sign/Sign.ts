@@ -1,7 +1,14 @@
 import type { ToolCall } from "../tool/index.ts"
 
 export type Sign =
-  PersonaSign | UserSign | AssistantSign | ToolSign | ToolOutputSign | ErrorSign
+  | PersonaSign
+  | UserSign
+  | ReasoningSign
+  | AssistantSign
+  | ToolCallSign
+  | ToolSign
+  | ToolOutputSign
+  | ErrorSign
 
 export type PersonaSign = {
   kind: "PersonaSign"
@@ -45,23 +52,36 @@ export function asUserSign(value: Sign): UserSign {
   throw new Error(`[asUserSign] fail on: ${value.kind}`)
 }
 
-export type AssistantSign = {
-  kind: "AssistantSign"
-  reasoning: string
+export type ReasoningSign = {
+  kind: "ReasoningSign"
   content: string
-  toolCalls: Array<ToolCall>
 }
 
-export function AssistantSign(
-  reasoning: string,
-  content: string,
-  toolCalls: Array<ToolCall>,
-): AssistantSign {
+export function ReasoningSign(content: string): ReasoningSign {
+  return {
+    kind: "ReasoningSign",
+    content,
+  }
+}
+
+export function isReasoningSign(value: Sign): value is ReasoningSign {
+  return value.kind === "ReasoningSign"
+}
+
+export function asReasoningSign(value: Sign): ReasoningSign {
+  if (isReasoningSign(value)) return value
+  throw new Error(`[asReasoningSign] fail on: ${value.kind}`)
+}
+
+export type AssistantSign = {
+  kind: "AssistantSign"
+  content: string
+}
+
+export function AssistantSign(content: string): AssistantSign {
   return {
     kind: "AssistantSign",
-    reasoning,
     content,
-    toolCalls,
   }
 }
 
@@ -72,6 +92,27 @@ export function isAssistantSign(value: Sign): value is AssistantSign {
 export function asAssistantSign(value: Sign): AssistantSign {
   if (isAssistantSign(value)) return value
   throw new Error(`[asAssistantSign] fail on: ${value.kind}`)
+}
+
+export type ToolCallSign = {
+  kind: "ToolCallSign"
+  toolCall: ToolCall
+}
+
+export function ToolCallSign(toolCall: ToolCall): ToolCallSign {
+  return {
+    kind: "ToolCallSign",
+    toolCall,
+  }
+}
+
+export function isToolCallSign(value: Sign): value is ToolCallSign {
+  return value.kind === "ToolCallSign"
+}
+
+export function asToolCallSign(value: Sign): ToolCallSign {
+  if (isToolCallSign(value)) return value
+  throw new Error(`[asToolCallSign] fail on: ${value.kind}`)
 }
 
 export type ToolSign = {

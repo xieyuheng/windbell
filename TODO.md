@@ -1,10 +1,3 @@
-# semiosis
-
-[semiosis.js] assistant sign 也许应该被分解为
-
-- inquiry sign -- 带有 tool call 的
-- anchor sign -- 不带 tool call 的
-
 # windbell
 
 [windbell] workspace manager
