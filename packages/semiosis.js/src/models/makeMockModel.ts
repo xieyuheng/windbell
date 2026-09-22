@@ -1,20 +1,21 @@
-import type { Model, ModelInput, ModelOutput } from "../model/index.ts"
+import type { Model } from "../model/index.ts"
+import type { Sign } from "../sign/index.ts"
 
 export type MockModel = Model & {
-  inputs: Array<ModelInput>
+  turns: Array<Array<Sign>>
   step: number
 }
 
-export function makeMockModel(outputs: Array<ModelOutput>): MockModel {
+export function makeMockModel(outputs: Array<Array<Sign>>): MockModel {
   if (outputs.length === 0) {
     throw new Error("[makeMockModel] outputs must not be empty")
   }
 
   const model: MockModel = {
-    inputs: [],
+    turns: [],
     step: 0,
     interpret: async (input) => {
-      model.inputs.push(input)
+      model.turns.push(input)
 
       const output = outputs[model.step]
       if (output === undefined) {

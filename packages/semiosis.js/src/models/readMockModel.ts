@@ -2,7 +2,6 @@ import fs from "node:fs"
 import Path from "node:path"
 import { fileURLToPath } from "node:url"
 import { z } from "zod"
-import type { ModelOutput } from "../model/index.ts"
 import type { Sign } from "../sign/index.ts"
 import { makeMockModel, type MockModel } from "./makeMockModel.ts"
 
@@ -55,7 +54,7 @@ export function readMockModel(name: string): MockModel {
 
   const path = mockModelPath(name)
   const text = readMockModelFile(path)
-  const outputs: Array<ModelOutput> = text
+  const outputs: Array<Array<Sign>> = text
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line !== "")

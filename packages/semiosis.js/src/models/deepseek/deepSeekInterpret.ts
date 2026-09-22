@@ -4,7 +4,6 @@ import type {
   DeepSeekMessage,
   DeepSeekTool,
 } from "../../clients/deepseek/index.ts"
-import type { ModelInput, ModelOutput } from "../../model/index.ts"
 import {
   AssistantSign,
   ReasoningSign,
@@ -24,8 +23,8 @@ import type { DeepSeekModelConfig } from "./DeepSeekModelConfig.ts"
 export async function deepSeekInterpret(
   client: DeepSeekClient,
   config: DeepSeekModelConfig,
-  input: ModelInput,
-): Promise<ModelOutput> {
+  input: Array<Sign>,
+): Promise<Array<Sign>> {
   const request: DeepSeekChatCompletionInput = {
     model: config.name,
     messages: Array.from(parseDeepSeekMessage(input)),
@@ -47,9 +46,7 @@ export async function deepSeekInterpret(
   return makeOutputSigns(message)
 }
 
-function* parseDeepSeekMessage(
-  signs: ReadonlyArray<Sign>,
-): Generator<DeepSeekMessage> {
+function* parseDeepSeekMessage(signs: Array<Sign>): Generator<DeepSeekMessage> {
   let index = 0
 
   while (index < signs.length) {
