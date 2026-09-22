@@ -1,6 +1,5 @@
 import type { Context } from "../model/Context.ts"
 import type { Model } from "../model/Model.ts"
-import { PersonaSign } from "../sign/index.ts"
 import type { Tool } from "../tool/index.ts"
 
 export type Agent = {
@@ -10,18 +9,19 @@ export type Agent = {
 }
 
 export type AgentConfig = {
-  system: string
   cwd: string
   tools: Array<Tool>
   maxSteps: number
 }
 
-export function makeAgent(model: Model, config: AgentConfig): Agent {
+export function makeAgent(
+  model: Model,
+  config: AgentConfig,
+  context: Context,
+): Agent {
   return {
     model,
     config,
-    context: {
-      signs: config.system === "" ? [] : [PersonaSign(config.system)],
-    },
+    context,
   }
 }

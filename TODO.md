@@ -1,9 +1,8 @@
 # semiosis
 
-[semiosis.js] AgentConfig 不再有 system 字段，改为调用 agentRun 时传入 SystemSign
+[semiosis.js] 增加 ToolSign，用 Sign 的形式来表达 Tool
 
-目前 makeBashTool 这个函数的设计有问题，
-因为为了实现 handle 函数，根本不需要 spec 的信息。
+现在的 "ToolSign" 改为 "ToolOutputSign"
 
 # windbell
 

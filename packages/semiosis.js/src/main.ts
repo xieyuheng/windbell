@@ -29,12 +29,17 @@ router.defineHandlers({
 
     const [providerName, modelName] = parseQualifiedModelName(modelSpec)
     const model = makeModel(providerName, modelName)
-    const agent = makeAgent(model, {
-      system: "You are a helpful software engineer assistant.",
-      cwd: process.cwd(),
-      tools: [makeBashTool()],
-      maxSteps: defaultMaxSteps,
-    })
+    const agent = makeAgent(
+      model,
+      {
+        cwd: process.cwd(),
+        tools: [makeBashTool()],
+        maxSteps: defaultMaxSteps,
+      },
+      {
+        signs: [PersonaSign("You are a helpful software engineer assistant.")],
+      },
+    )
     return startAgentRepl(agent)
   },
 
@@ -52,20 +57,26 @@ router.defineHandlers({
       200_000,
     )
 
-    const agent = makeAgent(model, {
-      system: promptBatch.system,
-      cwd,
-      tools: [
-        makeBashTool({
-          description: "Run commands in a bash shell.",
-          timeoutMs: 300_000,
-          maxOutputChars,
-        }),
-      ],
-      maxSteps,
-    })
+    const personaSign = PersonaSign(promptBatch.system)
+    const agent = makeAgent(
+      model,
+      {
+        cwd,
+        tools: [
+          makeBashTool({
+            description: "Run commands in a bash shell.",
+            timeoutMs: 300_000,
+            maxOutputChars,
+          }),
+        ],
+        maxSteps,
+      },
+      {
+        signs: [personaSign],
+      },
+    )
 
-    console.log(formatSign(PersonaSign(promptBatch.system)))
+    console.log(formatSign(personaSign))
 
     for (const prompt of promptBatch.prompts) {
       const userSign = UserSign(prompt)
