@@ -21,12 +21,8 @@ export class ToolRouter {
     this.routes[sign.name] = { sign, handler, validate }
   }
 
-  findTool(name: string): ToolRoute | undefined {
-    return this.routes[name]
-  }
-
   async run(agent: Agent, toolCall: ToolCall): Promise<Sign> {
-    const route = this.findTool(toolCall.name)
+    const route = this.routes[toolCall.name]
     if (route === undefined) {
       return ToolOutputSign(
         toolCall.id,

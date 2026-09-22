@@ -1,2 +1,2 @@
-export * from "./makeBashTool.ts"
+export * from "./bash/index.ts"
 export * from "./makeDefaultToolRouter.ts"

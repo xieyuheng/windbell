@@ -1,26 +1,6 @@
 import { spawn } from "node:child_process"
 import process from "node:process"
-import { ToolSign } from "../sign/index.ts"
-import type { ToolHandler } from "../tool/index.ts"
-
-export const defaultBashToolDescription = `Run commands in a bash shell.
-* When invoking this tool, the contents of the "command" parameter does NOT need to be XML-escaped.
-* Network access depends on the task environment. Prefer configured mirrors/proxies when they are available.
-* Shell state is not persistent across calls. Use \`cd <dir> && <command>\` when you need a specific working directory.
-* To inspect a particular line range of a file, e.g. lines 10-25, try 'sed -n 10,25p /path/to/the/file'.
-* Please avoid commands that may produce a very large amount of output.`
-
-export const defaultBashToolTimeoutMs = 300_000
-export const defaultBashToolMaxOutputChars = 200_000
-
-export type BashToolSignOptions = {
-  description: string
-}
-
-export type BashToolHandlerOptions = {
-  timeoutMs: number
-  maxOutputChars: number
-}
+import type { ToolHandler } from "../../tool/index.ts"
 
 type BashRunOptions = {
   cwd: string
@@ -38,18 +18,9 @@ type BashRunResult = {
   timedOut: boolean
 }
 
-export function makeBashToolSign(options: BashToolSignOptions): ToolSign {
-  return ToolSign("bash", options.description, {
-    type: "object",
-    properties: {
-      command: {
-        type: "string",
-        description: "The bash command to execute.",
-      },
-    },
-    required: ["command"],
-    additionalProperties: false,
-  })
+export type BashToolHandlerOptions = {
+  timeoutMs: number
+  maxOutputChars: number
 }
 
 export function makeBashToolHandler(
