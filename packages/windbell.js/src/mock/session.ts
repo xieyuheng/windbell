@@ -8,7 +8,7 @@ export const mockSessions: Array<Session> = [
     title: "风铃与符号过程",
     signs: [
       {
-        kind: "SystemSign",
+        kind: "PersonaSign",
         content: "You are a helpful software engineer assistant.",
       },
       {

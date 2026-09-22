@@ -1,6 +1,7 @@
 # semiosis
 
-[semiosis.js] SystemSign 改名为 PersonaSign
+[semiosis.js] agentRun 的输入从 string 改为任意的 Sign
+[semiosis.js] AgentConfig 不再有 system 字段，改为调用 agentRun 时传入 SystemSign
 
 目前 makeBashTool 这个函数的设计有问题，
 因为为了实现 handle 函数，根本不需要 spec 的信息。

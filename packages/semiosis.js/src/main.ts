@@ -9,7 +9,7 @@ import { agentRun, makeAgent } from "./agent/index.ts"
 import { formatSign } from "./format/index.ts"
 import { makeModel } from "./models/index.ts"
 import { readPromptBatch } from "./prompts/index.ts"
-import { SystemSign, UserSign } from "./sign/index.ts"
+import { PersonaSign, UserSign } from "./sign/index.ts"
 import { startAgentRepl } from "./repl/index.ts"
 import { makeBashTool } from "./tools/index.ts"
 
@@ -65,7 +65,7 @@ router.defineHandlers({
       maxSteps,
     })
 
-    console.log(formatSign(SystemSign(promptBatch.system)))
+    console.log(formatSign(PersonaSign(promptBatch.system)))
 
     for (const prompt of promptBatch.prompts) {
       console.log(formatSign(UserSign(prompt)))

@@ -14,7 +14,7 @@ const toolCallSchema = z.object({
 
 const signSchema = z.discriminatedUnion("kind", [
   z.object({
-    kind: z.literal("SystemSign"),
+    kind: z.literal("PersonaSign"),
     content: z.string(),
   }),
   z.object({

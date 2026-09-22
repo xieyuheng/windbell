@@ -39,7 +39,7 @@ export async function deepSeekInterpret(
 
 function makeDeepSeekMessage(sign: Sign): DeepSeekMessage {
   switch (sign.kind) {
-    case "SystemSign":
+    case "PersonaSign":
       return { role: "system", content: sign.content }
     case "UserSign":
       return { role: "user", content: sign.content }

@@ -1,26 +1,26 @@
 import type { ToolCall } from "../tool/index.ts"
 
-export type Sign = SystemSign | UserSign | AssistantSign | ToolSign | ErrorSign
+export type Sign = PersonaSign | UserSign | AssistantSign | ToolSign | ErrorSign
 
-export type SystemSign = {
-  kind: "SystemSign"
+export type PersonaSign = {
+  kind: "PersonaSign"
   content: string
 }
 
-export function SystemSign(content: string): SystemSign {
+export function PersonaSign(content: string): PersonaSign {
   return {
-    kind: "SystemSign",
+    kind: "PersonaSign",
     content,
   }
 }
 
-export function isSystemSign(value: Sign): value is SystemSign {
-  return value.kind === "SystemSign"
+export function isPersonaSign(value: Sign): value is PersonaSign {
+  return value.kind === "PersonaSign"
 }
 
-export function asSystemSign(value: Sign): SystemSign {
-  if (isSystemSign(value)) return value
-  throw new Error(`[asSystemSign] fail on: ${value.kind}`)
+export function asPersonaSign(value: Sign): PersonaSign {
+  if (isPersonaSign(value)) return value
+  throw new Error(`[asPersonaSign] fail on: ${value.kind}`)
 }
 
 export type UserSign = {

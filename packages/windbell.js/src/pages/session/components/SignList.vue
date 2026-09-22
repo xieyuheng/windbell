@@ -20,8 +20,8 @@ function kindLabel(kind: Sign["kind"]): string {
       return t("signKind.assistant")
     case "ToolSign":
       return t("signKind.tool")
-    case "SystemSign":
-      return t("signKind.system")
+    case "PersonaSign":
+      return t("signKind.persona")
     case "ErrorSign":
       return t("signKind.error")
   }
@@ -32,7 +32,7 @@ function body(sign: Sign): string {
     case "UserSign":
     case "AssistantSign":
     case "ToolSign":
-    case "SystemSign":
+    case "PersonaSign":
       return sign.content
     case "ErrorSign":
       return sign.message
@@ -47,7 +47,7 @@ function borderClass(kind: Sign["kind"]): string {
       return "border-accent"
     case "ToolSign":
       return "border-warning"
-    case "SystemSign":
+    case "PersonaSign":
       return "border-info"
     case "ErrorSign":
       return "border-danger"
@@ -62,7 +62,7 @@ function textClass(kind: Sign["kind"]): string {
       return "text-accent"
     case "ToolSign":
       return "text-warning"
-    case "SystemSign":
+    case "PersonaSign":
       return "text-info"
     case "ErrorSign":
       return "text-danger"

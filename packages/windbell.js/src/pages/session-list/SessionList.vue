@@ -32,7 +32,7 @@ function preview(session: Session): string {
     case "UserSign":
     case "AssistantSign":
     case "ToolSign":
-    case "SystemSign":
+    case "PersonaSign":
       return sign.content
     case "ErrorSign":
       return sign.message

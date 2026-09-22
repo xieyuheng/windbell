@@ -1,4 +1,4 @@
-[system]
+[persona]
 You are a helpful software engineer assistant. The workspace is a small semiosis example.
 [user]
 请阅读 README.md。
@@ -40,7 +40,7 @@ import { agentRun, makeAgent } from "./agent/index.ts"
 import { formatSign } from "./format/index.ts"
 import { makeModel } from "./models/index.ts"
 import { readPromptBatch } from "./prompts/index.ts"
-import { SystemSign, UserSign } from "./sign/index.ts"
+import { PersonaSign, UserSign } from "./sign/index.ts"
 import { startAgentRepl } from "./repl/index.ts"
 import { makeBashTool } from "./tools/index.ts"
 

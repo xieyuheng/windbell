@@ -1,6 +1,6 @@
 import type { Context } from "../model/Context.ts"
 import type { Model } from "../model/Model.ts"
-import { SystemSign } from "../sign/index.ts"
+import { PersonaSign } from "../sign/index.ts"
 import type { Tool } from "../tool/index.ts"
 
 export type Agent = {
@@ -21,7 +21,7 @@ export function makeAgent(model: Model, config: AgentConfig): Agent {
     model,
     config,
     context: {
-      signs: config.system === "" ? [] : [SystemSign(config.system)],
+      signs: config.system === "" ? [] : [PersonaSign(config.system)],
     },
   }
 }
