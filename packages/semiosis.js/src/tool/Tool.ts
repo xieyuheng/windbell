@@ -1,10 +1,5 @@
 import type { Agent } from "../agent/Agent.ts"
-
-export type ToolSpec = {
-  name: string
-  description: string
-  parameters: Record<string, unknown>
-}
+import type { ToolSign } from "../sign/index.ts"
 
 export type ToolCall = {
   id: string
@@ -18,6 +13,6 @@ export type ToolHandler = (
 ) => string | Promise<string>
 
 export type Tool = {
-  spec: ToolSpec
+  sign: ToolSign
   handler: ToolHandler
 }

@@ -1,10 +1,9 @@
 # semiosis
 
-[semiosis.js] 增加 ToolSign，用 Sign 的形式来表达 ToolSpec
+[semiosis.js] assistant sign 也许应该被分解为
 
-每次调用 model api 的时候，从 signs 中取 ToolSign 来构成 tools。
-
-先不要写代码，先讨论方案。
+- inquiry sign -- 带有 tool call 的
+- anchor sign -- 不带 tool call 的
 
 # windbell
 

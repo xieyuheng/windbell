@@ -8,7 +8,7 @@ export async function toolCallRun(
   agent: Agent,
 ): Promise<Sign> {
   const tool = agent.config.tools.find(
-    (tool) => tool.spec.name === toolCall.name,
+    (tool) => tool.sign.name === toolCall.name,
   )
   if (tool === undefined) {
     return ToolOutputSign(

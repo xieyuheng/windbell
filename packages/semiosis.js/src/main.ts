@@ -29,15 +29,19 @@ router.defineHandlers({
 
     const [providerName, modelName] = parseQualifiedModelName(modelSpec)
     const model = makeModel(providerName, modelName)
+    const tools = [makeBashTool()]
     const agent = makeAgent(
       model,
       {
         cwd: process.cwd(),
-        tools: [makeBashTool()],
+        tools,
         maxSteps: defaultMaxSteps,
       },
       {
-        signs: [PersonaSign("You are a helpful software engineer assistant.")],
+        signs: [
+          ...tools.map((tool) => tool.sign),
+          PersonaSign("You are a helpful software engineer assistant."),
+        ],
       },
     )
     return startAgentRepl(agent)
@@ -58,21 +62,22 @@ router.defineHandlers({
     )
 
     const personaSign = PersonaSign(promptBatch.system)
+    const tools = [
+      makeBashTool({
+        description: "Run commands in a bash shell.",
+        timeoutMs: 300_000,
+        maxOutputChars,
+      }),
+    ]
     const agent = makeAgent(
       model,
       {
         cwd,
-        tools: [
-          makeBashTool({
-            description: "Run commands in a bash shell.",
-            timeoutMs: 300_000,
-            maxOutputChars,
-          }),
-        ],
+        tools,
         maxSteps,
       },
       {
-        signs: [personaSign],
+        signs: [...tools.map((tool) => tool.sign), personaSign],
       },
     )
 

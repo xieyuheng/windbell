@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process"
 import process from "node:process"
+import { ToolSign } from "../sign/index.ts"
 import type { Tool } from "../tool/index.ts"
 
 export type BashToolOptions = {
@@ -41,21 +42,17 @@ export function makeBashTool(
   options: BashToolOptions = defaultBashToolOptions,
 ): Tool {
   return {
-    spec: {
-      name: "bash",
-      description: options.description,
-      parameters: {
-        type: "object",
-        properties: {
-          command: {
-            type: "string",
-            description: "The bash command to execute.",
-          },
+    sign: ToolSign("bash", options.description, {
+      type: "object",
+      properties: {
+        command: {
+          type: "string",
+          description: "The bash command to execute.",
         },
-        required: ["command"],
-        additionalProperties: false,
       },
-    },
+      required: ["command"],
+      additionalProperties: false,
+    }),
     handler: async (agent, args) => {
       const command = args.command
       if (typeof command !== "string") {

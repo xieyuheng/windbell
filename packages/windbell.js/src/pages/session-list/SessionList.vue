@@ -34,6 +34,8 @@ function preview(session: Session): string {
     case "ToolOutputSign":
     case "PersonaSign":
       return sign.content
+    case "ToolSign":
+      return sign.name
     case "ErrorSign":
       return sign.message
   }

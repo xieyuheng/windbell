@@ -5,8 +5,13 @@ import type {
   DeepSeekTool,
 } from "../../clients/deepseek/index.ts"
 import type { ModelInput, ModelOutput } from "../../model/index.ts"
-import { AssistantSign, type Sign } from "../../sign/index.ts"
-import type { ToolCall, ToolSpec } from "../../tool/index.ts"
+import {
+  AssistantSign,
+  isToolSign,
+  type Sign,
+  type ToolSign,
+} from "../../sign/index.ts"
+import type { ToolCall } from "../../tool/index.ts"
 import type { DeepSeekModelConfig } from "./DeepSeekModelConfig.ts"
 
 export async function deepSeekInterpret(
@@ -14,10 +19,13 @@ export async function deepSeekInterpret(
   config: DeepSeekModelConfig,
   input: ModelInput,
 ): Promise<ModelOutput> {
+  const messageSigns = input.context.signs.filter((sign) => !isToolSign(sign))
+  const toolSigns = input.context.signs.filter(isToolSign)
+
   const request: DeepSeekChatCompletionInput = {
     model: config.name,
-    messages: input.context.signs.map(makeDeepSeekMessage),
-    tools: input.tools.map(makeDeepSeekTool),
+    messages: messageSigns.map(makeDeepSeekMessage),
+    tools: toolSigns.map(makeDeepSeekTool),
     thinking: {
       type: config.thinking,
     },
@@ -59,6 +67,8 @@ function makeDeepSeekMessage(sign: Sign): DeepSeekMessage {
 
       return message
     }
+    case "ToolSign":
+      throw new Error("[deepSeekInterpret] cannot send ToolSign")
     case "ToolOutputSign":
       return {
         role: "tool",
@@ -70,13 +80,13 @@ function makeDeepSeekMessage(sign: Sign): DeepSeekMessage {
   }
 }
 
-function makeDeepSeekTool(tool: ToolSpec): DeepSeekTool {
+function makeDeepSeekTool(sign: ToolSign): DeepSeekTool {
   return {
     type: "function",
     function: {
-      name: tool.name,
-      description: tool.description,
-      parameters: tool.parameters,
+      name: sign.name,
+      description: sign.description,
+      parameters: sign.parameters,
     },
   }
 }

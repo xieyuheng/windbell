@@ -1,7 +1,7 @@
 import type { ToolCall } from "../tool/index.ts"
 
 export type Sign =
-  PersonaSign | UserSign | AssistantSign | ToolOutputSign | ErrorSign
+  PersonaSign | UserSign | AssistantSign | ToolSign | ToolOutputSign | ErrorSign
 
 export type PersonaSign = {
   kind: "PersonaSign"
@@ -72,6 +72,35 @@ export function isAssistantSign(value: Sign): value is AssistantSign {
 export function asAssistantSign(value: Sign): AssistantSign {
   if (isAssistantSign(value)) return value
   throw new Error(`[asAssistantSign] fail on: ${value.kind}`)
+}
+
+export type ToolSign = {
+  kind: "ToolSign"
+  name: string
+  description: string
+  parameters: Record<string, unknown>
+}
+
+export function ToolSign(
+  name: string,
+  description: string,
+  parameters: Record<string, unknown>,
+): ToolSign {
+  return {
+    kind: "ToolSign",
+    name,
+    description,
+    parameters,
+  }
+}
+
+export function isToolSign(value: Sign): value is ToolSign {
+  return value.kind === "ToolSign"
+}
+
+export function asToolSign(value: Sign): ToolSign {
+  if (isToolSign(value)) return value
+  throw new Error(`[asToolSign] fail on: ${value.kind}`)
 }
 
 export type ToolOutputSign = {

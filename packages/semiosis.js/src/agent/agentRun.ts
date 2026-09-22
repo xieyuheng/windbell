@@ -24,7 +24,6 @@ export async function* agentRun(
 
     const output = await agent.model.interpret({
       context: agent.context,
-      tools: agent.config.tools.map((tool) => tool.spec),
     })
 
     const sign = output.sign
