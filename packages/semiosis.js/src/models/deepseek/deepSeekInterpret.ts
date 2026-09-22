@@ -19,7 +19,6 @@ import {
   type Sign,
   type ToolSign,
 } from "../../sign/index.ts"
-import type { ToolCall } from "../../tool/index.ts"
 import type { DeepSeekModelConfig } from "./DeepSeekModelConfig.ts"
 
 export async function deepSeekInterpret(
@@ -65,7 +64,7 @@ function* parseDeepSeekMessage(signs: Array<Sign>): Generator<DeepSeekMessage> {
     if (isAssistantPartSign(sign)) {
       let reasoning = ""
       let content = ""
-      const toolCalls: Array<ToolCall> = []
+      const toolCalls: Array<ToolCallSign> = []
 
       while (index < signs.length) {
         const part = signs[index]
@@ -83,7 +82,7 @@ function* parseDeepSeekMessage(signs: Array<Sign>): Generator<DeepSeekMessage> {
         } else if (isAssistantSign(part)) {
           content += part.content
         } else if (isToolCallSign(part)) {
-          toolCalls.push(part.toolCall)
+          toolCalls.push(part)
         }
 
         index += 1
@@ -189,7 +188,7 @@ function makeDeepSeekTool(sign: ToolSign): DeepSeekTool {
   }
 }
 
-function makeDeepSeekToolCall(toolCall: ToolCall) {
+function makeDeepSeekToolCall(toolCall: ToolCallSign) {
   return {
     id: toolCall.id,
     type: "function" as const,

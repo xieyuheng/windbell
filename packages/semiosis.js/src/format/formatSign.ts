@@ -19,7 +19,7 @@ export function formatSign(sign: Sign): string {
     }
 
     case "ToolCallSign": {
-      return `[tool-call] ${sign.toolCall.name}\n${sign.toolCall.arguments}`
+      return `[tool-call] ${sign.name}\n${sign.arguments}`
     }
 
     case "ToolSign": {

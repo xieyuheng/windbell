@@ -1,5 +1,3 @@
-import type { ToolCall } from "../tool/index.ts"
-
 export type Sign =
   | PersonaSign
   | UserSign
@@ -96,13 +94,15 @@ export function asAssistantSign(value: Sign): AssistantSign {
 
 export type ToolCallSign = {
   kind: "ToolCallSign"
-  toolCall: ToolCall
+  id: string
+  name: string
+  arguments: string
 }
 
-export function ToolCallSign(toolCall: ToolCall): ToolCallSign {
+export function ToolCallSign(input: Omit<ToolCallSign, "kind">): ToolCallSign {
   return {
     kind: "ToolCallSign",
-    toolCall,
+    ...input,
   }
 }
 

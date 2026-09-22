@@ -1,5 +1,7 @@
 # semiosis
 
+[semiosis.js] ToolCall 可否与 semiosis
+
 # windbell
 
 [windbell] workspace manager

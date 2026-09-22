@@ -128,5 +128,5 @@ function formatBashRunResult(result: BashRunResult, timeoutMs: number): string {
 
 function truncatedText(text: string, truncated: boolean): string {
   if (!truncated) return text
-  return `${text}\n[output truncated]`
+  return `${text}\n[output-truncated]`
 }

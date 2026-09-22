@@ -6,12 +6,6 @@ import type { ModelOutput } from "../model/index.ts"
 import type { Sign } from "../sign/index.ts"
 import { makeMockModel, type MockModel } from "./makeMockModel.ts"
 
-const toolCallSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  arguments: z.string(),
-})
-
 const signSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("PersonaSign"),
@@ -31,7 +25,9 @@ const signSchema = z.discriminatedUnion("kind", [
   }),
   z.object({
     kind: z.literal("ToolCallSign"),
-    toolCall: toolCallSchema,
+    id: z.string(),
+    name: z.string(),
+    arguments: z.string(),
   }),
   z.object({
     kind: z.literal("ToolSign"),

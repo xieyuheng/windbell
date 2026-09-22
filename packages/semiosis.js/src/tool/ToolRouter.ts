@@ -1,8 +1,13 @@
 import { errorReport } from "@xieyuheng/std.js/error"
 import { Ajv } from "ajv"
 import type { Agent } from "../agent/Agent.ts"
-import { ToolOutputSign, type Sign, type ToolSign } from "../sign/index.ts"
-import type { ToolCall, ToolHandler, ToolRoute } from "./Tool.ts"
+import {
+  ToolOutputSign,
+  type Sign,
+  type ToolCallSign,
+  type ToolSign,
+} from "../sign/index.ts"
+import type { ToolHandler, ToolRoute } from "./Tool.ts"
 
 export class ToolRouter {
   ajv = new Ajv({
@@ -21,7 +26,7 @@ export class ToolRouter {
     this.routes[sign.name] = { sign, handler, validate }
   }
 
-  async run(agent: Agent, toolCall: ToolCall): Promise<Sign> {
+  async run(agent: Agent, toolCall: ToolCallSign): Promise<Sign> {
     const route = this.routes[toolCall.name]
     if (route === undefined) {
       return ToolOutputSign(
@@ -60,7 +65,7 @@ export function makeToolRouter(): ToolRouter {
   return new ToolRouter()
 }
 
-function toolArgumentsParse(toolCall: ToolCall): Record<string, unknown> {
+function toolArgumentsParse(toolCall: ToolCallSign): Record<string, unknown> {
   const value = toolArgumentsJsonParse(toolCall)
 
   if (typeof value !== "object" || value === null || value instanceof Array) {
@@ -72,7 +77,7 @@ function toolArgumentsParse(toolCall: ToolCall): Record<string, unknown> {
   return value as Record<string, unknown>
 }
 
-function toolArgumentsJsonParse(toolCall: ToolCall): unknown {
+function toolArgumentsJsonParse(toolCall: ToolCallSign): unknown {
   try {
     return JSON.parse(toolCall.arguments)
   } catch (error) {

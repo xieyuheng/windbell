@@ -36,7 +36,7 @@ function preview(session: Session): string {
     case "PersonaSign":
       return sign.content
     case "ToolCallSign":
-      return `${sign.toolCall.name} ${sign.toolCall.arguments}`
+      return `${sign.name} ${sign.arguments}`
     case "ToolSign":
       return sign.name
     case "ErrorSign":
