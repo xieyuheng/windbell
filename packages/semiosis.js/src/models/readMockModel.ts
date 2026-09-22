@@ -59,9 +59,7 @@ export function readMockModel(name: string): MockModel {
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line !== "")
-    .map((line, index) => ({
-      signs: parseMockSigns(path, line, index + 1),
-    }))
+    .map((line, index) => parseMockSigns(path, line, index + 1))
 
   return makeMockModel(outputs)
 }

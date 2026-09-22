@@ -42,12 +42,10 @@ router.defineHandlers({
         maxSteps: defaultMaxSteps,
         toolRouter,
       },
-      {
-        signs: [
-          ...toolRouter.toolSigns,
-          PersonaSign("You are a helpful software engineer assistant."),
-        ],
-      },
+      [
+        ...toolRouter.toolSigns,
+        PersonaSign("You are a helpful software engineer assistant."),
+      ],
     )
     return startAgentRepl(agent)
   },
@@ -84,9 +82,7 @@ router.defineHandlers({
         maxSteps,
         toolRouter,
       },
-      {
-        signs: [...toolRouter.toolSigns, personaSign],
-      },
+      [...toolRouter.toolSigns, personaSign],
     )
 
     for (const sign of toolRouter.toolSigns) {

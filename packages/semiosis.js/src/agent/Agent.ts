@@ -1,11 +1,11 @@
-import type { Context } from "../model/Context.ts"
 import type { Model } from "../model/Model.ts"
+import type { Sign } from "../sign/index.ts"
 import type { ToolRouter } from "../tool/index.ts"
 
 export type Agent = {
   model: Model
   config: AgentConfig
-  context: Context
+  context: Array<Sign>
 }
 
 export type AgentConfig = {
@@ -17,7 +17,7 @@ export type AgentConfig = {
 export function makeAgent(
   model: Model,
   config: AgentConfig,
-  context: Context,
+  context: Array<Sign>,
 ): Agent {
   return {
     model,

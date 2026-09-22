@@ -13,7 +13,7 @@ export async function* agentRun(
   agent: Agent,
   input: Sign,
 ): AsyncGenerator<Sign> {
-  agent.context.signs.push(input)
+  agent.context.push(input)
 
   let step = 0
   while (true) {
@@ -24,13 +24,11 @@ export async function* agentRun(
 
     step += 1
 
-    const output = await agent.model.interpret({
-      context: agent.context,
-    })
+    const output = await agent.model.interpret(agent.context)
 
     const toolCallSigns: Array<ToolCallSign> = []
 
-    for (const sign of output.signs) {
+    for (const sign of output) {
       if (isErrorSign(sign)) {
         yield sign
         return
@@ -45,7 +43,7 @@ export async function* agentRun(
         return
       }
 
-      agent.context.signs.push(sign)
+      agent.context.push(sign)
       yield sign
 
       if (isToolCallSign(sign)) {
@@ -65,7 +63,7 @@ export async function* agentRun(
         return
       }
 
-      agent.context.signs.push(sign)
+      agent.context.push(sign)
       yield sign
     }
   }

@@ -14,9 +14,7 @@ export function makeDeepSeekModel(
       try {
         return await deepSeekInterpret(client, config, input)
       } catch (error) {
-        return {
-          signs: [ErrorSign(`[makeDeepSeekModel] ${errorReport(error)}`)],
-        }
+        return [ErrorSign(`[makeDeepSeekModel] ${errorReport(error)}`)]
       }
     },
   }

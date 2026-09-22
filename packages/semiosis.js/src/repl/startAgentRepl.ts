@@ -53,7 +53,7 @@ export async function startAgentRepl(agent: Agent): Promise<void> {
     }
 
     if (input === "/debug") {
-      console.log(JSON.stringify(agent.context.signs, null, 2))
+      console.log(JSON.stringify(agent.context, null, 2))
       if (!isClosed) readline.prompt()
       continue
     }

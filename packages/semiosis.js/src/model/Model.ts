@@ -1,4 +1,3 @@
-import type { Context } from "./Context.ts"
 import type { Sign } from "../sign/index.ts"
 
 export type Model = {
@@ -7,10 +6,6 @@ export type Model = {
 
 export type ModelInterpret = (input: ModelInput) => Promise<ModelOutput>
 
-export type ModelInput = {
-  context: Context
-}
+export type ModelInput = ReadonlyArray<Sign>
 
-export type ModelOutput = {
-  signs: Array<Sign>
-}
+export type ModelOutput = Array<Sign>

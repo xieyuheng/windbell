@@ -28,8 +28,8 @@ export async function deepSeekInterpret(
 ): Promise<ModelOutput> {
   const request: DeepSeekChatCompletionInput = {
     model: config.name,
-    messages: Array.from(parseDeepSeekMessage(input.context.signs)),
-    tools: input.context.signs.filter(isToolSign).map(makeDeepSeekTool),
+    messages: Array.from(parseDeepSeekMessage(input)),
+    tools: input.filter(isToolSign).map(makeDeepSeekTool),
     thinking: {
       type: config.thinking,
     },
@@ -44,12 +44,12 @@ export async function deepSeekInterpret(
     throw new Error("[deepSeekInterpret] output.choices[0].message is missing")
   }
 
-  return {
-    signs: makeOutputSigns(message),
-  }
+  return makeOutputSigns(message)
 }
 
-function* parseDeepSeekMessage(signs: Array<Sign>): Generator<DeepSeekMessage> {
+function* parseDeepSeekMessage(
+  signs: ReadonlyArray<Sign>,
+): Generator<DeepSeekMessage> {
   let index = 0
 
   while (index < signs.length) {
