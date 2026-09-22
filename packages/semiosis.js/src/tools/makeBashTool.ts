@@ -1,25 +1,25 @@
 import { spawn } from "node:child_process"
 import process from "node:process"
 import { ToolSign } from "../sign/index.ts"
-import type { Tool } from "../tool/index.ts"
+import type { ToolHandler } from "../tool/index.ts"
 
-export type BashToolOptions = {
-  description: string
-  timeoutMs: number
-  maxOutputChars: number
-}
-
-const defaultBashToolDescription = `Run commands in a bash shell.
+export const defaultBashToolDescription = `Run commands in a bash shell.
 * When invoking this tool, the contents of the "command" parameter does NOT need to be XML-escaped.
 * Network access depends on the task environment. Prefer configured mirrors/proxies when they are available.
 * Shell state is not persistent across calls. Use \`cd <dir> && <command>\` when you need a specific working directory.
 * To inspect a particular line range of a file, e.g. lines 10-25, try 'sed -n 10,25p /path/to/the/file'.
 * Please avoid commands that may produce a very large amount of output.`
 
-const defaultBashToolOptions: BashToolOptions = {
-  description: defaultBashToolDescription,
-  timeoutMs: 300_000,
-  maxOutputChars: 200_000,
+export const defaultBashToolTimeoutMs = 300_000
+export const defaultBashToolMaxOutputChars = 200_000
+
+export type BashToolSignOptions = {
+  description: string
+}
+
+export type BashToolHandlerOptions = {
+  timeoutMs: number
+  maxOutputChars: number
 }
 
 type BashRunOptions = {
@@ -38,35 +38,36 @@ type BashRunResult = {
   timedOut: boolean
 }
 
-export function makeBashTool(
-  options: BashToolOptions = defaultBashToolOptions,
-): Tool {
-  return {
-    sign: ToolSign("bash", options.description, {
-      type: "object",
-      properties: {
-        command: {
-          type: "string",
-          description: "The bash command to execute.",
-        },
+export function makeBashToolSign(options: BashToolSignOptions): ToolSign {
+  return ToolSign("bash", options.description, {
+    type: "object",
+    properties: {
+      command: {
+        type: "string",
+        description: "The bash command to execute.",
       },
-      required: ["command"],
-      additionalProperties: false,
-    }),
-    handler: async (agent, args) => {
-      const command = args.command
-      if (typeof command !== "string") {
-        throw new Error("[makeBashTool] command must be a string")
-      }
-
-      const result = await bashRun(command, {
-        cwd: agent.config.cwd,
-        timeoutMs: options.timeoutMs,
-        maxOutputChars: options.maxOutputChars,
-      })
-
-      return formatBashRunResult(result, options.timeoutMs)
     },
+    required: ["command"],
+    additionalProperties: false,
+  })
+}
+
+export function makeBashToolHandler(
+  options: BashToolHandlerOptions,
+): ToolHandler {
+  return async (agent, args) => {
+    const command = args.command
+    if (typeof command !== "string") {
+      throw new Error("[makeBashToolHandler] command must be a string")
+    }
+
+    const result = await bashRun(command, {
+      cwd: agent.config.cwd,
+      timeoutMs: options.timeoutMs,
+      maxOutputChars: options.maxOutputChars,
+    })
+
+    return formatBashRunResult(result, options.timeoutMs)
   }
 }
 

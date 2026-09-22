@@ -11,7 +11,12 @@ import { makeModel } from "./models/index.ts"
 import { readPromptBatch } from "./prompts/index.ts"
 import { PersonaSign, UserSign } from "./sign/index.ts"
 import { startAgentRepl } from "./repl/index.ts"
-import { makeBashTool } from "./tools/index.ts"
+import { makeToolRouter } from "./tool/index.ts"
+import {
+  makeBashToolHandler,
+  makeBashToolSign,
+  makeDefaultToolRouter,
+} from "./tools/index.ts"
 
 const { version } = getPackageJson(fileURLToPath(import.meta.url))
 const router = cli.createRouter("semiosis.js", version)
@@ -29,17 +34,17 @@ router.defineHandlers({
 
     const [providerName, modelName] = parseQualifiedModelName(modelSpec)
     const model = makeModel(providerName, modelName)
-    const tools = [makeBashTool()]
+    const toolRouter = makeDefaultToolRouter()
     const agent = makeAgent(
       model,
       {
         cwd: process.cwd(),
-        tools,
         maxSteps: defaultMaxSteps,
+        toolRouter,
       },
       {
         signs: [
-          ...tools.map((tool) => tool.sign),
+          ...toolRouter.toolSigns,
           PersonaSign("You are a helpful software engineer assistant."),
         ],
       },
@@ -62,27 +67,30 @@ router.defineHandlers({
     )
 
     const personaSign = PersonaSign(promptBatch.system)
-    const tools = [
-      makeBashTool({
+    const toolRouter = makeToolRouter()
+    toolRouter.defineTool(
+      makeBashToolSign({
         description: "Run commands in a bash shell.",
+      }),
+      makeBashToolHandler({
         timeoutMs: 300_000,
         maxOutputChars,
       }),
-    ]
+    )
     const agent = makeAgent(
       model,
       {
         cwd,
-        tools,
         maxSteps,
+        toolRouter,
       },
       {
-        signs: [...tools.map((tool) => tool.sign), personaSign],
+        signs: [...toolRouter.toolSigns, personaSign],
       },
     )
 
-    for (const tool of tools) {
-      console.log(formatSign(tool.sign))
+    for (const sign of toolRouter.toolSigns) {
+      console.log(formatSign(sign))
     }
     console.log(formatSign(personaSign))
 

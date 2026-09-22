@@ -1,15 +1,9 @@
 # semiosis
 
-[semiosis.js] 设计 ToolRouter 与 ToolRoute
-
-并且用 router.defineTool(sign, handler) 的方式注册 tool。
-
-agent 带有 toolRouter 字段。
-
-我们可以设置 defaultToolRouter，
-在构造 agent 的时候传入。
-
-
+[semiosis.js] 中 tool sign 的 parameters 描述使用了 json-schema，
+是否可以对 parameters 的 schema 定义本身进行检查？
+我们可否在 handler 里对这个 schema 进行检查？
+zod 可否做到这些功能？
 
 [semiosis.js] assistant sign 也许应该被分解为
 

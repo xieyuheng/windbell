@@ -1,6 +1,6 @@
 import type { Context } from "../model/Context.ts"
 import type { Model } from "../model/Model.ts"
-import type { Tool } from "../tool/index.ts"
+import type { ToolRouter } from "../tool/index.ts"
 
 export type Agent = {
   model: Model
@@ -10,8 +10,8 @@ export type Agent = {
 
 export type AgentConfig = {
   cwd: string
-  tools: Array<Tool>
   maxSteps: number
+  toolRouter: ToolRouter
 }
 
 export function makeAgent(

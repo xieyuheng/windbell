@@ -59,13 +59,13 @@ import { makeModel } from "./models/index.ts"
 import { readPromptBatch } from "./prompts/index.ts"
 import { PersonaSign, UserSign } from "./sign/index.ts"
 import { startAgentRepl } from "./repl/index.ts"
-import { makeBashTool } from "./tools/index.ts"
+import { makeToolRouter } from "./tool/index.ts"
+import {
+  makeBashToolHandler,
+  makeBashToolSign,
+  makeDefaultToolRouter,
+} from "./tools/index.ts"
 
-const { version } = getPackageJson(fileURLToPath(import.meta.url))
-const router = cli.createRouter("semiosis.js", version)
-
-router.defineRoutes([
-  "repl --model <provider-name>/<model-name> -- start agent repl in current directory",
 
 [reasoning]
 入口文件里有一个最小的命令入口。

@@ -12,7 +12,7 @@ export type ToolHandler = (
   args: Record<string, unknown>,
 ) => string | Promise<string>
 
-export type Tool = {
+export type ToolRoute = {
   sign: ToolSign
   handler: ToolHandler
 }
