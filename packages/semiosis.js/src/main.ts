@@ -32,7 +32,7 @@ router.defineHandlers({
   repl: ({ options }) => {
     const modelSpec = readRequiredOption(options, "--model")
 
-    const [providerName, modelName] = parseQualifiedModelName(modelSpec)
+    const [providerName, modelName] = parseQualifiedName(modelSpec)
     const model = makeModel(providerName, modelName)
     const toolRouter = makeDefaultToolRouter()
     const agent = makeAgent(
@@ -57,7 +57,7 @@ router.defineHandlers({
     const promptsPath = readRequiredOption(options, "--prompts")
     const promptBatch = readPromptBatch(promptsPath)
 
-    const [providerName, modelName] = parseQualifiedModelName(modelSpec)
+    const [providerName, modelName] = parseQualifiedName(modelSpec)
     const model = makeModel(providerName, modelName)
     const cwd = options["--cwd"] ?? process.cwd()
     const maxSteps = parsePositiveInt(options["--max-steps"], defaultMaxSteps)
@@ -112,7 +112,7 @@ try {
   process.exit(1)
 }
 
-function parseQualifiedModelName(text: string): [string, string] {
+function parseQualifiedName(text: string): [string, string] {
   const [providerName, modelName, ...rest] = text.split("/")
   if (
     providerName === undefined ||

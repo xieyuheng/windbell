@@ -1,6 +1,6 @@
 # semiosis
 
-[semiosis.js] ToolCall 可否与 semiosis
+[semiosis.js] Model 可否增加 qualifiedName 字段？
 
 # windbell
 
