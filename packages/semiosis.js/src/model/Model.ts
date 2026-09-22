@@ -16,9 +16,3 @@ export type ModelInput = {
 export type ModelOutput = {
   sign: Sign
 }
-
-export type ModelConfig = {
-  apiKey: string
-  baseUrl: string
-  model: string
-}
