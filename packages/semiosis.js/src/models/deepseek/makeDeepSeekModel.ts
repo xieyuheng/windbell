@@ -10,6 +10,7 @@ export function makeDeepSeekModel(
   config: DeepSeekModelConfig,
 ): Model {
   return {
+    qualifiedName: `deepseek/${config.name}`,
     interpret: async (input) => {
       try {
         return await deepSeekInterpret(client, config, input)

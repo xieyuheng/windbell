@@ -6,12 +6,16 @@ export type MockModel = Model & {
   step: number
 }
 
-export function makeMockModel(outputs: Array<Array<Sign>>): MockModel {
+export function makeMockModel(
+  qualifiedName: string,
+  outputs: Array<Array<Sign>>,
+): MockModel {
   if (outputs.length === 0) {
     throw new Error("[makeMockModel] outputs must not be empty")
   }
 
   const model: MockModel = {
+    qualifiedName,
     turns: [],
     step: 0,
     interpret: async (input) => {

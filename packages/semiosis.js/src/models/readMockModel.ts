@@ -60,7 +60,7 @@ export function readMockModel(name: string): MockModel {
     .filter((line) => line !== "")
     .map((line, index) => parseMockSigns(path, line, index + 1))
 
-  return makeMockModel(outputs)
+  return makeMockModel(`mock/${name}`, outputs)
 }
 
 function mockModelPath(name: string): string {
