@@ -9,11 +9,11 @@ import {
 } from "../sign/index.ts"
 import type { Agent } from "./Agent.ts"
 
-export async function* agentRun(
+export async function* agentInterpret(
   agent: Agent,
-  input: Sign,
+  input: Array<Sign>,
 ): AsyncGenerator<Sign> {
-  await agent.appendContext([input])
+  await agent.appendContext(input)
 
   while (true) {
     const context = await agent.getContext()
@@ -32,7 +32,9 @@ export async function* agentRun(
         !isAssistantSign(sign) &&
         !isToolCallSign(sign)
       ) {
-        yield ErrorSign(`[agentRun] unexpected model output sign: ${sign.kind}`)
+        yield ErrorSign(
+          `[agentInterpret] unexpected model output sign: ${sign.kind}`,
+        )
         return
       }
 

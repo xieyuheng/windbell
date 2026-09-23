@@ -1,7 +1,7 @@
 import * as Readline from "node:readline"
 import process from "node:process"
 import { errorReport } from "@xieyuheng/std.js/error"
-import { agentRun, type Agent } from "../agent/index.ts"
+import { agentInterpret, type Agent } from "../agent/index.ts"
 import { formatSign } from "../format/index.ts"
 import { UserSign } from "../sign/index.ts"
 
@@ -66,7 +66,7 @@ export async function startAgentRepl(
     }
 
     try {
-      for await (const sign of agentRun(agent, UserSign(input))) {
+      for await (const sign of agentInterpret(agent, [UserSign(input)])) {
         console.log(formatSign(sign))
       }
     } catch (error) {
