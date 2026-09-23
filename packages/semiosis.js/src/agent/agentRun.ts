@@ -48,7 +48,7 @@ export async function* agentRun(
     }
 
     for (const toolCallSign of toolCallSigns) {
-      const sign = await agent.config.toolRouter.run(agent, toolCallSign)
+      const sign = await agent.config.toolRouter.run(toolCallSign)
 
       if (isErrorSign(sign)) {
         yield sign

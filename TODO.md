@@ -1,7 +1,5 @@
 # semiosis
 
-[semiosis.js]
-
 # windbell
 
 [windbell] workspace manager

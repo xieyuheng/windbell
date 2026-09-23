@@ -1,6 +1,5 @@
 import { errorReport } from "@xieyuheng/std.js/error"
 import { Ajv } from "ajv"
-import type { Agent } from "../agent/Agent.ts"
 import {
   ToolOutputSign,
   type Sign,
@@ -26,7 +25,7 @@ export class ToolRouter {
     this.routes[sign.name] = { sign, handler, validate }
   }
 
-  async run(agent: Agent, toolCall: ToolCallSign): Promise<Sign> {
+  async run(toolCall: ToolCallSign): Promise<Sign> {
     const route = this.routes[toolCall.name]
     if (route === undefined) {
       return ToolOutputSign(
@@ -49,7 +48,7 @@ export class ToolRouter {
         )
       }
 
-      const content = await route.handler(agent, args)
+      const content = await route.handler(args)
       return ToolOutputSign(toolCall.callId, content)
     } catch (error) {
       return ToolOutputSign(toolCall.callId, errorReport(error))

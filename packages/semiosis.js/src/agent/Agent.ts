@@ -9,7 +9,6 @@ export type Agent = {
 }
 
 export type AgentConfig = {
-  cwd: string
   toolRouter: ToolRouter
 }
 

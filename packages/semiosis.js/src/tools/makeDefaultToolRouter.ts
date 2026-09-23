@@ -8,7 +8,13 @@ const defaultBashToolDescription = `Run commands in a bash shell.
 * To inspect a particular line range of a file, e.g. lines 10-25, try 'sed -n 10,25p /path/to/the/file'.
 * Please avoid commands that may produce a very large amount of output.`
 
-export function makeDefaultToolRouter(): ToolRouter {
+export type DefaultToolRouterOptions = {
+  cwd: string
+}
+
+export function makeDefaultToolRouter(
+  options: DefaultToolRouterOptions,
+): ToolRouter {
   const toolRouter = makeToolRouter()
 
   toolRouter.defineTool(
@@ -16,6 +22,7 @@ export function makeDefaultToolRouter(): ToolRouter {
       description: defaultBashToolDescription,
     }),
     makeBashToolHandler({
+      cwd: options.cwd,
       timeoutMs: 300_000,
       maxOutputChars: 200_000,
     }),

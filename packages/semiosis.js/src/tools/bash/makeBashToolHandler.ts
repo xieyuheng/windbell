@@ -19,6 +19,7 @@ type BashRunResult = {
 }
 
 export type BashToolHandlerOptions = {
+  cwd: string
   timeoutMs: number
   maxOutputChars: number
 }
@@ -26,11 +27,11 @@ export type BashToolHandlerOptions = {
 export function makeBashToolHandler(
   options: BashToolHandlerOptions,
 ): ToolHandler {
-  return async (agent, args) => {
+  return async (args) => {
     const command = args.command as string
 
     const result = await bashRun(command, {
-      cwd: agent.config.cwd,
+      cwd: options.cwd,
       timeoutMs: options.timeoutMs,
       maxOutputChars: options.maxOutputChars,
     })

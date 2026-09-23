@@ -32,11 +32,10 @@ router.defineHandlers({
 
     const [providerName, modelName] = parseQualifiedName(modelSpec)
     const model = makeModel(providerName, modelName)
-    const toolRouter = makeDefaultToolRouter()
+    const toolRouter = makeDefaultToolRouter({ cwd: process.cwd() })
     const agent = makeAgent(
       model,
       {
-        cwd: process.cwd(),
         toolRouter,
       },
       [
@@ -67,6 +66,7 @@ router.defineHandlers({
         description: "Run commands in a bash shell.",
       }),
       makeBashToolHandler({
+        cwd,
         timeoutMs: 300_000,
         maxOutputChars,
       }),
@@ -74,7 +74,6 @@ router.defineHandlers({
     const agent = makeAgent(
       model,
       {
-        cwd,
         toolRouter,
       },
       [...toolRouter.toolSigns, personaSign],
