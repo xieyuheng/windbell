@@ -1,8 +1,6 @@
 import { Hono, type Context } from "hono"
-import { cors } from "hono/cors"
 import { HTTPException } from "hono/http-exception"
 import * as service from "../service/index.ts"
-import type { FileSystemRouterOptions } from "./FileSystemRouterOptions.ts"
 
 type Handler = (body: unknown) => Promise<unknown>
 
@@ -22,12 +20,12 @@ const handlers: Record<string, Handler> = {
   rename: async (body) => service.rename(readPath(body), readNewPath(body)),
 }
 
-export function createFileSystemRouter(options: FileSystemRouterOptions): Hono {
+export function createFileSystemRouter(): Hono {
   const app = new Hono()
 
-  if (options.corsOrigin !== undefined) {
-    app.use("*", cors({ origin: options.corsOrigin }))
-  }
+  app.get("/health", async (c) => {
+    return c.json(await service.health())
+  })
 
   app.post("/:method", async (c) => {
     const method = c.req.param("method")

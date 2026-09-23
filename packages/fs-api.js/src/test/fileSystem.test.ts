@@ -4,6 +4,18 @@ import Os from "node:os"
 import Path from "node:path"
 import { test } from "node:test"
 import { makeFileSystemClient, startFileSystemServer } from "../index.ts"
+import { createFileSystemRouter } from "../router/index.ts"
+
+test("GET /health", async () => {
+  const app = createFileSystemRouter()
+  const response = await app.request("/health")
+
+  assert.equal(response.status, 200)
+  assert.deepEqual(await response.json(), {
+    ok: true,
+    service: "fs-api",
+  })
+})
 
 test("fileSystem client and server", async (t) => {
   const root = await fs.mkdtemp(Path.join(Os.tmpdir(), "windbell-fs-"))
@@ -11,6 +23,7 @@ test("fileSystem client and server", async (t) => {
     host: "127.0.0.1",
     port: 0,
     basePath: "/fs",
+    corsOrigin: undefined,
   })
   const client = makeFileSystemClient({ baseUrl: url })
 

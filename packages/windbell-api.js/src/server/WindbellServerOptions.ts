@@ -1,4 +1,6 @@
-export type WindbellServerOptions = {
-  hostname?: string
-  port?: number
+import type { WindbellRouterOptions } from "../router/index.ts"
+
+export type WindbellServerOptions = WindbellRouterOptions & {
+  hostname: string
+  port: number
 }

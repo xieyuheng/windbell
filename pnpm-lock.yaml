@@ -111,6 +111,9 @@ importers:
       '@xieyuheng/fs-api.js':
         specifier: workspace:*
         version: link:../fs-api.js
+      '@xieyuheng/semiosis-api.js':
+        specifier: workspace:*
+        version: link:../semiosis-api.js
       '@xieyuheng/semiosis.js':
         specifier: workspace:*
         version: link:../semiosis.js

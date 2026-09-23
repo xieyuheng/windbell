@@ -1,7 +1,6 @@
-import type { FileSystemRouterOptions } from "../router/index.ts"
-
-export type FileSystemServerOptions = FileSystemRouterOptions & {
+export type FileSystemServerOptions = {
   host: string
   port: number
   basePath: string
+  corsOrigin: string | undefined
 }
