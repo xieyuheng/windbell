@@ -1,5 +1,5 @@
 {
-  "name": "@xieyuheng/windbell-server.js",
+  "name": "@xieyuheng/windbell-api.js",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -23,6 +23,6 @@
     "typescript": "^7.0.2"
   },
   "bin": {
-    "windbell-server": "src/main.ts"
+    "windbell-api": "src/main.ts"
   }
 }

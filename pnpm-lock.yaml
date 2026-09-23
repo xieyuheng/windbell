@@ -81,7 +81,7 @@ importers:
         specifier: npm:typescript-native-bridge@6.0.3-bridge.17.tsgo.7.0.2
         version: typescript-native-bridge@6.0.3-bridge.17.tsgo.7.0.2
 
-  packages/windbell-server.js:
+  packages/windbell-api.js:
     dependencies:
       '@hono/node-server':
         specifier: 2.1.1
@@ -106,7 +106,7 @@ importers:
         specifier: npm:typescript-native-bridge@6.0.3-bridge.17.tsgo.7.0.2
         version: typescript-native-bridge@6.0.3-bridge.17.tsgo.7.0.2
 
-  packages/windbell.js:
+  packages/windbell-web.js:
     dependencies:
       '@lucide/vue':
         specifier: 1.47.0

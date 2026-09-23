@@ -10,8 +10,8 @@ set -e
 ./scripts/run-in.sh cli.js format.sh
 ./scripts/run-in.sh semiosis.js format.sh
 ./scripts/run-in.sh fs-api.js format.sh
-./scripts/run-in.sh windbell-server.js format.sh
-./scripts/run-in.sh windbell.js format.sh
+./scripts/run-in.sh windbell-api.js format.sh
+./scripts/run-in.sh windbell-web.js format.sh
 
 # ts check
 
@@ -19,8 +19,8 @@ set -e
 ./scripts/run-in.sh cli.js check.sh
 ./scripts/run-in.sh semiosis.js check.sh
 ./scripts/run-in.sh fs-api.js check.sh
-./scripts/run-in.sh windbell-server.js check.sh
-./scripts/run-in.sh windbell.js check.sh
+./scripts/run-in.sh windbell-api.js check.sh
+./scripts/run-in.sh windbell-web.js check.sh
 
 # ts test
 
@@ -28,8 +28,8 @@ set -e
 ./scripts/run-in.sh cli.js clean.sh test.sh
 ./scripts/run-in.sh semiosis.js clean.sh test.sh
 ./scripts/run-in.sh fs-api.js clean.sh test.sh
-./scripts/run-in.sh windbell-server.js clean.sh test.sh
+./scripts/run-in.sh windbell-api.js clean.sh test.sh
 
 # frontend build
 
-./scripts/run-in.sh windbell.js clean.sh build.sh
+./scripts/run-in.sh windbell-web.js clean.sh build.sh

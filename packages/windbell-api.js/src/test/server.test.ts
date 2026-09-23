@@ -1,20 +1,20 @@
 import assert from "node:assert/strict"
 import { test } from "node:test"
-import { createApp } from "../app.ts"
+import { createWindbellRouter } from "../router/index.ts"
 
 test("GET /api/health", async () => {
-  const app = createApp()
+  const app = createWindbellRouter()
   const response = await app.request("/api/health")
 
   assert.equal(response.status, 200)
   assert.deepEqual(await response.json(), {
     ok: true,
-    service: "windbell-server",
+    service: "windbell-api",
   })
 })
 
 test("POST /api/fs/exists", async () => {
-  const app = createApp()
+  const app = createWindbellRouter()
   const response = await app.request("/api/fs/exists", {
     method: "POST",
     headers: {
