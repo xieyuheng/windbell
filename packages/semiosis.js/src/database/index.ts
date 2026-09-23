@@ -1,4 +1,6 @@
 export * from "./Database.ts"
+export * from "./ModelStore.ts"
+export * from "./ProviderStore.ts"
 export * from "./SessionStore.ts"
 export * from "./WorkspaceStore.ts"
 export * from "./defaultDatabaseRoot.ts"
