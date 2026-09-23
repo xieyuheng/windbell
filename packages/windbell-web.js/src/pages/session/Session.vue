@@ -5,7 +5,7 @@ import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
 import SignList from "./components/SignList.vue"
 import { sessionMessages } from "./Session.i18n"
-import { createSessionState, loadSessionState } from "./SessionState"
+import { loadSessionState, makeSessionState } from "./SessionState"
 
 const route = useRoute()
 const sessionId = computed(() => String(route.params.sessionId ?? ""))
@@ -15,7 +15,7 @@ const { t } = useI18n({
   useScope: "local",
 })
 
-const state = createSessionState(sessionId.value)
+const state = makeSessionState(sessionId.value)
 const title = computed(() => state.title || t("notFound"))
 
 watch(sessionId, (value) => {

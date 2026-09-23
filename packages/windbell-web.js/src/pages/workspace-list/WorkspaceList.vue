@@ -5,14 +5,14 @@ import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
 import { mockSessions } from "../../mock/session"
 import { workspaceListMessages } from "./WorkspaceList.i18n"
-import { createWorkspaceListState } from "./WorkspaceListState"
+import { makeWorkspaceListState } from "./WorkspaceListState"
 
 const { t } = useI18n({
   messages: workspaceListMessages,
   useScope: "local",
 })
 
-const state = createWorkspaceListState()
+const state = makeWorkspaceListState()
 
 function sessionCount(workspaceId: string): number {
   return mockSessions.filter((session) => session.workspaceId === workspaceId)

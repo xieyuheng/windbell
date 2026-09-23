@@ -1,2 +1,2 @@
-export * from "./createFileSystemServer.ts"
+export * from "./startFileSystemServer.ts"
 export * from "./FileSystemServerOptions.ts"

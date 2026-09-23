@@ -1,1 +1,1 @@
-export * from "./createFileSystemRouter.ts"
+export * from "./makeFileSystemRouter.ts"

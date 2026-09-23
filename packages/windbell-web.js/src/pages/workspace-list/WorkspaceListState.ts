@@ -6,7 +6,7 @@ export type WorkspaceListState = {
   workspaces: Array<S.Workspace>
 }
 
-export function createWorkspaceListState(): WorkspaceListState {
+export function makeWorkspaceListState(): WorkspaceListState {
   return reactive<WorkspaceListState>({
     workspaces: mockWorkspaces,
   })

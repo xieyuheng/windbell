@@ -1,2 +1,2 @@
-export * from "./createWindbellRouter.ts"
+export * from "./makeWindbellRouter.ts"
 export * from "./WindbellRouterOptions.ts"

@@ -27,11 +27,11 @@ The client wraps the endpoints into a typed JavaScript interface.
 
 ```typescript
 import { Hono } from "hono"
-import { createFileSystemRouter } from "@xieyuheng/fs-api.js"
+import { makeFileSystemRouter } from "@xieyuheng/fs-api.js"
 
 const app = new Hono()
 
-app.route("/api/fs", createFileSystemRouter())
+app.route("/api/fs", makeFileSystemRouter())
 ```
 
 ## Server

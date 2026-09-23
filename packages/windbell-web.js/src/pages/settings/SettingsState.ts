@@ -4,7 +4,7 @@ export type SettingsState = {
   goBack(): void
 }
 
-export function createSettingsState(router: Router): SettingsState {
+export function makeSettingsState(router: Router): SettingsState {
   return {
     goBack() {
       if (window.history.length > 1) {

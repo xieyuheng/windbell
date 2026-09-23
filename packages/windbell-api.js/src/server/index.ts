@@ -1,2 +1,2 @@
-export * from "./createWindbellServer.ts"
+export * from "./startWindbellServer.ts"
 export * from "./WindbellServerOptions.ts"

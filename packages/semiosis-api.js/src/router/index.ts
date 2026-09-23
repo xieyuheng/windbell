@@ -1,2 +1,2 @@
-export * from "./createSemiosisRouter.ts"
+export * from "./makeSemiosisRouter.ts"
 export * from "./SemiosisRouterOptions.ts"

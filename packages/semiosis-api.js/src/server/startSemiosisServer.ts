@@ -1,22 +1,22 @@
 import { serve, type ServerType } from "@hono/node-server"
 import { Hono } from "hono"
 import type { AddressInfo } from "node:net"
-import { createSemiosisRouter } from "../router/index.ts"
+import { makeSemiosisRouter } from "../router/index.ts"
 import type { SemiosisServerOptions } from "./SemiosisServerOptions.ts"
 
-function createApp(options: SemiosisServerOptions): Hono {
+function makeApp(options: SemiosisServerOptions): Hono {
   const database = options.database
   const app = new Hono()
   const basePath = normalizeBasePath(options.basePath)
 
-  app.route(basePath || "/", createSemiosisRouter({ database }))
+  app.route(basePath || "/", makeSemiosisRouter({ database }))
   return app
 }
 
 export async function startSemiosisServer(
   options: SemiosisServerOptions,
 ): Promise<{ server: ServerType; url: string }> {
-  const app = createApp(options)
+  const app = makeApp(options)
   const hostname = options.hostname
   const port = options.port
   const basePath = normalizeBasePath(options.basePath)

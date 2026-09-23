@@ -4,10 +4,10 @@ import Os from "node:os"
 import Path from "node:path"
 import { test } from "node:test"
 import { makeFileSystemClient, startFileSystemServer } from "../index.ts"
-import { createFileSystemRouter } from "../router/index.ts"
+import { makeFileSystemRouter } from "../router/index.ts"
 
 test("GET /health", async () => {
-  const app = createFileSystemRouter()
+  const app = makeFileSystemRouter()
   const response = await app.request("/health")
 
   assert.equal(response.status, 200)

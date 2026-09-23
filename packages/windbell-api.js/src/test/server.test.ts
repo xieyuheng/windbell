@@ -4,12 +4,12 @@ import { tmpdir } from "node:os"
 import Path from "node:path"
 import { test } from "node:test"
 import { makeDatabase } from "@xieyuheng/semiosis.js"
-import { createWindbellRouter } from "../router/index.ts"
+import { makeWindbellRouter } from "../router/index.ts"
 
 test("windbell router", async (t) => {
   const root = await mkdtemp(Path.join(tmpdir(), "windbell-api-"))
   const database = makeDatabase({ root })
-  const app = createWindbellRouter({
+  const app = makeWindbellRouter({
     database,
     corsOrigin: undefined,
   })

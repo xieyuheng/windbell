@@ -4,7 +4,7 @@ import { HTTPException } from "hono/http-exception"
 import { makeSemiosisService } from "../service/index.ts"
 import type { SemiosisRouterOptions } from "./SemiosisRouterOptions.ts"
 
-export function createSemiosisRouter(options: SemiosisRouterOptions): Hono {
+export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
   const app = new Hono()
   const service = makeSemiosisService({
     database: options.database,

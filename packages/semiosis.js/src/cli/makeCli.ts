@@ -8,7 +8,7 @@ import { makeReplHandler } from "./commands/repl.ts"
 export function makeCli() {
   const database = makeDatabase({ root: defaultDatabaseRoot() })
   const { version } = getPackageJson(fileURLToPath(import.meta.url))
-  const router = Cli.createRouter("semiosis.js", version)
+  const router = Cli.makeRouter("semiosis.js", version)
 
   router.defineRoutes([
     "repl --model <provider-name>/<model-name> --session <session-id> -- start agent repl in current directory",

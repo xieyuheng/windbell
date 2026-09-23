@@ -20,7 +20,7 @@ const handlers: Record<string, Handler> = {
   rename: async (body) => service.rename(readPath(body), readNewPath(body)),
 }
 
-export function createFileSystemRouter(): Hono {
+export function makeFileSystemRouter(): Hono {
   const app = new Hono()
 
   app.get("/health", async (c) => {

@@ -31,7 +31,7 @@ function applyTheme(theme: Theme): void {
   document.documentElement.style.colorScheme = theme.resolved
 }
 
-export function createTheme(): Theme {
+export function makeTheme(): Theme {
   const theme = reactive<Theme>({
     mode: getInitialMode(),
     resolved: "light",
@@ -44,7 +44,7 @@ export function createTheme(): Theme {
   return theme
 }
 
-const theme = createTheme()
+const theme = makeTheme()
 
 watch(
   () => theme.mode,

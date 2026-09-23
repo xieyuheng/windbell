@@ -8,7 +8,7 @@ export type SessionState = {
   context: Array<S.Sign>
 }
 
-export function createSessionState(sessionId: S.SessionId): SessionState {
+export function makeSessionState(sessionId: S.SessionId): SessionState {
   const state = reactive<SessionState>({
     sessionId,
     title: "",

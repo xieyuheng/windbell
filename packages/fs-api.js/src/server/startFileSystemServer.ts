@@ -2,27 +2,24 @@ import { serve, type ServerType } from "@hono/node-server"
 import { Hono } from "hono"
 import { cors } from "hono/cors"
 import type { AddressInfo } from "node:net"
-import { createFileSystemRouter } from "../router/index.ts"
+import { makeFileSystemRouter } from "../router/index.ts"
 import type { FileSystemServerOptions } from "./FileSystemServerOptions.ts"
 
-function createApp(options: FileSystemServerOptions): Hono {
+function makeApp(options: FileSystemServerOptions): Hono {
   const app = new Hono()
 
   if (options.corsOrigin !== undefined) {
     app.use("*", cors({ origin: options.corsOrigin }))
   }
 
-  app.route(
-    normalizeBasePath(options.basePath) || "/",
-    createFileSystemRouter(),
-  )
+  app.route(normalizeBasePath(options.basePath) || "/", makeFileSystemRouter())
   return app
 }
 
 export async function startFileSystemServer(
   options: FileSystemServerOptions,
 ): Promise<{ server: ServerType; url: string }> {
-  const app = createApp(options)
+  const app = makeApp(options)
   const hostname = options.host
   const port = options.port
   const basePath = normalizeBasePath(options.basePath)
