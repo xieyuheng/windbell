@@ -28,7 +28,6 @@ export async function startAgentRepl(agent: Agent): Promise<void> {
   })
 
   console.log("semiosis.js repl")
-  console.log("commands: /exit /debug")
 
   readline.setPrompt("> ")
   readline.prompt()
@@ -52,12 +51,6 @@ export async function startAgentRepl(agent: Agent): Promise<void> {
       continue
     }
 
-    if (input === "/debug") {
-      console.log(JSON.stringify(agent.context, null, 2))
-      if (!isClosed) readline.prompt()
-      continue
-    }
-
     try {
       for await (const sign of agentRun(agent, UserSign(input))) {
         console.log(formatSign(sign))
@@ -70,5 +63,4 @@ export async function startAgentRepl(agent: Agent): Promise<void> {
   }
 
   readline.close()
-  console.log("bye")
 }
