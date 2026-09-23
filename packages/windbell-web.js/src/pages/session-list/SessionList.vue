@@ -30,7 +30,6 @@ async function createSession(): Promise<void> {
     await router.push({
       name: "session",
       params: {
-        workspaceId: state.workspaceId,
         sessionId: session.id,
       },
     })
@@ -101,7 +100,6 @@ useHead(() => ({
           :to="{
             name: 'session',
             params: {
-              workspaceId: state.workspaceId,
               sessionId: session.id,
             },
           }"

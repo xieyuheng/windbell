@@ -12,12 +12,24 @@ const semiosis = makeSemiosisClient({
 const route = useRoute()
 const router = useRouter()
 
-const activeWorkspaceId = computed(() => String(route.params.workspaceId ?? ""))
 const activeSessionId = computed(() => String(route.params.sessionId ?? ""))
 const expandedWorkspaceIds = ref(new Set<S.WorkspaceId>())
 const workspaces = ref<Array<S.Workspace>>([])
 const sessions = ref<Array<S.SessionIndex>>([])
 const error = ref<string | undefined>(undefined)
+
+const activeWorkspaceId = computed(() => {
+  const workspaceId = route.params.workspaceId
+  if (workspaceId !== undefined) {
+    return String(workspaceId)
+  }
+
+  const session = sessions.value.find(
+    (session) => session.id === activeSessionId.value,
+  )
+
+  return session?.workspaceId ?? ""
+})
 
 watch(
   activeWorkspaceId,
@@ -58,13 +70,12 @@ function toggleWorkspace(workspaceId: S.WorkspaceId): void {
 }
 
 function selectSession(
-  workspaceId: S.WorkspaceId,
+  _workspaceId: S.WorkspaceId,
   sessionId: S.SessionId,
 ): void {
   router.push({
     name: "session",
     params: {
-      workspaceId,
       sessionId,
     },
   })

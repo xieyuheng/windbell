@@ -25,7 +25,7 @@ export const routes: Array<RouteRecordRaw> = [
     component: () => import("./session-list/SessionList.vue"),
   },
   {
-    path: "/workspaces/:workspaceId/sessions/:sessionId",
+    path: "/sessions/:sessionId",
     name: "session",
     component: () => import("./session/Session.vue"),
   },

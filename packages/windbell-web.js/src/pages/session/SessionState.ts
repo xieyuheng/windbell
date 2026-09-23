@@ -15,8 +15,6 @@ const semiosis = makeSemiosisClient({
   baseUrl: "/api/semiosis",
 })
 
-const defaultModelQualifiedName = "mock/conversation"
-
 export function makeSessionState(sessionId: S.SessionId): SessionState {
   return reactive<SessionState>({
     sessionId,
@@ -59,19 +57,26 @@ export async function interpretSession(
   state: SessionState,
   content: string,
 ): Promise<void> {
-  const input: S.UserSign = {
-    kind: "UserSign",
-    content,
-  }
-
-  state.context.push(input)
   state.interpreting = true
   state.error = undefined
 
   try {
+    const settings = await semiosis.settings.get()
+
+    if (settings.defaultModel === null) {
+      throw new Error("default model is not configured")
+    }
+
+    const input: S.UserSign = {
+      kind: "UserSign",
+      content,
+    }
+
+    state.context.push(input)
+
     const result = await semiosis.sessions.interpret(state.sessionId, {
       model: {
-        qualifiedName: defaultModelQualifiedName,
+        qualifiedName: settings.defaultModel.qualifiedName,
       },
       input: [input],
     })

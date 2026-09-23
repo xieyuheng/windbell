@@ -34,6 +34,15 @@ export type SemiosisClient = {
     service: string
   }>
 
+  models: {
+    list(): Promise<Array<{ qualifiedName: string }>>
+  }
+
+  settings: {
+    get(): Promise<S.Settings>
+    put(settings: S.Settings): Promise<void>
+  }
+
   workspaces: {
     list(): Promise<Array<S.Workspace>>
     ensure(options: EnsureWorkspaceOptions): Promise<S.Workspace>
@@ -60,6 +69,18 @@ export function makeSemiosisClient(
 ): SemiosisClient {
   return {
     health: () => call(config.baseUrl, "GET", "/health"),
+
+    models: {
+      list: () => call(config.baseUrl, "GET", "/models"),
+    },
+
+    settings: {
+      get: () => call(config.baseUrl, "GET", "/settings"),
+
+      put: async (settings) => {
+        await call(config.baseUrl, "PUT", "/settings", settings)
+      },
+    },
 
     workspaces: {
       list: () => call(config.baseUrl, "GET", "/workspaces"),

@@ -17,6 +17,37 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     })
   })
 
+  app.get("/models", async () => {
+    const providerNames = await options.database.providers.list()
+    const models: Array<{ qualifiedName: string }> = []
+
+    for (const providerName of providerNames) {
+      const modelNames = await options.database.models.list(providerName)
+
+      for (const modelName of modelNames) {
+        models.push({
+          qualifiedName: `${providerName}/${modelName}`,
+        })
+      }
+    }
+
+    return sendJson(200, models)
+  })
+
+  app.get("/settings", async () => {
+    const settings = await options.database.settings.get()
+
+    return sendJson(200, settings ?? { defaultModel: null })
+  })
+
+  app.put("/settings", async (c) => {
+    const body = readRecord(await readJsonBody(c))
+    const settings = readSettings(body)
+
+    await options.database.settings.put(settings)
+    return sendEmpty(204)
+  })
+
   app.get("/workspaces", async () => {
     return sendJson(200, await service.workspaces.list())
   })
@@ -214,6 +245,25 @@ function readSession(body: unknown): S.Session {
     context: context as Array<S.Sign>,
     createdAt: readNumber(record, "createdAt"),
     updatedAt: readNumber(record, "updatedAt"),
+  }
+}
+
+function readSettings(body: Record<string, unknown>): S.Settings {
+  const value = body["defaultModel"]
+
+  if (value === null) {
+    return {
+      defaultModel: null,
+    }
+  }
+
+  const record = readRecord(value)
+  const qualifiedName = readString(record, "qualifiedName")
+
+  return {
+    defaultModel: {
+      qualifiedName,
+    },
   }
 }
 
