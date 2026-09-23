@@ -1,37 +1,17 @@
-import fs from "node:fs"
-import Os from "node:os"
-import Path from "node:path"
-import { parseDeepSeekModelConfig } from "./parseDeepSeekModelConfig.ts"
+import type { Database } from "../../database/index.ts"
 import type { DeepSeekModelConfig } from "./DeepSeekModelConfig.ts"
+import { parseDeepSeekModelConfig } from "./parseDeepSeekModelConfig.ts"
 
-export function readDeepSeekModelConfig(name: string): DeepSeekModelConfig {
-  const path = deepSeekModelConfigPath(name)
-  const text = readDeepSeekModelConfigFile(path)
-  return parseDeepSeekModelConfig(name, text)
-}
-
-function deepSeekModelConfigPath(name: string): string {
-  if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
-    throw new Error(`[readDeepSeekModelConfig] invalid model name: ${name}`)
-  }
-
-  return Path.join(
-    Os.homedir(),
-    ".windbell",
-    "database",
-    "models",
-    "deepseek",
-    `${name}.json`,
-  )
-}
-
-function readDeepSeekModelConfigFile(path: string): string {
-  try {
-    return fs.readFileSync(path, "utf8")
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
+export async function readDeepSeekModelConfig(
+  database: Database,
+  name: string,
+): Promise<DeepSeekModelConfig> {
+  const value = await database.models.get("deepseek", name)
+  if (value === undefined) {
     throw new Error(
-      `[readDeepSeekModelConfigFile] fail to read model config: ${path}\n  ${message}`,
+      `[readDeepSeekModelConfig] model config not found: deepseek/${name}`,
     )
   }
+
+  return parseDeepSeekModelConfig(name, value)
 }

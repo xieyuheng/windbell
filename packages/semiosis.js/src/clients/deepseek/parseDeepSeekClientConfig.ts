@@ -6,8 +6,9 @@ const deepSeekClientConfigSchema = z.object({
   key: z.string().min(1),
 })
 
-export function parseDeepSeekClientConfig(text: string): DeepSeekClientConfig {
-  const value = parseDeepSeekJson(text)
+export function parseDeepSeekClientConfig(
+  value: unknown,
+): DeepSeekClientConfig {
   const result = deepSeekClientConfigSchema.safeParse(value)
   if (!result.success) {
     throw new Error(
@@ -16,13 +17,4 @@ export function parseDeepSeekClientConfig(text: string): DeepSeekClientConfig {
   }
 
   return result.data
-}
-
-function parseDeepSeekJson(text: string): unknown {
-  try {
-    return JSON.parse(text)
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    throw new Error(`[parseDeepSeekClientConfig] invalid JSON: ${message}`)
-  }
 }

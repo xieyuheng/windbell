@@ -1,32 +1,16 @@
-import fs from "node:fs"
-import Os from "node:os"
-import Path from "node:path"
+import type { Database } from "../../database/index.ts"
 import type { DeepSeekClientConfig } from "./DeepSeekClientConfig.ts"
 import { parseDeepSeekClientConfig } from "./parseDeepSeekClientConfig.ts"
 
-export function readDeepSeekClientConfig(): DeepSeekClientConfig {
-  const path = deepSeekClientConfigPath()
-  const text = deepSeekConfigTextRead(path)
-  return parseDeepSeekClientConfig(text)
-}
-
-function deepSeekClientConfigPath(): string {
-  return Path.join(
-    Os.homedir(),
-    ".windbell",
-    "database",
-    "providers",
-    "deepseek.json",
-  )
-}
-
-function deepSeekConfigTextRead(path: string): string {
-  try {
-    return fs.readFileSync(path, "utf8")
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
+export async function readDeepSeekClientConfig(
+  database: Database,
+): Promise<DeepSeekClientConfig> {
+  const value = await database.providers.get("deepseek")
+  if (value === undefined) {
     throw new Error(
-      `[readDeepSeekClientConfig] fail to read provider file: ${path}\n  ${message}`,
+      "[readDeepSeekClientConfig] provider config not found: deepseek",
     )
   }
+
+  return parseDeepSeekClientConfig(value)
 }

@@ -9,10 +9,18 @@ import type { ToolRouter } from "../tool/index.ts"
 import type { Workspace } from "../workspace/Workspace.ts"
 import { parseQualifiedName, readRequiredOption } from "./options.ts"
 
-export function makeModelFromOptions(options: Record<string, unknown>): Model {
-  const modelSpec = readRequiredOption(options, "--model")
+export async function makeModelFromOptions(options: {
+  database: Database
+  cliOptions: Record<string, unknown>
+}): Promise<Model> {
+  const modelSpec = readRequiredOption(options.cliOptions, "--model")
   const [providerName, modelName] = parseQualifiedName(modelSpec)
-  return makeModel(providerName, modelName)
+
+  return await makeModel({
+    database: options.database,
+    providerName,
+    modelName,
+  })
 }
 
 export async function ensureWorkspace(options: {

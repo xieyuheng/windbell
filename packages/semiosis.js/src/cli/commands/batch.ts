@@ -27,7 +27,10 @@ export type BatchCommandOptions = {
 
 export function makeBatchHandler(options: BatchCommandOptions) {
   return async (context: Cli.HandlerContext) => {
-    const model = makeModelFromOptions(context.options)
+    const model = await makeModelFromOptions({
+      database: options.database,
+      cliOptions: context.options,
+    })
 
     const promptsPath = readRequiredOption(context.options, "--prompts")
     const promptBatch = readPromptBatch(promptsPath)

@@ -17,9 +17,8 @@ const deepSeekModelConfigSchema = z.object({
 
 export function parseDeepSeekModelConfig(
   name: string,
-  text: string,
+  value: unknown,
 ): DeepSeekModelConfig {
-  const value = parseDeepSeekJson(text)
   const result = deepSeekModelConfigSchema.safeParse(value)
   if (!result.success) {
     throw new Error(
@@ -30,14 +29,5 @@ export function parseDeepSeekModelConfig(
   return {
     name,
     ...result.data,
-  }
-}
-
-function parseDeepSeekJson(text: string): unknown {
-  try {
-    return JSON.parse(text)
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    throw new Error(`[parseDeepSeekModelConfig] invalid JSON: ${message}`)
   }
 }

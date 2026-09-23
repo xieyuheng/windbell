@@ -19,7 +19,10 @@ export type ReplCommandOptions = {
 
 export function makeReplHandler(options: ReplCommandOptions) {
   return async (context: Cli.HandlerContext) => {
-    const model = makeModelFromOptions(context.options)
+    const model = await makeModelFromOptions({
+      database: options.database,
+      cliOptions: context.options,
+    })
     const workspace = await ensureWorkspace({
       database: options.database,
       cwd: process.cwd(),
