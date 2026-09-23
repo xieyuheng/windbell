@@ -1,5 +1,3 @@
-# semiosis
-
 # windbell
 
 [windbell] workspace manager

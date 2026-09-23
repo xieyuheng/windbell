@@ -1,0 +1,32 @@
+{
+  "name": "@xieyuheng/semiosis-api.js",
+  "version": "0.1.0",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "repository": "github:xieyuheng/windbell",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client/index.ts",
+    "./router": "./src/router/index.ts",
+    "./server": "./src/server/index.ts",
+    "./service": "./src/service/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "prettier": {
+    "semi": false,
+    "trailingComma": "all"
+  },
+  "dependencies": {
+    "@hono/node-server": "2.1.1",
+    "@xieyuheng/semiosis.js": "workspace:*",
+    "hono": "4.13.8"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "prettier": "^3.9.8",
+    "typescript": "^7.0.2"
+  }
+}
