@@ -1,6 +1,6 @@
 import Path from "node:path"
 import process from "node:process"
-import type { HandlerContext } from "@xieyuheng/cli.js"
+import type * as Cli from "@xieyuheng/cli.js"
 import { agentRun } from "../../agent/index.ts"
 import type { Database } from "../../database/index.ts"
 import { formatSign } from "../../format/index.ts"
@@ -26,7 +26,7 @@ export type BatchCommandOptions = {
 }
 
 export function makeBatchHandler(options: BatchCommandOptions) {
-  return async (context: HandlerContext) => {
+  return async (context: Cli.HandlerContext) => {
     const model = makeModelFromOptions(context.options)
 
     const promptsPath = readRequiredOption(context.options, "--prompts")

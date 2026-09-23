@@ -1,5 +1,5 @@
 import process from "node:process"
-import type { HandlerContext } from "@xieyuheng/cli.js"
+import type * as Cli from "@xieyuheng/cli.js"
 import type { Database } from "../../database/index.ts"
 import { startAgentRepl } from "../../repl/index.ts"
 import { PersonaSign } from "../../sign/index.ts"
@@ -18,7 +18,7 @@ export type ReplCommandOptions = {
 }
 
 export function makeReplHandler(options: ReplCommandOptions) {
-  return async (context: HandlerContext) => {
+  return async (context: Cli.HandlerContext) => {
     const model = makeModelFromOptions(context.options)
     const workspace = await ensureWorkspace({
       database: options.database,
