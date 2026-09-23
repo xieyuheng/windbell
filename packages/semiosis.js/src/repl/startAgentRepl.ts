@@ -5,7 +5,14 @@ import { agentRun, type Agent } from "../agent/index.ts"
 import { formatSign } from "../format/index.ts"
 import { UserSign } from "../sign/index.ts"
 
-export async function startAgentRepl(agent: Agent): Promise<void> {
+export type StartAgentReplOptions = {
+  showContext?: boolean
+}
+
+export async function startAgentRepl(
+  agent: Agent,
+  options: StartAgentReplOptions = {},
+): Promise<void> {
   const readline = Readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -28,6 +35,13 @@ export async function startAgentRepl(agent: Agent): Promise<void> {
   })
 
   console.log("semiosis.js repl")
+
+  if (options.showContext) {
+    const context = await agent.getContext()
+    for (const sign of context) {
+      console.log(formatSign(sign))
+    }
+  }
 
   readline.setPrompt("> ")
   readline.prompt()

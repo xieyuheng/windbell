@@ -49,8 +49,9 @@ router.defineHandlers({
       PersonaSign("You are a helpful software engineer assistant."),
     ]
 
+    const sessionId = readOptionalOption(options, "--session")
     const session = await getOrMakeSession({
-      sessionId: readOptionalOption(options, "--session"),
+      sessionId,
       workspace,
       title: "untitled",
       initialSigns,
@@ -63,7 +64,9 @@ router.defineHandlers({
       makeToolRouter: () => toolRouter,
     })
 
-    return startAgentRepl(agent)
+    return startAgentRepl(agent, {
+      showContext: sessionId !== undefined,
+    })
   },
 
   batch: async ({ options }) => {
