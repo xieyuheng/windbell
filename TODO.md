@@ -1,11 +1,6 @@
 # semiosis
 
-[semiosis.js] 下面取消 AgentConfig 类型，为之后的 Session 做准备，因为
-
-
-[semiosis.js] 下面我们要设计 Session 和 Workspace 类型 
-
-- windbell.js 的 models 中已经定义了这两个类型，是否应该改为 import semiosis.js？
+[semiosis.js]
 
 # windbell
 

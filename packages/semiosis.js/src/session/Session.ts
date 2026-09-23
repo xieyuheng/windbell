@@ -11,3 +11,5 @@ export type Session = {
   createdAt: number
   updatedAt: number
 }
+
+export type SessionIndex = Omit<Session, "context">
