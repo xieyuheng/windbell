@@ -2,24 +2,23 @@
 import { ChevronDown, ChevronRight, Settings } from "@lucide/vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
-import type { Workspace, WorkspaceId } from "../../models/Workspace"
-import type { Session, SessionId } from "../../models/Session"
+import type * as S from "@xieyuheng/semiosis.js"
 import SessionList from "./SessionList.vue"
 
 defineProps<{
-  workspaces: Array<Workspace>
-  sessions: Array<Session>
-  activeWorkspaceId?: WorkspaceId | null
-  activeSessionId?: SessionId | null
-  expandedWorkspaceIds: Set<WorkspaceId>
+  workspaces: Array<S.Workspace>
+  sessions: Array<S.Session>
+  activeWorkspaceId?: S.WorkspaceId | null
+  activeSessionId?: S.SessionId | null
+  expandedWorkspaceIds: Set<S.WorkspaceId>
 }>()
 
 defineEmits<{
-  (event: "toggle", workspaceId: WorkspaceId): void
+  (event: "toggle", workspaceId: S.WorkspaceId): void
   (
     event: "select-session",
-    workspaceId: WorkspaceId,
-    sessionId: SessionId,
+    workspaceId: S.WorkspaceId,
+    sessionId: S.SessionId,
   ): void
 }>()
 

@@ -1,9 +1,9 @@
 import { reactive } from "vue"
 import { mockWorkspaces } from "../../mock/workspace"
-import type { Workspace } from "../../models/Workspace"
+import type * as S from "@xieyuheng/semiosis.js"
 
 export type WorkspaceListState = {
-  workspaces: Array<Workspace>
+  workspaces: Array<S.Workspace>
 }
 
 export function createWorkspaceListState(): WorkspaceListState {

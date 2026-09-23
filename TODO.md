@@ -1,15 +1,11 @@
 # semiosis
 
-[semiosis.js] 下面我要设计 Session 类型
+[semiosis.js] 下面取消 AgentConfig 类型，为之后的 Session 做准备，因为
 
-- ~/.windbell/database/sessions/<session-id>/
 
-  - index.json -- 保存 Session 类型相关的数据
+[semiosis.js] 下面我们要设计 Session 和 Workspace 类型 
 
-  - context/ -- 一个 .md 或 .json 文件，一个 sign。
-    文件名前缀为长度为 4 的序号，从 0000 开始，
-    0000-<sign-type-name>.md 或 .json -- 比如 PersonaSign 就是 persona，
-    ToolCallSign 就是 tool-call。
+- windbell.js 的 models 中已经定义了这两个类型，是否应该改为 import semiosis.js？
 
 # windbell
 

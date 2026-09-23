@@ -1,5 +1,5 @@
-import type { Sign } from "@xieyuheng/semiosis.js"
-import type { WorkspaceId } from "./Workspace"
+import type { Sign } from "../sign/index.ts"
+import type { WorkspaceId } from "../workspace/Workspace.ts"
 
 export type SessionId = string
 
@@ -7,7 +7,7 @@ export type Session = {
   id: SessionId
   workspaceId: WorkspaceId
   title: string
-  signs: Array<Sign>
+  context: Array<Sign>
   createdAt: number
   updatedAt: number
 }

@@ -1,19 +1,18 @@
 import { reactive } from "vue"
-import type { Sign } from "@xieyuheng/semiosis.js"
+import type * as S from "@xieyuheng/semiosis.js"
 import { mockSessions } from "../../mock/session"
-import type { SessionId } from "../../models/Session"
 
 export type SessionState = {
-  sessionId: SessionId
+  sessionId: S.SessionId
   title: string
-  signs: Array<Sign>
+  context: Array<S.Sign>
 }
 
-export function createSessionState(sessionId: SessionId): SessionState {
+export function createSessionState(sessionId: S.SessionId): SessionState {
   const state = reactive<SessionState>({
     sessionId,
     title: "",
-    signs: [],
+    context: [],
   })
 
   loadSessionState(state, sessionId)
@@ -22,11 +21,11 @@ export function createSessionState(sessionId: SessionId): SessionState {
 
 export function loadSessionState(
   state: SessionState,
-  sessionId: SessionId,
+  sessionId: S.SessionId,
 ): void {
   const session = mockSessions.find((item) => item.id === sessionId)
 
   state.sessionId = sessionId
   state.title = session?.title ?? ""
-  state.signs = session?.signs ?? []
+  state.context = session?.context ?? []
 }

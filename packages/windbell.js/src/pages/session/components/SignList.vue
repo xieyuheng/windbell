@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Sign } from "@xieyuheng/semiosis.js"
+import type * as S from "@xieyuheng/semiosis.js"
 import { useI18n } from "vue-i18n"
 import { sessionMessages } from "../Session.i18n"
 
 defineProps<{
-  signs: Array<Sign>
+  signs: Array<S.Sign>
 }>()
 
 const { t } = useI18n({
@@ -12,7 +12,7 @@ const { t } = useI18n({
   useScope: "local",
 })
 
-function kindLabel(kind: Sign["kind"]): string {
+function kindLabel(kind: S.Sign["kind"]): string {
   switch (kind) {
     case "UserSign":
       return t("signKind.user")
@@ -33,7 +33,7 @@ function kindLabel(kind: Sign["kind"]): string {
   }
 }
 
-function body(sign: Sign): string {
+function body(sign: S.Sign): string {
   switch (sign.kind) {
     case "UserSign":
     case "ReasoningSign":
@@ -50,7 +50,7 @@ function body(sign: Sign): string {
   }
 }
 
-function borderClass(kind: Sign["kind"]): string {
+function borderClass(kind: S.Sign["kind"]): string {
   switch (kind) {
     case "UserSign":
       return "border-ink-muted"
@@ -68,7 +68,7 @@ function borderClass(kind: Sign["kind"]): string {
   }
 }
 
-function textClass(kind: Sign["kind"]): string {
+function textClass(kind: S.Sign["kind"]): string {
   switch (kind) {
     case "UserSign":
       return "text-ink"

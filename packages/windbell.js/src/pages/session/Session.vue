@@ -44,6 +44,6 @@ useHead(() => ({
       </h1>
     </header>
 
-    <SignList :signs="state.signs" />
+    <SignList :signs="state.context" />
   </main>
 </template>

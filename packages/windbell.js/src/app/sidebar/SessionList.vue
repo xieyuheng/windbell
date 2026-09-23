@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { Session, SessionId } from "../../models/Session"
+import type * as S from "@xieyuheng/semiosis.js"
 
 defineProps<{
-  sessions: Array<Session>
-  activeSessionId?: SessionId | null
+  sessions: Array<S.Session>
+  activeSessionId?: S.SessionId | null
 }>()
 
 defineEmits<{
-  (event: "select", sessionId: SessionId): void
+  (event: "select", sessionId: S.SessionId): void
 }>()
 </script>
 

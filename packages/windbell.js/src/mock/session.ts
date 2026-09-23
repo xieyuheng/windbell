@@ -1,12 +1,11 @@
-import type { Sign } from "@xieyuheng/semiosis.js"
-import type { Session } from "../models/Session"
+import type * as S from "@xieyuheng/semiosis.js"
 
-export const mockSessions: Array<Session> = [
+export const mockSessions: Array<S.Session> = [
   {
     id: "session-windbell-semiosis",
     workspaceId: "workspace-windbell",
     title: "风铃与符号过程",
-    signs: [
+    context: [
       {
         kind: "PersonaSign",
         content: "You are a helpful software engineer assistant.",
@@ -31,7 +30,7 @@ export const mockSessions: Array<Session> = [
     id: "session-windbell-mobile",
     workspaceId: "workspace-windbell",
     title: "移动端工作区界面",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "移动端选择工作区和对话的界面，应该用卡片还是列表？",
@@ -52,7 +51,7 @@ export const mockSessions: Array<Session> = [
     id: "session-meta-lisp-eval",
     workspaceId: "workspace-meta-lisp",
     title: "最小求值器",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "帮我设计一个最小的表达式求值器。",
@@ -84,7 +83,7 @@ export const mockSessions: Array<Session> = [
     id: "session-fs-api-rpc",
     workspaceId: "workspace-fs-api",
     title: "RPC API 设计",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "fs-api 应该用 REST 还是 RPC？",
@@ -120,7 +119,7 @@ export const mockSessions: Array<Session> = [
     id: "session-std-test",
     workspaceId: "workspace-std",
     title: "测试组织",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "std 里的测试应该如何组织？",
@@ -138,7 +137,7 @@ export const mockSessions: Array<Session> = [
     id: "session-windbell-1",
     workspaceId: "workspace-windbell",
     title: "Markdown 编辑器布局",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 1 轮：windbell 的界面应该如何继续迭代？",
@@ -169,7 +168,7 @@ export const mockSessions: Array<Session> = [
     id: "session-windbell-2",
     workspaceId: "workspace-windbell",
     title: "Sign Timeline 的滚动行为",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 2 轮：windbell 的界面应该如何继续迭代？",
@@ -200,7 +199,7 @@ export const mockSessions: Array<Session> = [
     id: "session-windbell-3",
     workspaceId: "workspace-windbell",
     title: "移动端设置入口",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 3 轮：windbell 的界面应该如何继续迭代？",
@@ -231,7 +230,7 @@ export const mockSessions: Array<Session> = [
     id: "session-windbell-4",
     workspaceId: "workspace-windbell",
     title: "设计系统颜色收敛",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 4 轮：windbell 的界面应该如何继续迭代？",
@@ -262,7 +261,7 @@ export const mockSessions: Array<Session> = [
     id: "session-meta-lisp-1",
     workspaceId: "workspace-meta-lisp",
     title: "表达式求值器的 AST",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 1 轮：meta-lisp 当前最重要的问题是什么？",
@@ -291,7 +290,7 @@ export const mockSessions: Array<Session> = [
     id: "session-meta-lisp-2",
     workspaceId: "workspace-meta-lisp",
     title: "作用域与环境模型",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 2 轮：meta-lisp 当前最重要的问题是什么？",
@@ -320,7 +319,7 @@ export const mockSessions: Array<Session> = [
     id: "session-fs-api-1",
     workspaceId: "workspace-fs-api",
     title: "RPC 错误格式设计",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 1 轮：fs-api 当前最重要的问题是什么？",
@@ -349,7 +348,7 @@ export const mockSessions: Array<Session> = [
     id: "session-fs-api-2",
     workspaceId: "workspace-fs-api",
     title: "类型化 client 封装",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 2 轮：fs-api 当前最重要的问题是什么？",
@@ -378,7 +377,7 @@ export const mockSessions: Array<Session> = [
     id: "session-std-1",
     workspaceId: "workspace-std",
     title: "快照测试的组织方式",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 1 轮：std 当前最重要的问题是什么？",
@@ -407,7 +406,7 @@ export const mockSessions: Array<Session> = [
     id: "session-std-2",
     workspaceId: "workspace-std",
     title: "字符串工具函数设计",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 2 轮：std 当前最重要的问题是什么？",
@@ -436,7 +435,7 @@ export const mockSessions: Array<Session> = [
     id: "session-literate-1",
     workspaceId: "workspace-literate",
     title: "代码块与正文的交叉引用",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 1 轮：literate 当前最重要的问题是什么？",
@@ -465,7 +464,7 @@ export const mockSessions: Array<Session> = [
     id: "session-literate-2",
     workspaceId: "workspace-literate",
     title: "文学式编程的文档结构",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 2 轮：literate 当前最重要的问题是什么？",
@@ -494,7 +493,7 @@ export const mockSessions: Array<Session> = [
     id: "session-semiosis-1",
     workspaceId: "workspace-semiosis",
     title: "Sign 的连续解释",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 1 轮：semiosis 当前最重要的问题是什么？",
@@ -523,7 +522,7 @@ export const mockSessions: Array<Session> = [
     id: "session-semiosis-2",
     workspaceId: "workspace-semiosis",
     title: "工具结果的符号化",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 2 轮：semiosis 当前最重要的问题是什么？",
@@ -552,7 +551,7 @@ export const mockSessions: Array<Session> = [
     id: "session-windbell-long",
     workspaceId: "workspace-windbell",
     title: "超长对话：滚动测试",
-    signs: [
+    context: [
       {
         kind: "UserSign",
         content: "第 1 轮：继续展开这个符号过程。",

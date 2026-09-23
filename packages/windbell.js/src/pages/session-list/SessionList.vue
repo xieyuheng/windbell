@@ -6,7 +6,7 @@ import { useI18n } from "vue-i18n"
 import { RouterLink, useRoute } from "vue-router"
 import { mockSessions } from "../../mock/session"
 import { mockWorkspaces } from "../../mock/workspace"
-import type { Session } from "../../models/Session"
+import type * as S from "@xieyuheng/semiosis.js"
 import { sessionListMessages } from "./SessionList.i18n"
 
 const route = useRoute()
@@ -24,8 +24,8 @@ const sessions = computed(() =>
   mockSessions.filter((session) => session.workspaceId === workspaceId.value),
 )
 
-function preview(session: Session): string {
-  const sign = session.signs[session.signs.length - 1]
+function preview(session: S.Session): string {
+  const sign = session.context[session.context.length - 1]
   if (sign === undefined) return ""
 
   switch (sign.kind) {
@@ -102,7 +102,7 @@ useHead(() => ({
           </p>
 
           <p class="text-sm text-ink">
-            {{ t("signCount", { count: session.signs.length }) }}
+            {{ t("signCount", { count: session.context.length }) }}
           </p>
         </RouterLink>
       </li>

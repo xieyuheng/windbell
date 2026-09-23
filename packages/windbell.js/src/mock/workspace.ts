@@ -1,6 +1,6 @@
-import type { Workspace } from "../models/Workspace"
+import type * as S from "@xieyuheng/semiosis.js"
 
-export const mockWorkspaces: Array<Workspace> = [
+export const mockWorkspaces: Array<S.Workspace> = [
   {
     id: "workspace-windbell",
     name: "windbell",

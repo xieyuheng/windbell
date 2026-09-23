@@ -3,8 +3,7 @@ import { computed, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { mockSessions } from "../../mock/session"
 import { mockWorkspaces } from "../../mock/workspace"
-import type { WorkspaceId } from "../../models/Workspace"
-import type { SessionId } from "../../models/Session"
+import type * as S from "@xieyuheng/semiosis.js"
 import WorkspaceList from "./WorkspaceList.vue"
 
 const route = useRoute()
@@ -12,7 +11,7 @@ const router = useRouter()
 
 const activeWorkspaceId = computed(() => String(route.params.workspaceId ?? ""))
 const activeSessionId = computed(() => String(route.params.sessionId ?? ""))
-const expandedWorkspaceIds = ref(new Set<WorkspaceId>())
+const expandedWorkspaceIds = ref(new Set<S.WorkspaceId>())
 
 watch(
   activeWorkspaceId,
@@ -25,7 +24,7 @@ watch(
   { immediate: true },
 )
 
-function toggleWorkspace(workspaceId: WorkspaceId): void {
+function toggleWorkspace(workspaceId: S.WorkspaceId): void {
   const next = new Set(expandedWorkspaceIds.value)
   if (next.has(workspaceId)) {
     next.delete(workspaceId)
@@ -35,7 +34,10 @@ function toggleWorkspace(workspaceId: WorkspaceId): void {
   expandedWorkspaceIds.value = next
 }
 
-function selectSession(workspaceId: WorkspaceId, sessionId: SessionId): void {
+function selectSession(
+  workspaceId: S.WorkspaceId,
+  sessionId: S.SessionId,
+): void {
   router.push({
     name: "session",
     params: {
