@@ -1,8 +1,8 @@
 import { Hono, type Context } from "hono"
 import { cors } from "hono/cors"
+import { HTTPException } from "hono/http-exception"
 import * as service from "../service/index.ts"
 import type { FileSystemRouterOptions } from "./FileSystemRouterOptions.ts"
-import { HttpError } from "./HttpError.ts"
 
 type Handler = (body: unknown) => Promise<unknown>
 
@@ -34,7 +34,7 @@ export function createFileSystemRouter(options: FileSystemRouterOptions): Hono {
     const handler = handlers[method]
 
     if (handler === undefined) {
-      throw new HttpError(404, `unknown method: ${method}`)
+      throw new HTTPException(404, { message: `unknown method: ${method}` })
     }
 
     const body = await readJsonBody(c)
@@ -43,7 +43,7 @@ export function createFileSystemRouter(options: FileSystemRouterOptions): Hono {
     return sendJson(200, result)
   })
 
-  app.onError((error, c) => sendError(error, c))
+  app.onError((error) => sendError(error))
 
   return app
 }
@@ -55,7 +55,7 @@ async function readJsonBody(c: Context): Promise<unknown> {
   try {
     return JSON.parse(text)
   } catch {
-    throw new HttpError(400, "invalid JSON body")
+    throw new HTTPException(400, { message: "invalid JSON body" })
   }
 }
 
@@ -64,7 +64,7 @@ function readPath(body: unknown): string {
   const path = record.path
 
   if (typeof path !== "string") {
-    throw new HttpError(400, "field `path` must be a string")
+    throw new HTTPException(400, { message: "field `path` must be a string" })
   }
 
   return path
@@ -75,7 +75,7 @@ function readText(body: unknown): string {
   const text = record.text
 
   if (typeof text !== "string") {
-    throw new HttpError(400, "field `text` must be a string")
+    throw new HTTPException(400, { message: "field `text` must be a string" })
   }
 
   return text
@@ -86,7 +86,9 @@ function readNewPath(body: unknown): string {
   const newPath = record.newPath
 
   if (typeof newPath !== "string") {
-    throw new HttpError(400, "field `newPath` must be a string")
+    throw new HTTPException(400, {
+      message: "field `newPath` must be a string",
+    })
   }
 
   return newPath
@@ -94,7 +96,9 @@ function readNewPath(body: unknown): string {
 
 function readRecord(body: unknown): Record<string, unknown> {
   if (body === null || typeof body !== "object" || Array.isArray(body)) {
-    throw new HttpError(400, "request body must be a JSON object")
+    throw new HTTPException(400, {
+      message: "request body must be a JSON object",
+    })
   }
 
   return body as Record<string, unknown>
@@ -109,9 +113,9 @@ function sendJson(statusCode: number, value: unknown): Response {
   })
 }
 
-function sendError(error: unknown, _c: Context): Response {
-  const httpError = error instanceof HttpError ? error : undefined
-  const statusCode = httpError?.statusCode ?? statusCodeFromError(error)
+function sendError(error: unknown): Response {
+  const statusCode =
+    error instanceof HTTPException ? error.status : statusCodeFromError(error)
   const message = error instanceof Error ? error.message : String(error)
 
   return sendJson(statusCode, {

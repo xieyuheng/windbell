@@ -1,7 +1,7 @@
 import type { Session, Sign, Workspace } from "@xieyuheng/semiosis.js"
 import { Hono, type Context } from "hono"
+import { HTTPException } from "hono/http-exception"
 import { makeSemiosisService } from "../service/index.ts"
-import { HttpError } from "./HttpError.ts"
 import type { SemiosisRouterOptions } from "./SemiosisRouterOptions.ts"
 
 export function createSemiosisRouter(options: SemiosisRouterOptions): Hono {
@@ -33,7 +33,7 @@ export function createSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const workspace = await service.workspaces.get(c.req.param("workspaceId"))
 
     if (workspace === undefined) {
-      throw new HttpError(404, "workspace not found")
+      throw new HTTPException(404, { message: "workspace not found" })
     }
 
     return sendJson(200, workspace)
@@ -44,7 +44,7 @@ export function createSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const workspaceId = c.req.param("workspaceId")
 
     if (workspace.id !== workspaceId) {
-      throw new HttpError(400, "workspace id mismatch")
+      throw new HTTPException(400, { message: "workspace id mismatch" })
     }
 
     await service.workspaces.put(workspace)
@@ -74,7 +74,7 @@ export function createSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const session = await service.sessions.get(c.req.param("sessionId"))
 
     if (session === undefined) {
-      throw new HttpError(404, "session not found")
+      throw new HTTPException(404, { message: "session not found" })
     }
 
     return sendJson(200, session)
@@ -85,7 +85,7 @@ export function createSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const sessionId = c.req.param("sessionId")
 
     if (session.id !== sessionId) {
-      throw new HttpError(400, "session id mismatch")
+      throw new HTTPException(400, { message: "session id mismatch" })
     }
 
     await service.sessions.put(session)
@@ -105,7 +105,7 @@ export function createSemiosisRouter(options: SemiosisRouterOptions): Hono {
     return sendEmpty(204)
   })
 
-  app.onError((error, _c) => sendError(error))
+  app.onError((error) => sendError(error))
 
   return app
 }
@@ -117,13 +117,15 @@ async function readJsonBody(c: Context): Promise<unknown> {
   try {
     return JSON.parse(text)
   } catch {
-    throw new HttpError(400, "invalid JSON body")
+    throw new HTTPException(400, { message: "invalid JSON body" })
   }
 }
 
 function readRecord(body: unknown): Record<string, unknown> {
   if (body === null || typeof body !== "object" || Array.isArray(body)) {
-    throw new HttpError(400, "request body must be a JSON object")
+    throw new HTTPException(400, {
+      message: "request body must be a JSON object",
+    })
   }
 
   return body as Record<string, unknown>
@@ -132,7 +134,9 @@ function readRecord(body: unknown): Record<string, unknown> {
 function readString(body: Record<string, unknown>, name: string): string {
   const value = body[name]
   if (typeof value !== "string") {
-    throw new HttpError(400, `field \`${name}\` must be a string`)
+    throw new HTTPException(400, {
+      message: `field \`${name}\` must be a string`,
+    })
   }
 
   return value
@@ -141,7 +145,9 @@ function readString(body: Record<string, unknown>, name: string): string {
 function readNumber(body: Record<string, unknown>, name: string): number {
   const value = body[name]
   if (typeof value !== "number") {
-    throw new HttpError(400, `field \`${name}\` must be a number`)
+    throw new HTTPException(400, {
+      message: `field \`${name}\` must be a number`,
+    })
   }
 
   return value
@@ -162,7 +168,9 @@ function readSession(body: unknown): Session {
   const record = readRecord(body)
   const context = record.context
   if (!Array.isArray(context)) {
-    throw new HttpError(400, "field `context` must be an array")
+    throw new HTTPException(400, {
+      message: "field `context` must be an array",
+    })
   }
 
   return {
@@ -178,7 +186,9 @@ function readSession(body: unknown): Session {
 function readSign(body: Record<string, unknown>, name: string): Sign {
   const value = body[name]
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
-    throw new HttpError(400, `field \`${name}\` must be an object`)
+    throw new HTTPException(400, {
+      message: `field \`${name}\` must be an object`,
+    })
   }
 
   return value as Sign
@@ -198,8 +208,8 @@ function sendEmpty(statusCode: number): Response {
 }
 
 function sendError(error: unknown): Response {
-  const httpError = error instanceof HttpError ? error : undefined
-  const statusCode = httpError?.statusCode ?? 500
+  const statusCode =
+    error instanceof HTTPException ? error.status : statusCodeFromError(error)
   const message = error instanceof Error ? error.message : String(error)
 
   return sendJson(statusCode, {
@@ -207,4 +217,31 @@ function sendError(error: unknown): Response {
       message,
     },
   })
+}
+
+function statusCodeFromError(error: unknown): number {
+  const code = readErrorCode(error)
+
+  switch (code) {
+    case "ENOENT":
+      return 404
+    case "EACCES":
+    case "EPERM":
+      return 403
+    case "EISDIR":
+    case "ENOTDIR":
+      return 400
+    case "EEXIST":
+    case "ENOTEMPTY":
+      return 409
+    case "ENOSPC":
+      return 507
+    default:
+      return 500
+  }
+}
+
+function readErrorCode(error: unknown): string | undefined {
+  if (!(error instanceof Error)) return undefined
+  return (error as NodeJS.ErrnoException).code
 }
