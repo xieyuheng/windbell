@@ -79,7 +79,8 @@ test("semiosis client and server", async (t) => {
     workspaceId: workspace.id,
     title: "test session",
   })
-  assert.equal(session.context.length, 0)
+  assert.ok(session.context.length > 0)
+  assert.equal(session.context[0]?.kind, "ToolSign")
 
   const result = await client.sessions.interpret(session.id, {
     model: {

@@ -98,7 +98,18 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const workspaceId = readString(body, "workspaceId")
     const title = readString(body, "title")
 
-    return sendJson(201, await service.sessions.make({ workspaceId, title }))
+    const workspace = await options.database.workspaces.get(workspaceId)
+    if (workspace === undefined) {
+      throw new HTTPException(404, {
+        message: `workspace not found: ${workspaceId}`,
+      })
+    }
+
+    const session = await service.sessions.make({ workspaceId, title })
+    session.context = makeDefaultInitialSigns(workspace)
+    await service.sessions.put(session)
+
+    return sendJson(201, session)
   })
 
   app.get("/sessions/:sessionId", async (c) => {
@@ -173,6 +184,17 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
   app.onError((error) => sendError(error))
 
   return app
+}
+
+function makeDefaultInitialSigns(workspace: S.Workspace): Array<S.Sign> {
+  const toolRouter = S.makeDefaultToolRouter({
+    cwd: workspace.root,
+  })
+
+  return [
+    ...toolRouter.toolSigns,
+    S.PersonaSign("You are a helpful software engineer assistant."),
+  ]
 }
 
 async function readJsonBody(c: Context): Promise<unknown> {
