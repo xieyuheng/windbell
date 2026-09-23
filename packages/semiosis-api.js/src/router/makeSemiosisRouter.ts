@@ -1,4 +1,4 @@
-import type { Session, Sign, Workspace } from "@xieyuheng/semiosis.js"
+import type * as S from "@xieyuheng/semiosis.js"
 import { Hono, type Context } from "hono"
 import { HTTPException } from "hono/http-exception"
 import { makeSemiosisService } from "../service/index.ts"
@@ -153,7 +153,7 @@ function readNumber(body: Record<string, unknown>, name: string): number {
   return value
 }
 
-function readWorkspace(body: unknown): Workspace {
+function readWorkspace(body: unknown): S.Workspace {
   const record = readRecord(body)
   return {
     id: readString(record, "id"),
@@ -164,7 +164,7 @@ function readWorkspace(body: unknown): Workspace {
   }
 }
 
-function readSession(body: unknown): Session {
+function readSession(body: unknown): S.Session {
   const record = readRecord(body)
   const context = record.context
   if (!Array.isArray(context)) {
@@ -177,13 +177,13 @@ function readSession(body: unknown): Session {
     id: readString(record, "id"),
     workspaceId: readString(record, "workspaceId"),
     title: readString(record, "title"),
-    context: context as Array<Sign>,
+    context: context as Array<S.Sign>,
     createdAt: readNumber(record, "createdAt"),
     updatedAt: readNumber(record, "updatedAt"),
   }
 }
 
-function readSign(body: Record<string, unknown>, name: string): Sign {
+function readSign(body: Record<string, unknown>, name: string): S.Sign {
   const value = body[name]
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
     throw new HTTPException(400, {
@@ -191,7 +191,7 @@ function readSign(body: Record<string, unknown>, name: string): Sign {
     })
   }
 
-  return value as Sign
+  return value as S.Sign
 }
 
 function sendJson(statusCode: number, value: unknown): Response {

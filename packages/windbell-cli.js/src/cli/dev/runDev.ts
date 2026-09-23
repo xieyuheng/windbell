@@ -1,4 +1,4 @@
-import { makeDatabase } from "@xieyuheng/semiosis.js"
+import * as S from "@xieyuheng/semiosis.js"
 import { startWindbellServer } from "@xieyuheng/windbell-api.js"
 import Path from "node:path"
 import { createServer, type ViteDevServer } from "vite"
@@ -6,7 +6,7 @@ import { closeServer } from "./closeServer.ts"
 import type { DevOptions } from "./resolveDevOptions.ts"
 
 export async function runDev(options: DevOptions): Promise<void> {
-  const database = makeDatabase({
+  const database = S.makeDatabase({
     root: options.databaseRoot,
   })
 

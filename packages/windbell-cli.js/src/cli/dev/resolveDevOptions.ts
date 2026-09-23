@@ -1,4 +1,4 @@
-import { defaultDatabaseRoot } from "@xieyuheng/semiosis.js"
+import * as S from "@xieyuheng/semiosis.js"
 import Path from "node:path"
 import process from "node:process"
 import { fileURLToPath } from "node:url"
@@ -26,7 +26,7 @@ export function resolveDevOptions(
   )
 
   const databaseRoot =
-    readOptionalString(options, "--database-root") ?? defaultDatabaseRoot()
+    readOptionalString(options, "--database-root") ?? S.defaultDatabaseRoot()
 
   const webSourceRoot =
     readOptionalString(options, "--web-source-root") ?? defaultWebSourceRoot()

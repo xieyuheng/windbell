@@ -1,7 +1,7 @@
-import type { Database } from "@xieyuheng/semiosis.js"
+import type * as S from "@xieyuheng/semiosis.js"
 
 export type SemiosisServerOptions = {
-  database: Database
+  database: S.Database
   hostname: string
   port: number
   basePath: string

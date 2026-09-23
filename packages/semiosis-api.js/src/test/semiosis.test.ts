@@ -3,12 +3,12 @@ import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import Path from "node:path"
 import { test } from "node:test"
-import { makeDatabase, UserSign } from "@xieyuheng/semiosis.js"
+import * as S from "@xieyuheng/semiosis.js"
 import { makeSemiosisClient, startSemiosisServer } from "../index.ts"
 
 test("semiosis client and server", async (t) => {
   const root = await mkdtemp(Path.join(tmpdir(), "semiosis-api-"))
-  const database = makeDatabase({ root })
+  const database = S.makeDatabase({ root })
   const { server, url } = await startSemiosisServer({
     database,
     hostname: "127.0.0.1",
@@ -48,7 +48,7 @@ test("semiosis client and server", async (t) => {
   })
   assert.equal(session.context.length, 0)
 
-  await client.sessions.appendSign(session.id, UserSign("hello"))
+  await client.sessions.appendSign(session.id, S.UserSign("hello"))
 
   const gotSession = await client.sessions.get(session.id)
   assert.equal(gotSession?.context.length, 1)

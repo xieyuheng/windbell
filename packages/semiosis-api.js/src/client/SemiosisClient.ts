@@ -1,12 +1,4 @@
-import type {
-  Session,
-  SessionId,
-  SessionIndex,
-  Sign,
-  Workspace,
-  WorkspaceId,
-} from "@xieyuheng/semiosis.js"
-
+import type * as S from "@xieyuheng/semiosis.js"
 export type SemiosisClientConfig = {
   baseUrl: string
 }
@@ -17,12 +9,12 @@ export type EnsureWorkspaceOptions = {
 }
 
 export type MakeSessionOptions = {
-  workspaceId: WorkspaceId
+  workspaceId: S.WorkspaceId
   title: string
 }
 
 export type ListSessionsOptions = {
-  workspaceId: WorkspaceId | undefined
+  workspaceId: S.WorkspaceId | undefined
 }
 
 export type SemiosisClient = {
@@ -32,20 +24,20 @@ export type SemiosisClient = {
   }>
 
   workspaces: {
-    list(): Promise<Array<Workspace>>
-    ensure(options: EnsureWorkspaceOptions): Promise<Workspace>
-    get(id: WorkspaceId): Promise<Workspace | undefined>
-    put(workspace: Workspace): Promise<void>
-    remove(id: WorkspaceId): Promise<void>
+    list(): Promise<Array<S.Workspace>>
+    ensure(options: EnsureWorkspaceOptions): Promise<S.Workspace>
+    get(id: S.WorkspaceId): Promise<S.Workspace | undefined>
+    put(workspace: S.Workspace): Promise<void>
+    remove(id: S.WorkspaceId): Promise<void>
   }
 
   sessions: {
-    list(options: ListSessionsOptions): Promise<Array<SessionIndex>>
-    make(options: MakeSessionOptions): Promise<Session>
-    get(id: SessionId): Promise<Session | undefined>
-    put(session: Session): Promise<void>
-    appendSign(id: SessionId, sign: Sign): Promise<void>
-    remove(id: SessionId): Promise<void>
+    list(options: ListSessionsOptions): Promise<Array<S.SessionIndex>>
+    make(options: MakeSessionOptions): Promise<S.Session>
+    get(id: S.SessionId): Promise<S.Session | undefined>
+    put(session: S.Session): Promise<void>
+    appendSign(id: S.SessionId, sign: S.Sign): Promise<void>
+    remove(id: S.SessionId): Promise<void>
   }
 }
 

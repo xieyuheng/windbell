@@ -1,12 +1,12 @@
-import type { Database } from "@xieyuheng/semiosis.js"
+import type * as S from "@xieyuheng/semiosis.js"
 
 export type SemiosisServiceOptions = {
-  database: Database
+  database: S.Database
 }
 
 export type SemiosisService = {
-  workspaces: Database["workspaces"]
-  sessions: Database["sessions"]
+  workspaces: S.Database["workspaces"]
+  sessions: S.Database["sessions"]
 }
 
 export function makeSemiosisService(

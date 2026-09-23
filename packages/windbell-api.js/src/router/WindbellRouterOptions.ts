@@ -1,6 +1,6 @@
-import type { Database } from "@xieyuheng/semiosis.js"
+import type * as S from "@xieyuheng/semiosis.js"
 
 export type WindbellRouterOptions = {
-  database: Database
+  database: S.Database
   corsOrigin: string | undefined
 }

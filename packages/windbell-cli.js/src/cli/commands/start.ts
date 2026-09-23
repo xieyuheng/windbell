@@ -1,5 +1,5 @@
 import type * as Cli from "@xieyuheng/cli.js"
-import { defaultDatabaseRoot, makeDatabase } from "@xieyuheng/semiosis.js"
+import * as S from "@xieyuheng/semiosis.js"
 import { startWindbellServer } from "@xieyuheng/windbell-api.js"
 import { existsSync } from "node:fs"
 import Path from "node:path"
@@ -30,7 +30,7 @@ export function makeStartHandler() {
 
     const databaseRoot =
       readOptionalString(context.options, "--database-root") ??
-      defaultDatabaseRoot()
+      S.defaultDatabaseRoot()
 
     const webDistRoot =
       readOptionalString(context.options, "--web-dist-root") ??
@@ -42,7 +42,7 @@ export function makeStartHandler() {
       )
     }
 
-    const database = makeDatabase({
+    const database = S.makeDatabase({
       root: databaseRoot,
     })
 
