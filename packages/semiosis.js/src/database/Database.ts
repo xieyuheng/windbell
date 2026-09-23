@@ -3,10 +3,9 @@ import { makeModelStore, type ModelStore } from "./ModelStore.ts"
 import { makeProviderStore, type ProviderStore } from "./ProviderStore.ts"
 import { makeSessionStore, type SessionStore } from "./SessionStore.ts"
 import { makeWorkspaceStore, type WorkspaceStore } from "./WorkspaceStore.ts"
-import { defaultDatabaseRoot } from "./defaultDatabaseRoot.ts"
 
 export type DatabaseOptions = {
-  root?: string
+  root: string
 }
 
 export type Database = {
@@ -17,8 +16,8 @@ export type Database = {
   sessions: SessionStore
 }
 
-export function makeDatabase(options: DatabaseOptions = {}): Database {
-  const root = options.root ?? defaultDatabaseRoot()
+export function makeDatabase(options: DatabaseOptions): Database {
+  const root = options.root
 
   return {
     root,

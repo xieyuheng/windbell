@@ -1,12 +1,12 @@
 import * as Cli from "@xieyuheng/cli.js"
 import { getPackageJson } from "@xieyuheng/std.js/node"
 import { fileURLToPath } from "node:url"
-import { makeDatabase } from "../database/index.ts"
+import { defaultDatabaseRoot, makeDatabase } from "../database/index.ts"
 import { makeBatchHandler } from "./commands/batch.ts"
 import { makeReplHandler } from "./commands/repl.ts"
 
 export function makeCli() {
-  const database = makeDatabase()
+  const database = makeDatabase({ root: defaultDatabaseRoot() })
   const { version } = getPackageJson(fileURLToPath(import.meta.url))
   const router = Cli.createRouter("semiosis.js", version)
 

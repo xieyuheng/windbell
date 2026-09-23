@@ -2,7 +2,6 @@ import { makeAgent, type Agent } from "../agent/index.ts"
 import type { Database } from "../database/index.ts"
 import type { Model } from "../model/index.ts"
 import type { ToolRouter } from "../tool/index.ts"
-import { makeDefaultToolRouter } from "../tools/index.ts"
 import type { Workspace } from "../workspace/Workspace.ts"
 import type { Session, SessionId } from "./Session.ts"
 import { makeSessionContext } from "./makeSessionContext.ts"
@@ -11,7 +10,7 @@ export type MakeAgentFromSessionOptions = {
   database: Database
   sessionId: SessionId
   model: Model
-  makeToolRouter?: (options: {
+  makeToolRouter: (options: {
     session: Session
     workspace: Workspace
   }) => ToolRouter | Promise<ToolRouter>
@@ -34,10 +33,7 @@ export async function makeAgentFromSession(
     )
   }
 
-  const toolRouter =
-    options.makeToolRouter === undefined
-      ? makeDefaultToolRouter({ cwd: workspace.root })
-      : await options.makeToolRouter({ session, workspace })
+  const toolRouter = await options.makeToolRouter({ session, workspace })
 
   return makeAgent({
     model: options.model,

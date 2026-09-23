@@ -30,13 +30,13 @@ export type MakeSessionOptions = {
 }
 
 export type ListSessionOptions = {
-  workspaceId?: WorkspaceId
+  workspaceId: WorkspaceId | undefined
 }
 
 export type SessionStore = {
   make(options: MakeSessionOptions): Promise<Session>
   get(id: SessionId): Promise<Session | undefined>
-  list(options?: ListSessionOptions): Promise<Array<SessionIndex>>
+  list(options: ListSessionOptions): Promise<Array<SessionIndex>>
   put(session: Session): Promise<void>
   appendSign(id: SessionId, sign: Sign): Promise<void>
   remove(id: SessionId): Promise<void>
@@ -136,7 +136,7 @@ export function makeSessionStore(options: SessionStoreOptions): SessionStore {
       }
     },
 
-    async list(options = {}) {
+    async list(options) {
       const ids = await listDirectories(root)
       const indexes: Array<SessionIndex> = []
 

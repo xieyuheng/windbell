@@ -6,12 +6,12 @@ import { formatSign } from "../format/index.ts"
 import { UserSign } from "../sign/index.ts"
 
 export type StartAgentReplOptions = {
-  showContext?: boolean
+  showContext: boolean
 }
 
 export async function startAgentRepl(
   agent: Agent,
-  options: StartAgentReplOptions = {},
+  options: StartAgentReplOptions,
 ): Promise<void> {
   const readline = Readline.createInterface({
     input: process.stdin,

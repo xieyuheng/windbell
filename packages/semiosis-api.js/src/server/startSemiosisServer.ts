@@ -1,12 +1,13 @@
 import { serve, type ServerType } from "@hono/node-server"
-import { makeDatabase } from "@xieyuheng/semiosis.js"
+import { defaultDatabaseRoot, makeDatabase } from "@xieyuheng/semiosis.js"
 import { Hono } from "hono"
 import type { AddressInfo } from "node:net"
 import { createSemiosisRouter } from "../router/index.ts"
 import type { SemiosisServerOptions } from "./SemiosisServerOptions.ts"
 
 function createApp(options: SemiosisServerOptions): Hono {
-  const database = options.database ?? makeDatabase()
+  const database =
+    options.database ?? makeDatabase({ root: defaultDatabaseRoot() })
   const app = new Hono()
   const basePath = normalizeBasePath(options.basePath)
 
