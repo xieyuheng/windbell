@@ -56,7 +56,7 @@ import { agentRun, makeAgent } from "./agent/index.ts"
 import { formatSign } from "./format/index.ts"
 import { makeModel } from "./models/index.ts"
 import { readPromptBatch } from "./prompts/index.ts"
-import { PersonaSign, UserSign } from "./sign/index.ts"
+import { PersonaSign, UserSign, type Sign } from "./sign/index.ts"
 import { startAgentRepl } from "./repl/index.ts"
 import { makeToolRouter } from "./tool/index.ts"
 import {

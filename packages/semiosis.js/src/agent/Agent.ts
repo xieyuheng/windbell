@@ -2,24 +2,15 @@ import type { Model } from "../model/Model.ts"
 import type { Sign } from "../sign/index.ts"
 import type { ToolRouter } from "../tool/index.ts"
 
-export type Agent = {
+export type AgentOptions = {
   model: Model
-  config: AgentConfig
-  context: Array<Sign>
-}
-
-export type AgentConfig = {
   toolRouter: ToolRouter
+  getContext: () => Promise<Array<Sign>>
+  appendContext: (signs: Array<Sign>) => Promise<void>
 }
 
-export function makeAgent(
-  model: Model,
-  config: AgentConfig,
-  context: Array<Sign>,
-): Agent {
-  return {
-    model,
-    config,
-    context,
-  }
+export type Agent = AgentOptions
+
+export function makeAgent(options: AgentOptions): Agent {
+  return options
 }

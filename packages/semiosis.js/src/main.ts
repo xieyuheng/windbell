@@ -9,7 +9,7 @@ import { agentRun, makeAgent } from "./agent/index.ts"
 import { formatSign } from "./format/index.ts"
 import { makeModel } from "./models/index.ts"
 import { readPromptBatch } from "./prompts/index.ts"
-import { PersonaSign, UserSign } from "./sign/index.ts"
+import { PersonaSign, UserSign, type Sign } from "./sign/index.ts"
 import { startAgentRepl } from "./repl/index.ts"
 import { makeToolRouter } from "./tool/index.ts"
 import {
@@ -33,16 +33,18 @@ router.defineHandlers({
     const [providerName, modelName] = parseQualifiedName(modelSpec)
     const model = makeModel(providerName, modelName)
     const toolRouter = makeDefaultToolRouter({ cwd: process.cwd() })
-    const agent = makeAgent(
+    const context: Array<Sign> = [
+      ...toolRouter.toolSigns,
+      PersonaSign("You are a helpful software engineer assistant."),
+    ]
+    const agent = makeAgent({
       model,
-      {
-        toolRouter,
+      toolRouter,
+      getContext: async () => context,
+      appendContext: async (signs) => {
+        context.push(...signs)
       },
-      [
-        ...toolRouter.toolSigns,
-        PersonaSign("You are a helpful software engineer assistant."),
-      ],
-    )
+    })
     return startAgentRepl(agent)
   },
 
@@ -71,13 +73,15 @@ router.defineHandlers({
         maxOutputChars,
       }),
     )
-    const agent = makeAgent(
+    const context: Array<Sign> = [...toolRouter.toolSigns, personaSign]
+    const agent = makeAgent({
       model,
-      {
-        toolRouter,
+      toolRouter,
+      getContext: async () => context,
+      appendContext: async (signs) => {
+        context.push(...signs)
       },
-      [...toolRouter.toolSigns, personaSign],
-    )
+    })
 
     for (const sign of toolRouter.toolSigns) {
       console.log(formatSign(sign))

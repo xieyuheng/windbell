@@ -13,10 +13,11 @@ export async function* agentRun(
   agent: Agent,
   input: Sign,
 ): AsyncGenerator<Sign> {
-  agent.context.push(input)
+  await agent.appendContext([input])
 
   while (true) {
-    const output = await agent.model.interpret(agent.context)
+    const context = await agent.getContext()
+    const output = await agent.model.interpret(context)
 
     const toolCallSigns: Array<ToolCallSign> = []
 
@@ -35,7 +36,7 @@ export async function* agentRun(
         return
       }
 
-      agent.context.push(sign)
+      await agent.appendContext([sign])
       yield sign
 
       if (isToolCallSign(sign)) {
@@ -48,14 +49,14 @@ export async function* agentRun(
     }
 
     for (const toolCallSign of toolCallSigns) {
-      const sign = await agent.config.toolRouter.run(toolCallSign)
+      const sign = await agent.toolRouter.run(toolCallSign)
 
       if (isErrorSign(sign)) {
         yield sign
         return
       }
 
-      agent.context.push(sign)
+      await agent.appendContext([sign])
       yield sign
     }
   }
