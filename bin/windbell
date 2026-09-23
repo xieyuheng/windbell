@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+root="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+exec node "$root/packages/windbell-cli.js/src/main.ts" "$@"
