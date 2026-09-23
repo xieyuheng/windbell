@@ -131,6 +131,37 @@ importers:
         specifier: npm:typescript-native-bridge@6.0.3-bridge.17.tsgo.7.0.2
         version: typescript-native-bridge@6.0.3-bridge.17.tsgo.7.0.2
 
+  packages/windbell-cli.js:
+    dependencies:
+      '@hono/node-server':
+        specifier: 2.1.1
+        version: 2.1.1(hono@4.13.8)
+      '@xieyuheng/cli.js':
+        specifier: workspace:*
+        version: link:../cli.js
+      '@xieyuheng/semiosis.js':
+        specifier: workspace:*
+        version: link:../semiosis.js
+      '@xieyuheng/std.js':
+        specifier: workspace:*
+        version: link:../std.js
+      '@xieyuheng/windbell-api.js':
+        specifier: workspace:*
+        version: link:../windbell-api.js
+      vite:
+        specifier: 8.3.0
+        version: 8.3.0(@types/node@26.6.2)(jiti@2.7.0)
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.2
+        version: 26.6.2
+      prettier:
+        specifier: ^3.9.8
+        version: 3.9.8
+      typescript:
+        specifier: npm:typescript-native-bridge@6.0.3-bridge.17.tsgo.7.0.2
+        version: typescript-native-bridge@6.0.3-bridge.17.tsgo.7.0.2
+
   packages/windbell-web.js:
     dependencies:
       '@lucide/vue':

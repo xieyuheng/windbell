@@ -1,5 +1,5 @@
 {
-  "name": "@xieyuheng/windbell-api.js",
+  "name": "@xieyuheng/windbell-cli.js",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -12,15 +12,19 @@
     "trailingComma": "all"
   },
   "dependencies": {
-    "@hono/node-server": "2.1.1",
-    "@xieyuheng/fs-api.js": "workspace:*",
+    "@xieyuheng/cli.js": "workspace:*",
     "@xieyuheng/semiosis.js": "workspace:*",
-    "hono": "4.13.8",
-    "@xieyuheng/semiosis-api.js": "workspace:*"
+    "@xieyuheng/std.js": "workspace:*",
+    "@xieyuheng/windbell-api.js": "workspace:*",
+    "vite": "8.3.0",
+    "@hono/node-server": "2.1.1"
   },
   "devDependencies": {
     "@types/node": "^26.6.2",
     "prettier": "^3.9.8",
     "typescript": "^7.0.2"
+  },
+  "bin": {
+    "windbell": "src/main.ts"
   }
 }
