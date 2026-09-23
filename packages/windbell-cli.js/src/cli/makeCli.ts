@@ -6,7 +6,7 @@ import { makeStartHandler } from "./commands/start.ts"
 
 export function makeCli() {
   const { version } = getPackageJson(fileURLToPath(import.meta.url))
-  const router = Cli.createRouter("windbell", version)
+  const router = Cli.createRouter("windbell-cli.js", version)
 
   router.defineRoutes([
     "start --host <host> --port <port> --cors-origin <origin> --database-root <path> --web-dist-root <path> -- start windbell api and web",
