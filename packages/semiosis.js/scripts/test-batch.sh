@@ -2,6 +2,10 @@
 
 set -e
 
+database_dir="$(mktemp -d)"
+export WINDBELL_DATABASE="$database_dir"
+trap 'rm -rf "$database_dir"' EXIT
+
 mkdir -p snapshot
 
 node src/main.ts batch \

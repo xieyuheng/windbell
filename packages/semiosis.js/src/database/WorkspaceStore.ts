@@ -15,7 +15,9 @@ export type MakeWorkspaceOptions = {
 
 export type WorkspaceStore = {
   make(options: MakeWorkspaceOptions): Promise<Workspace>
+  ensure(options: MakeWorkspaceOptions): Promise<Workspace>
   get(id: WorkspaceId): Promise<Workspace | undefined>
+  getByRoot(root: string): Promise<Workspace | undefined>
   list(): Promise<Array<Workspace>>
   put(workspace: Workspace): Promise<void>
   remove(id: WorkspaceId): Promise<void>
@@ -41,8 +43,22 @@ export function makeWorkspaceStore(
         updatedAt: now,
       }
 
+      const existing = await store.getByRoot(workspace.root)
+      if (existing !== undefined) {
+        throw new Error(
+          `[WorkspaceStore] duplicate workspace root: ${workspace.root}`,
+        )
+      }
+
       await store.put(workspace)
       return workspace
+    },
+
+    async ensure(options) {
+      const existing = await store.getByRoot(options.root)
+      if (existing !== undefined) return existing
+
+      return await store.make(options)
     },
 
     async get(id) {
@@ -52,6 +68,15 @@ export function makeWorkspaceStore(
       if (value === undefined) return undefined
 
       return value as Workspace
+    },
+
+    async getByRoot(rootPath) {
+      const resolved = Path.resolve(rootPath)
+      const workspaces = await store.list()
+
+      return workspaces.find((workspace) => {
+        return Path.resolve(workspace.root) === resolved
+      })
     },
 
     async list() {
