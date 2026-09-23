@@ -1,4 +1,4 @@
-import type * as S from "@xieyuheng/semiosis.js"
+import * as S from "@xieyuheng/semiosis.js"
 import { Hono, type Context } from "hono"
 import { HTTPException } from "hono/http-exception"
 import { makeSemiosisService } from "../service/index.ts"
@@ -97,12 +97,46 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     return sendEmpty(204)
   })
 
-  app.post("/sessions/:sessionId/signs", async (c) => {
+  app.post("/sessions/:sessionId/interpret", async (c) => {
+    const sessionId = c.req.param("sessionId")
     const body = readRecord(await readJsonBody(c))
-    const sign = readSign(body, "sign")
+    const modelOptions = readModel(body, "model")
+    const input = readSigns(body, "input")
 
-    await service.sessions.appendSign(c.req.param("sessionId"), sign)
-    return sendEmpty(204)
+    const session = await service.sessions.get(sessionId)
+    if (session === undefined) {
+      throw new HTTPException(404, { message: "session not found" })
+    }
+
+    const workspace = await options.database.workspaces.get(session.workspaceId)
+    if (workspace === undefined) {
+      throw new HTTPException(404, {
+        message: `workspace not found: ${session.workspaceId}`,
+      })
+    }
+
+    const model = await S.makeModel(modelOptions.qualifiedName, {
+      database: options.database,
+    })
+
+    const toolRouter = S.makeDefaultToolRouter({
+      cwd: workspace.root,
+    })
+
+    const agent = await S.makeAgentFromSession({
+      database: options.database,
+      sessionId: session.id,
+      model,
+      makeToolRouter: () => toolRouter,
+    })
+
+    const signs: Array<S.Sign> = []
+
+    for await (const sign of S.agentInterpret(agent, input)) {
+      signs.push(sign)
+    }
+
+    return sendJson(200, { signs })
   })
 
   app.onError((error) => sendError(error))
@@ -183,15 +217,35 @@ function readSession(body: unknown): S.Session {
   }
 }
 
-function readSign(body: Record<string, unknown>, name: string): S.Sign {
+function readModel(
+  body: Record<string, unknown>,
+  name: string,
+): { qualifiedName: string } {
   const value = body[name]
-  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+  const record = readRecord(value)
+
+  return {
+    qualifiedName: readString(record, "qualifiedName"),
+  }
+}
+
+function readSigns(body: Record<string, unknown>, name: string): Array<S.Sign> {
+  const value = body[name]
+  if (!Array.isArray(value)) {
     throw new HTTPException(400, {
-      message: `field \`${name}\` must be an object`,
+      message: `field \`${name}\` must be an array`,
     })
   }
 
-  return value as S.Sign
+  for (const sign of value) {
+    if (sign === null || typeof sign !== "object" || Array.isArray(sign)) {
+      throw new HTTPException(400, {
+        message: `field \`${name}\` must contain signs`,
+      })
+    }
+  }
+
+  return value as Array<S.Sign>
 }
 
 function sendJson(statusCode: number, value: unknown): Response {

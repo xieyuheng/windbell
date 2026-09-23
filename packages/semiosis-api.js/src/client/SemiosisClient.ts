@@ -17,6 +17,17 @@ export type ListSessionsOptions = {
   workspaceId: S.WorkspaceId | undefined
 }
 
+export type InterpretOptions = {
+  model: {
+    qualifiedName: string
+  }
+  input: Array<S.Sign>
+}
+
+export type InterpretResult = {
+  signs: Array<S.Sign>
+}
+
 export type SemiosisClient = {
   health(): Promise<{
     ok: boolean
@@ -36,7 +47,10 @@ export type SemiosisClient = {
     make(options: MakeSessionOptions): Promise<S.Session>
     get(id: S.SessionId): Promise<S.Session | undefined>
     put(session: S.Session): Promise<void>
-    appendSign(id: S.SessionId, sign: S.Sign): Promise<void>
+    interpret(
+      id: S.SessionId,
+      options: InterpretOptions,
+    ): Promise<InterpretResult>
     remove(id: S.SessionId): Promise<void>
   }
 }
@@ -106,12 +120,12 @@ export function makeSemiosisClient(
         )
       },
 
-      appendSign: async (id, sign) => {
-        await call(
+      interpret: (id, options) => {
+        return call(
           config.baseUrl,
           "POST",
-          `/sessions/${encodeURIComponent(id)}/signs`,
-          { sign },
+          `/sessions/${encodeURIComponent(id)}/interpret`,
+          options,
         )
       },
 

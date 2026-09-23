@@ -1,5 +1,5 @@
 import assert from "node:assert/strict"
-import { mkdtemp, rm } from "node:fs/promises"
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import Path from "node:path"
 import { test } from "node:test"
@@ -29,16 +29,20 @@ test("semiosis client and server", async (t) => {
     service: "semiosis-api",
   })
 
+  const workspaceRoot = Path.join(root, "workspace")
+  await mkdir(workspaceRoot, { recursive: true })
+  await writeFile(Path.join(workspaceRoot, "README.md"), "# Test\n")
+
   const workspace = await client.workspaces.ensure({
     name: "test",
-    root: "/tmp/test",
+    root: workspaceRoot,
   })
   assert.equal(workspace.name, "test")
-  assert.equal(workspace.root, "/tmp/test")
+  assert.equal(workspace.root, workspaceRoot)
 
   const sameWorkspace = await client.workspaces.ensure({
     name: "another-name",
-    root: "/tmp/test",
+    root: workspaceRoot,
   })
   assert.equal(sameWorkspace.id, workspace.id)
 
@@ -48,10 +52,16 @@ test("semiosis client and server", async (t) => {
   })
   assert.equal(session.context.length, 0)
 
-  await client.sessions.appendSign(session.id, S.UserSign("hello"))
+  const result = await client.sessions.interpret(session.id, {
+    model: {
+      qualifiedName: "mock/conversation",
+    },
+    input: [S.UserSign("hello")],
+  })
+  assert.ok(result.signs.length > 0)
 
   const gotSession = await client.sessions.get(session.id)
-  assert.equal(gotSession?.context.length, 1)
+  assert.ok((gotSession?.context.length ?? 0) > 1)
 
   const indexes = await client.sessions.list({
     workspaceId: workspace.id,
