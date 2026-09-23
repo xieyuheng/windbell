@@ -10,7 +10,6 @@ export type Agent = {
 
 export type AgentConfig = {
   cwd: string
-  maxSteps: number
   toolRouter: ToolRouter
 }
 

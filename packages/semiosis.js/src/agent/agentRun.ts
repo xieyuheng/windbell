@@ -15,15 +15,7 @@ export async function* agentRun(
 ): AsyncGenerator<Sign> {
   agent.context.push(input)
 
-  let step = 0
   while (true) {
-    if (step >= agent.config.maxSteps) {
-      yield ErrorSign(`[agentRun] max steps reached: ${agent.config.maxSteps}`)
-      return
-    }
-
-    step += 1
-
     const output = await agent.model.interpret(agent.context)
 
     const toolCallSigns: Array<ToolCallSign> = []

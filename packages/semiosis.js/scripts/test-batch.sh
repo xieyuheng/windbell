@@ -15,12 +15,6 @@ node src/main.ts batch \
   > snapshot/tool-errors.out
 
 node src/main.ts batch \
-  --model mock/max-steps \
-  --prompts mock/prompts/max-steps.md \
-  --max-steps 2 \
-  > snapshot/max-steps.out
-
-node src/main.ts batch \
   --model mock/truncate-output \
   --prompts mock/prompts/truncate-output.md \
   --max-output-chars 4 \

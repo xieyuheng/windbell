@@ -23,10 +23,8 @@ const router = cli.createRouter("semiosis.js", version)
 
 router.defineRoutes([
   "repl --model <provider-name>/<model-name> -- start agent repl in current directory",
-  "batch --model <provider-name>/<model-name> --prompts <file> --cwd <dir> --max-steps <n> --max-output-chars <n> -- run prompts through agent",
+  "batch --model <provider-name>/<model-name> --prompts <file> --cwd <dir> --max-output-chars <n> -- run prompts through agent",
 ])
-
-const defaultMaxSteps = 100
 
 router.defineHandlers({
   repl: ({ options }) => {
@@ -39,7 +37,6 @@ router.defineHandlers({
       model,
       {
         cwd: process.cwd(),
-        maxSteps: defaultMaxSteps,
         toolRouter,
       },
       [
@@ -58,7 +55,6 @@ router.defineHandlers({
     const [providerName, modelName] = parseQualifiedName(modelSpec)
     const model = makeModel(providerName, modelName)
     const cwd = options["--cwd"] ?? process.cwd()
-    const maxSteps = parsePositiveInt(options["--max-steps"], defaultMaxSteps)
     const maxOutputChars = parsePositiveInt(
       options["--max-output-chars"],
       200_000,
@@ -79,7 +75,6 @@ router.defineHandlers({
       model,
       {
         cwd,
-        maxSteps,
         toolRouter,
       },
       [...toolRouter.toolSigns, personaSign],
