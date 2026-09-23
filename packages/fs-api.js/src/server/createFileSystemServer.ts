@@ -4,7 +4,7 @@ import type { AddressInfo } from "node:net"
 import { createFileSystemRouter } from "../router/index.ts"
 import type { FileSystemServerOptions } from "./FileSystemServerOptions.ts"
 
-function createApp(options: FileSystemServerOptions = {}): Hono {
+function createApp(options: FileSystemServerOptions): Hono {
   const app = new Hono()
   app.route(
     normalizeBasePath(options.basePath) || "/",
@@ -14,11 +14,11 @@ function createApp(options: FileSystemServerOptions = {}): Hono {
 }
 
 export async function startFileSystemServer(
-  options: FileSystemServerOptions = {},
+  options: FileSystemServerOptions,
 ): Promise<{ server: ServerType; url: string }> {
   const app = createApp(options)
-  const hostname = options.host ?? "127.0.0.1"
-  const port = options.port ?? 0
+  const hostname = options.host
+  const port = options.port
   const basePath = normalizeBasePath(options.basePath)
 
   const { server, url } = await new Promise<{
@@ -45,7 +45,7 @@ export async function startFileSystemServer(
   return { server, url }
 }
 
-function normalizeBasePath(basePath: string | undefined): string {
-  if (basePath === undefined || basePath === "" || basePath === "/") return ""
+function normalizeBasePath(basePath: string): string {
+  if (basePath === "" || basePath === "/") return ""
   return `/${basePath.replace(/^\/+|\/+$/g, "")}`
 }

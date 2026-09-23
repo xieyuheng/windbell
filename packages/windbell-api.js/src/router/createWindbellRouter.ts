@@ -9,7 +9,7 @@ export function createWindbellRouter(): Hono {
     return c.json(await health())
   })
 
-  app.route("/api/fs", createFileSystemRouter())
+  app.route("/api/fs", createFileSystemRouter({}))
 
   return app
 }

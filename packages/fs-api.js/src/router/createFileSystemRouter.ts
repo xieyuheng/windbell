@@ -22,9 +22,7 @@ const handlers: Record<string, Handler> = {
   rename: async (body) => service.rename(readPath(body), readNewPath(body)),
 }
 
-export function createFileSystemRouter(
-  options: FileSystemRouterOptions = {},
-): Hono {
+export function createFileSystemRouter(options: FileSystemRouterOptions): Hono {
   const app = new Hono()
 
   if (options.corsOrigin !== undefined) {
@@ -114,12 +112,10 @@ function sendJson(statusCode: number, value: unknown): Response {
 function sendError(error: unknown, _c: Context): Response {
   const httpError = error instanceof HttpError ? error : undefined
   const statusCode = httpError?.statusCode ?? statusCodeFromError(error)
-  const code = httpError?.code ?? readErrorCode(error)
   const message = error instanceof Error ? error.message : String(error)
 
   return sendJson(statusCode, {
     error: {
-      code,
       message,
     },
   })

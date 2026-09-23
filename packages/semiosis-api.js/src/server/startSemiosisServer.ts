@@ -1,13 +1,11 @@
 import { serve, type ServerType } from "@hono/node-server"
-import { defaultDatabaseRoot, makeDatabase } from "@xieyuheng/semiosis.js"
 import { Hono } from "hono"
 import type { AddressInfo } from "node:net"
 import { createSemiosisRouter } from "../router/index.ts"
 import type { SemiosisServerOptions } from "./SemiosisServerOptions.ts"
 
 function createApp(options: SemiosisServerOptions): Hono {
-  const database =
-    options.database ?? makeDatabase({ root: defaultDatabaseRoot() })
+  const database = options.database
   const app = new Hono()
   const basePath = normalizeBasePath(options.basePath)
 
@@ -16,11 +14,11 @@ function createApp(options: SemiosisServerOptions): Hono {
 }
 
 export async function startSemiosisServer(
-  options: SemiosisServerOptions = {},
+  options: SemiosisServerOptions,
 ): Promise<{ server: ServerType; url: string }> {
   const app = createApp(options)
-  const hostname = options.hostname ?? "127.0.0.1"
-  const port = options.port ?? 0
+  const hostname = options.hostname
+  const port = options.port
   const basePath = normalizeBasePath(options.basePath)
 
   const { server, url } = await new Promise<{
@@ -47,7 +45,7 @@ export async function startSemiosisServer(
   return { server, url }
 }
 
-function normalizeBasePath(basePath: string | undefined): string {
-  if (basePath === undefined || basePath === "" || basePath === "/") return ""
+function normalizeBasePath(basePath: string): string {
+  if (basePath === "" || basePath === "/") return ""
   return `/${basePath.replace(/^\/+|\/+$/g, "")}`
 }

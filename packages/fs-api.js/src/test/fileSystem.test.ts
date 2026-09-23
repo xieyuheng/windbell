@@ -7,7 +7,11 @@ import { makeFileSystemClient, startFileSystemServer } from "../index.ts"
 
 test("fileSystem client and server", async (t) => {
   const root = await fs.mkdtemp(Path.join(Os.tmpdir(), "windbell-fs-"))
-  const { server, url } = await startFileSystemServer({ basePath: "/fs" })
+  const { server, url } = await startFileSystemServer({
+    host: "127.0.0.1",
+    port: 0,
+    basePath: "/fs",
+  })
   const client = makeFileSystemClient({ baseUrl: url })
 
   t.after(async () => {

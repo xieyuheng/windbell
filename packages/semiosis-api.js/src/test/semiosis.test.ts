@@ -9,7 +9,12 @@ import { makeSemiosisClient, startSemiosisServer } from "../index.ts"
 test("semiosis client and server", async (t) => {
   const root = await mkdtemp(Path.join(tmpdir(), "semiosis-api-"))
   const database = makeDatabase({ root })
-  const { server, url } = await startSemiosisServer({ database })
+  const { server, url } = await startSemiosisServer({
+    database,
+    hostname: "127.0.0.1",
+    port: 0,
+    basePath: "",
+  })
   const client = makeSemiosisClient({ baseUrl: url })
 
   t.after(async () => {

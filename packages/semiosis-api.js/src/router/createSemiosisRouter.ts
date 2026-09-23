@@ -33,7 +33,7 @@ export function createSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const workspace = await service.workspaces.get(c.req.param("workspaceId"))
 
     if (workspace === undefined) {
-      throw new HttpError(404, "workspace not found", "not_found")
+      throw new HttpError(404, "workspace not found")
     }
 
     return sendJson(200, workspace)
@@ -44,7 +44,7 @@ export function createSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const workspaceId = c.req.param("workspaceId")
 
     if (workspace.id !== workspaceId) {
-      throw new HttpError(400, "workspace id mismatch", "bad_request")
+      throw new HttpError(400, "workspace id mismatch")
     }
 
     await service.workspaces.put(workspace)
@@ -74,7 +74,7 @@ export function createSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const session = await service.sessions.get(c.req.param("sessionId"))
 
     if (session === undefined) {
-      throw new HttpError(404, "session not found", "not_found")
+      throw new HttpError(404, "session not found")
     }
 
     return sendJson(200, session)
@@ -85,7 +85,7 @@ export function createSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const sessionId = c.req.param("sessionId")
 
     if (session.id !== sessionId) {
-      throw new HttpError(400, "session id mismatch", "bad_request")
+      throw new HttpError(400, "session id mismatch")
     }
 
     await service.sessions.put(session)
@@ -117,17 +117,13 @@ async function readJsonBody(c: Context): Promise<unknown> {
   try {
     return JSON.parse(text)
   } catch {
-    throw new HttpError(400, "invalid JSON body", "bad_request")
+    throw new HttpError(400, "invalid JSON body")
   }
 }
 
 function readRecord(body: unknown): Record<string, unknown> {
   if (body === null || typeof body !== "object" || Array.isArray(body)) {
-    throw new HttpError(
-      400,
-      "request body must be a JSON object",
-      "bad_request",
-    )
+    throw new HttpError(400, "request body must be a JSON object")
   }
 
   return body as Record<string, unknown>
@@ -136,11 +132,7 @@ function readRecord(body: unknown): Record<string, unknown> {
 function readString(body: Record<string, unknown>, name: string): string {
   const value = body[name]
   if (typeof value !== "string") {
-    throw new HttpError(
-      400,
-      `field \`${name}\` must be a string`,
-      "bad_request",
-    )
+    throw new HttpError(400, `field \`${name}\` must be a string`)
   }
 
   return value
@@ -149,11 +141,7 @@ function readString(body: Record<string, unknown>, name: string): string {
 function readNumber(body: Record<string, unknown>, name: string): number {
   const value = body[name]
   if (typeof value !== "number") {
-    throw new HttpError(
-      400,
-      `field \`${name}\` must be a number`,
-      "bad_request",
-    )
+    throw new HttpError(400, `field \`${name}\` must be a number`)
   }
 
   return value
@@ -174,7 +162,7 @@ function readSession(body: unknown): Session {
   const record = readRecord(body)
   const context = record.context
   if (!Array.isArray(context)) {
-    throw new HttpError(400, "field `context` must be an array", "bad_request")
+    throw new HttpError(400, "field `context` must be an array")
   }
 
   return {
@@ -190,11 +178,7 @@ function readSession(body: unknown): Session {
 function readSign(body: Record<string, unknown>, name: string): Sign {
   const value = body[name]
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
-    throw new HttpError(
-      400,
-      `field \`${name}\` must be an object`,
-      "bad_request",
-    )
+    throw new HttpError(400, `field \`${name}\` must be an object`)
   }
 
   return value as Sign
@@ -216,12 +200,10 @@ function sendEmpty(statusCode: number): Response {
 function sendError(error: unknown): Response {
   const httpError = error instanceof HttpError ? error : undefined
   const statusCode = httpError?.statusCode ?? 500
-  const code = httpError?.code
   const message = error instanceof Error ? error.message : String(error)
 
   return sendJson(statusCode, {
     error: {
-      code,
       message,
     },
   })

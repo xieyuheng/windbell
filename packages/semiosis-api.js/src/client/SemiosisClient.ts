@@ -22,7 +22,7 @@ export type MakeSessionOptions = {
 }
 
 export type ListSessionsOptions = {
-  workspaceId?: WorkspaceId
+  workspaceId: WorkspaceId | undefined
 }
 
 export type SemiosisClient = {
@@ -40,7 +40,7 @@ export type SemiosisClient = {
   }
 
   sessions: {
-    list(options?: ListSessionsOptions): Promise<Array<SessionIndex>>
+    list(options: ListSessionsOptions): Promise<Array<SessionIndex>>
     make(options: MakeSessionOptions): Promise<Session>
     get(id: SessionId): Promise<Session | undefined>
     put(session: Session): Promise<void>
@@ -87,7 +87,7 @@ export function makeSemiosisClient(
     },
 
     sessions: {
-      list: (options = {}) => {
+      list: (options) => {
         const query = new URLSearchParams()
         if (options.workspaceId !== undefined) {
           query.set("workspaceId", options.workspaceId)
