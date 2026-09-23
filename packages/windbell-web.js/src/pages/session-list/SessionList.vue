@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { useHead } from "@unhead/vue"
 import { Plus } from "@lucide/vue"
-import { computed } from "vue"
+import { useHead } from "@unhead/vue"
+import { computed, onMounted, watch } from "vue"
 import { useI18n } from "vue-i18n"
-import { RouterLink, useRoute } from "vue-router"
-import { mockSessions } from "../../mock/session"
-import { mockWorkspaces } from "../../mock/workspace"
-import type * as S from "@xieyuheng/semiosis.js"
+import { RouterLink, useRoute, useRouter } from "vue-router"
 import { sessionListMessages } from "./SessionList.i18n"
+import {
+  loadSessionList,
+  makeSession,
+  makeSessionListState,
+} from "./SessionListState"
 
 const route = useRoute()
+const router = useRouter()
 
 const { locale, t } = useI18n({
   messages: sessionListMessages,
@@ -17,30 +20,22 @@ const { locale, t } = useI18n({
 })
 
 const workspaceId = computed(() => String(route.params.workspaceId ?? ""))
-const workspace = computed(() =>
-  mockWorkspaces.find((item) => item.id === workspaceId.value),
-)
-const sessions = computed(() =>
-  mockSessions.filter((session) => session.workspaceId === workspaceId.value),
-)
+const state = makeSessionListState(workspaceId.value)
+const title = computed(() => state.workspace?.name ?? t("title"))
 
-function preview(session: S.Session): string {
-  const sign = session.context[session.context.length - 1]
-  if (sign === undefined) return ""
+async function createSession(): Promise<void> {
+  try {
+    const session = await makeSession(state, t("untitled"))
 
-  switch (sign.kind) {
-    case "UserSign":
-    case "ReasoningSign":
-    case "AssistantSign":
-    case "ToolOutputSign":
-    case "PersonaSign":
-      return sign.content
-    case "ToolCallSign":
-      return `${sign.name} ${sign.arguments}`
-    case "ToolSign":
-      return sign.name
-    case "ErrorSign":
-      return sign.message
+    await router.push({
+      name: "session",
+      params: {
+        workspaceId: state.workspaceId,
+        sessionId: session.id,
+      },
+    })
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
   }
 }
 
@@ -51,8 +46,17 @@ function formatUpdatedAt(value: number): string {
   }).format(value)
 }
 
+onMounted(async () => {
+  await loadSessionList(state)
+})
+
+watch(workspaceId, async (value) => {
+  state.workspaceId = value
+  await loadSessionList(state)
+})
+
 useHead(() => ({
-  title: workspace.value?.name ?? t("title"),
+  title: title.value,
   meta: [
     {
       name: "description",
@@ -67,7 +71,7 @@ useHead(() => ({
     <header class="flex flex-col gap-2 border-b border-line px-5 py-6">
       <div class="flex flex-col gap-1">
         <h1 class="text-2xl font-bold text-ink">
-          {{ workspace?.name ?? t("title") }}
+          {{ title }}
         </h1>
         <p class="text-sm text-ink">
           {{ t("description") }}
@@ -75,9 +79,20 @@ useHead(() => ({
       </div>
     </header>
 
-    <ol v-if="sessions.length > 0" class="flex flex-1 flex-col">
+    <p v-if="state.loading" class="px-5 py-4 text-sm text-ink">
+      {{ t("loading") }}
+    </p>
+
+    <p
+      v-else-if="state.error !== undefined"
+      class="px-5 py-4 text-sm text-danger"
+    >
+      {{ state.error }}
+    </p>
+
+    <ol v-else-if="state.sessions.length > 0" class="flex flex-1 flex-col">
       <li
-        v-for="session in sessions"
+        v-for="session in state.sessions"
         :key="session.id"
         class="border-b border-line"
       >
@@ -85,7 +100,10 @@ useHead(() => ({
           class="flex flex-col gap-2 px-5 py-4 transition-colors hover:bg-paper-deep"
           :to="{
             name: 'session',
-            params: { workspaceId: workspaceId, sessionId: session.id },
+            params: {
+              workspaceId: state.workspaceId,
+              sessionId: session.id,
+            },
           }"
         >
           <div class="flex items-baseline justify-between gap-4">
@@ -96,14 +114,6 @@ useHead(() => ({
               {{ formatUpdatedAt(session.updatedAt) }}
             </span>
           </div>
-
-          <p class="line-clamp-2 text-sm leading-7 text-ink">
-            {{ preview(session) }}
-          </p>
-
-          <p class="text-sm text-ink">
-            {{ t("signCount", { count: session.context.length }) }}
-          </p>
         </RouterLink>
       </li>
     </ol>
@@ -119,6 +129,7 @@ useHead(() => ({
       <button
         class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-4 py-3 text-sm font-medium text-paper transition-opacity hover:opacity-80"
         type="button"
+        @click="createSession"
       >
         <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
         <span>{{ t("newSession") }}</span>

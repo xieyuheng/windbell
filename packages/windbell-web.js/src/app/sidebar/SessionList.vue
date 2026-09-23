@@ -2,7 +2,7 @@
 import type * as S from "@xieyuheng/semiosis.js"
 
 defineProps<{
-  sessions: Array<S.Session>
+  sessions: Array<S.SessionIndex>
   activeSessionId?: S.SessionId | null
 }>()
 

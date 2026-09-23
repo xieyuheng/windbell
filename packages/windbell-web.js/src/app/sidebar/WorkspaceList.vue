@@ -7,7 +7,7 @@ import SessionList from "./SessionList.vue"
 
 defineProps<{
   workspaces: Array<S.Workspace>
-  sessions: Array<S.Session>
+  sessions: Array<S.SessionIndex>
   activeWorkspaceId?: S.WorkspaceId | null
   activeSessionId?: S.SessionId | null
   expandedWorkspaceIds: Set<S.WorkspaceId>

@@ -1,31 +1,85 @@
-import { reactive } from "vue"
+import { makeSemiosisClient } from "@xieyuheng/semiosis-api.js/client"
 import type * as S from "@xieyuheng/semiosis.js"
-import { mockSessions } from "../../mock/session"
+import { reactive } from "vue"
 
 export type SessionState = {
   sessionId: S.SessionId
   title: string
   context: Array<S.Sign>
+  loading: boolean
+  interpreting: boolean
+  error: string | undefined
 }
 
+const semiosis = makeSemiosisClient({
+  baseUrl: "/api/semiosis",
+})
+
+const defaultModelQualifiedName = "mock/conversation"
+
 export function makeSessionState(sessionId: S.SessionId): SessionState {
-  const state = reactive<SessionState>({
+  return reactive<SessionState>({
     sessionId,
     title: "",
     context: [],
+    loading: false,
+    interpreting: false,
+    error: undefined,
   })
-
-  loadSessionState(state, sessionId)
-  return state
 }
 
-export function loadSessionState(
+export async function loadSessionState(
   state: SessionState,
   sessionId: S.SessionId,
-): void {
-  const session = mockSessions.find((item) => item.id === sessionId)
-
+): Promise<void> {
   state.sessionId = sessionId
-  state.title = session?.title ?? ""
-  state.context = session?.context ?? []
+  state.loading = true
+  state.error = undefined
+
+  try {
+    const session = await semiosis.sessions.get(sessionId)
+
+    if (session === undefined) {
+      state.title = ""
+      state.context = []
+      state.error = `session not found: ${sessionId}`
+      return
+    }
+
+    state.title = session.title
+    state.context = session.context
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+  } finally {
+    state.loading = false
+  }
+}
+
+export async function interpretSession(
+  state: SessionState,
+  content: string,
+): Promise<void> {
+  const input: S.UserSign = {
+    kind: "UserSign",
+    content,
+  }
+
+  state.context.push(input)
+  state.interpreting = true
+  state.error = undefined
+
+  try {
+    const result = await semiosis.sessions.interpret(state.sessionId, {
+      model: {
+        qualifiedName: defaultModelQualifiedName,
+      },
+      input: [input],
+    })
+
+    state.context.push(...result.signs)
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+  } finally {
+    state.interpreting = false
+  }
 }

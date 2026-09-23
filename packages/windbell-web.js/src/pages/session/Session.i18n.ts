@@ -2,9 +2,11 @@ export const sessionMessages = {
   "zh-CN": {
     title: "对话",
     description: "由一个又一个符号组成的解释过程。",
-    back: "返回对话列表",
     notFound: "未找到对话",
-    thinking: "思考",
+    loading: "加载中...",
+    inputPlaceholder: "输入内容...",
+    send: "发送",
+    sending: "发送中...",
     signKind: {
       user: "用户",
       reasoning: "思考",
@@ -19,9 +21,11 @@ export const sessionMessages = {
   "en-US": {
     title: "Session",
     description: "An interpretation process made of signs.",
-    back: "Back to sessions",
     notFound: "Session not found",
-    thinking: "Thinking",
+    loading: "Loading...",
+    inputPlaceholder: "Type a message...",
+    send: "Send",
+    sending: "Sending...",
     signKind: {
       user: "User",
       reasoning: "Reasoning",

@@ -1,14 +1,24 @@
 export const workspaceListMessages = {
   "zh-CN": {
     title: "工作区",
-    description: "本地工作区列表。",
-    sessionCount: "{count} 个对话",
+    description: "选择一个工作区开始。",
     settings: "设置",
+    createWorkspace: "创建工作区",
+    name: "名称",
+    root: "路径",
+    create: "创建",
+    creating: "创建中...",
+    loading: "加载中...",
   },
   "en-US": {
     title: "Workspaces",
-    description: "Local workspace list.",
-    sessionCount: "{count} sessions",
+    description: "Choose a workspace to start.",
     settings: "Settings",
+    createWorkspace: "Create workspace",
+    name: "Name",
+    root: "Root",
+    create: "Create",
+    creating: "Creating...",
+    loading: "Loading...",
   },
 }

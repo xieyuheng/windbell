@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
-import { computed, watch } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
 import SignList from "./components/SignList.vue"
 import { sessionMessages } from "./Session.i18n"
-import { loadSessionState, makeSessionState } from "./SessionState"
+import {
+  interpretSession,
+  loadSessionState,
+  makeSessionState,
+} from "./SessionState"
 
 const route = useRoute()
 const sessionId = computed(() => String(route.params.sessionId ?? ""))
+const input = ref("")
 
 const { t } = useI18n({
   messages: sessionMessages,
@@ -18,8 +23,20 @@ const { t } = useI18n({
 const state = makeSessionState(sessionId.value)
 const title = computed(() => state.title || t("notFound"))
 
-watch(sessionId, (value) => {
-  loadSessionState(state, value)
+async function send(): Promise<void> {
+  const content = input.value.trim()
+  if (content === "" || state.interpreting) return
+
+  input.value = ""
+  await interpretSession(state, content)
+}
+
+onMounted(async () => {
+  await loadSessionState(state, sessionId.value)
+})
+
+watch(sessionId, async (value) => {
+  await loadSessionState(state, value)
 })
 
 useHead(() => ({
@@ -44,6 +61,30 @@ useHead(() => ({
       </h1>
     </header>
 
-    <SignList :signs="state.context" />
+    <p v-if="state.loading" class="text-sm text-ink">
+      {{ t("loading") }}
+    </p>
+
+    <p v-else-if="state.error !== undefined" class="text-sm text-danger">
+      {{ state.error }}
+    </p>
+
+    <SignList v-else :signs="state.context" />
+
+    <form class="flex gap-2" @submit.prevent="send">
+      <input
+        v-model="input"
+        class="flex-1 rounded border border-line bg-transparent px-3 py-2 text-sm text-ink outline-none"
+        :placeholder="t('inputPlaceholder')"
+        type="text"
+      />
+      <button
+        class="rounded-full bg-ink px-4 py-2 text-sm font-medium text-paper disabled:opacity-50"
+        type="submit"
+        :disabled="state.interpreting"
+      >
+        {{ state.interpreting ? t("sending") : t("send") }}
+      </button>
+    </form>
   </main>
 </template>

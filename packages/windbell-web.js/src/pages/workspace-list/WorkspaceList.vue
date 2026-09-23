@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { useHead } from "@unhead/vue"
 import { Settings } from "@lucide/vue"
+import { useHead } from "@unhead/vue"
+import { onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
-import { mockSessions } from "../../mock/session"
 import { workspaceListMessages } from "./WorkspaceList.i18n"
-import { makeWorkspaceListState } from "./WorkspaceListState"
+import {
+  ensureWorkspace,
+  loadWorkspaceList,
+  makeWorkspaceListState,
+} from "./WorkspaceListState"
 
 const { t } = useI18n({
   messages: workspaceListMessages,
@@ -13,10 +17,32 @@ const { t } = useI18n({
 })
 
 const state = makeWorkspaceListState()
+const name = ref("")
+const root = ref("")
+const creating = ref(false)
+const createError = ref<string | undefined>(undefined)
 
-function sessionCount(workspaceId: string): number {
-  return mockSessions.filter((session) => session.workspaceId === workspaceId)
-    .length
+onMounted(async () => {
+  await loadWorkspaceList(state)
+})
+
+async function createWorkspace(): Promise<void> {
+  creating.value = true
+  createError.value = undefined
+
+  try {
+    await ensureWorkspace(state, {
+      name: name.value,
+      root: root.value,
+    })
+
+    name.value = ""
+    root.value = ""
+  } catch (error) {
+    createError.value = error instanceof Error ? error.message : String(error)
+  } finally {
+    creating.value = false
+  }
 }
 
 useHead(() => ({
@@ -52,25 +78,62 @@ useHead(() => ({
       </RouterLink>
     </header>
 
-    <ul class="flex flex-col gap-3">
+    <form
+      class="flex flex-col gap-3 rounded-2xl border border-line p-4"
+      @submit.prevent="createWorkspace"
+    >
+      <h2 class="text-sm font-medium text-ink">
+        {{ t("createWorkspace") }}
+      </h2>
+
+      <input
+        v-model="name"
+        class="rounded border border-line bg-transparent px-3 py-2 text-sm text-ink outline-none"
+        :placeholder="t('name')"
+        type="text"
+      />
+
+      <input
+        v-model="root"
+        class="rounded border border-line bg-transparent px-3 py-2 font-mono text-sm text-ink outline-none"
+        :placeholder="t('root')"
+        type="text"
+      />
+
+      <button
+        class="rounded-full bg-ink px-4 py-2 text-sm font-medium text-paper disabled:opacity-50"
+        type="submit"
+        :disabled="creating"
+      >
+        {{ creating ? t("creating") : t("create") }}
+      </button>
+
+      <p v-if="createError !== undefined" class="text-sm text-danger">
+        {{ createError }}
+      </p>
+    </form>
+
+    <p v-if="state.loading" class="text-sm text-ink">
+      {{ t("loading") }}
+    </p>
+
+    <p v-else-if="state.error !== undefined" class="text-sm text-danger">
+      {{ state.error }}
+    </p>
+
+    <ul v-else class="flex flex-col gap-3">
       <li v-for="workspace in state.workspaces" :key="workspace.id">
         <RouterLink
           class="flex flex-col gap-3 rounded-2xl border border-line px-4 py-4 transition-colors hover:border-ink-muted"
           :to="{ name: 'session-list', params: { workspaceId: workspace.id } }"
         >
-          <div class="flex items-start justify-between gap-4">
-            <div class="min-w-0">
-              <h2 class="truncate text-base font-semibold text-ink">
-                {{ workspace.name }}
-              </h2>
-              <p class="mt-1 truncate font-mono text-sm text-ink">
-                {{ workspace.root }}
-              </p>
-            </div>
-
-            <span class="shrink-0 text-sm text-ink">
-              {{ t("sessionCount", { count: sessionCount(workspace.id) }) }}
-            </span>
+          <div class="min-w-0">
+            <h2 class="truncate text-base font-semibold text-ink">
+              {{ workspace.name }}
+            </h2>
+            <p class="mt-1 truncate font-mono text-sm text-ink">
+              {{ workspace.root }}
+            </p>
           </div>
         </RouterLink>
       </li>
