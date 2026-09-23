@@ -7,19 +7,16 @@ import { makeAgentFromSession, type Session } from "../session/index.ts"
 import type { Sign } from "../sign/index.ts"
 import type { ToolRouter } from "../tool/index.ts"
 import type { Workspace } from "../workspace/Workspace.ts"
-import { parseQualifiedName, readRequiredOption } from "./options.ts"
+import { readRequiredOption } from "./options.ts"
 
 export async function makeModelFromOptions(options: {
   database: Database
   cliOptions: Record<string, unknown>
 }): Promise<Model> {
-  const modelSpec = readRequiredOption(options.cliOptions, "--model")
-  const [providerName, modelName] = parseQualifiedName(modelSpec)
+  const qualifiedName = readRequiredOption(options.cliOptions, "--model")
 
-  return await makeModel({
+  return await makeModel(qualifiedName, {
     database: options.database,
-    providerName,
-    modelName,
   })
 }
 

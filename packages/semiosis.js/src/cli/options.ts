@@ -1,20 +1,3 @@
-export function parseQualifiedName(text: string): [string, string] {
-  const [providerName, modelName, ...rest] = text.split("/")
-  if (
-    providerName === undefined ||
-    modelName === undefined ||
-    providerName === "" ||
-    modelName === "" ||
-    rest.length !== 0
-  ) {
-    throw new Error(
-      `invalid --model: ${text}, expected <provider-name>/<model-name>`,
-    )
-  }
-
-  return [providerName, modelName]
-}
-
 export function readRequiredOption(
   options: Record<string, unknown>,
   name: string,
