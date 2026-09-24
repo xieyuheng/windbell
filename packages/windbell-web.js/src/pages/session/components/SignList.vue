@@ -92,7 +92,7 @@ function textClass(kind: S.Sign["kind"]): string {
     <li
       v-for="(sign, index) in signs"
       :key="index"
-      class="border-l-2 pl-4"
+      class="border-l-2 p-2"
       :class="borderClass(sign.kind)"
     >
       <p
