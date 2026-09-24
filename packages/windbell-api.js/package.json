@@ -14,13 +14,13 @@
   "dependencies": {
     "@hono/node-server": "2.1.1",
     "@xieyuheng/fs-api.js": "workspace:*",
+    "@xieyuheng/semiosis-api.js": "workspace:*",
     "@xieyuheng/semiosis.js": "workspace:*",
-    "hono": "4.13.8",
-    "@xieyuheng/semiosis-api.js": "workspace:*"
+    "hono": "4.13.8"
   },
   "devDependencies": {
     "@types/node": "^26.6.2",
-    "prettier": "^3.9.8",
+    "prettier": "^3.9.9",
     "typescript": "^7.0.2"
   }
 }
