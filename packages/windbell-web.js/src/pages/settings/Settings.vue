@@ -3,6 +3,7 @@ import { useHead } from "@unhead/vue"
 import { onMounted } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRouter } from "vue-router"
+import BaseCard from "../../components/BaseCard.vue"
 import { useFont, type Font } from "../../app/font"
 import { setLocale, supportedLocales } from "../../app/i18n"
 import { useTheme, type ThemeMode } from "../../app/theme"
@@ -49,16 +50,12 @@ useHead(() => ({
     </header>
 
     <div class="flex flex-col gap-4">
-      <section
-        class="overflow-hidden rounded border-3 border-paper-deep"
-        aria-labelledby="settings-language"
-      >
-        <h2
-          id="settings-language"
-          class="bg-paper-deep px-3 py-2 text-ink"
-        >
-          {{ t("language") }}
-        </h2>
+      <BaseCard as="section">
+        <template #header>
+          <h2 class="text-ink">
+            {{ t("language") }}
+          </h2>
+        </template>
 
         <div class="flex flex-col gap-1 p-2">
           <label
@@ -77,18 +74,14 @@ useHead(() => ({
             <span>{{ item.label }}</span>
           </label>
         </div>
-      </section>
+      </BaseCard>
 
-      <section
-        class="overflow-hidden rounded border-3 border-paper-deep"
-        aria-labelledby="settings-theme"
-      >
-        <h2
-          id="settings-theme"
-          class="bg-paper-deep px-3 py-2 text-ink"
-        >
-          {{ t("theme") }}
-        </h2>
+      <BaseCard as="section">
+        <template #header>
+          <h2 class="text-ink">
+            {{ t("theme") }}
+          </h2>
+        </template>
 
         <div class="flex flex-col gap-1 p-2">
           <label
@@ -107,18 +100,14 @@ useHead(() => ({
             <span>{{ t(item.labelKey) }}</span>
           </label>
         </div>
-      </section>
+      </BaseCard>
 
-      <section
-        class="overflow-hidden rounded border-3 border-paper-deep"
-        aria-labelledby="settings-font"
-      >
-        <h2
-          id="settings-font"
-          class="bg-paper-deep px-3 py-2 text-ink"
-        >
-          {{ t("font") }}
-        </h2>
+      <BaseCard as="section">
+        <template #header>
+          <h2 class="text-ink">
+            {{ t("font") }}
+          </h2>
+        </template>
 
         <div class="flex flex-col gap-1 p-2">
           <label
@@ -137,18 +126,14 @@ useHead(() => ({
             <span>{{ t(item.labelKey) }}</span>
           </label>
         </div>
-      </section>
+      </BaseCard>
 
-      <section
-        class="overflow-hidden rounded border-3 border-paper-deep"
-        aria-labelledby="settings-default-model"
-      >
-        <h2
-          id="settings-default-model"
-          class="bg-paper-deep px-3 py-2 text-ink"
-        >
-          {{ t("defaultModel") }}
-        </h2>
+      <BaseCard as="section">
+        <template #header>
+          <h2 class="text-ink">
+            {{ t("defaultModel") }}
+          </h2>
+        </template>
 
         <div class="flex flex-col gap-1 p-2">
           <p v-if="state.loading" class="px-2 py-1.5 text-ink">
@@ -183,7 +168,7 @@ useHead(() => ({
             {{ state.error }}
           </p>
         </div>
-      </section>
+      </BaseCard>
     </div>
   </main>
 </template>

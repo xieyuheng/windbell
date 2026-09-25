@@ -4,6 +4,7 @@ import { useHead } from "@unhead/vue"
 import { onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
+import BaseCard from "../../components/BaseCard.vue"
 import { workspaceListMessages } from "./WorkspaceList.i18n"
 import {
   ensureWorkspace,
@@ -123,22 +124,23 @@ useHead(() => ({
 
     <ul v-else class="flex flex-col gap-4">
       <li v-for="workspace in state.workspaces" :key="workspace.id">
-        <RouterLink
-          class="block overflow-hidden rounded border-3 border-paper-deep transition-colors hover:border-ink-muted"
+        <BaseCard
+          :as="RouterLink"
+          class="transition-colors hover:border-ink-muted"
           :to="{ name: 'session-list', params: { workspaceId: workspace.id } }"
         >
-          <div class="bg-paper-deep px-3 py-2">
+          <template #header>
             <h2 class="truncate text-base text-ink">
               {{ workspace.name }}
             </h2>
-          </div>
+          </template>
 
           <div class="px-3 py-2">
             <p class="truncate font-mono text-ink">
               {{ workspace.root }}
             </p>
           </div>
-        </RouterLink>
+        </BaseCard>
       </li>
     </ul>
   </main>

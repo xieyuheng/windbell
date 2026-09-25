@@ -2,6 +2,7 @@
 import type * as S from "@xieyuheng/semiosis.js"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
+import BaseCard from "../../../components/BaseCard.vue"
 import { sessionMessages } from "../Session.i18n"
 import { signCardConfig } from "./SignCard.config"
 
@@ -35,13 +36,15 @@ function body(sign: S.Sign): string {
 </script>
 
 <template>
-  <li class="border-3 rounded" :class="config.border">
-    <p class="tracking-wide px-3 py-2" :class="config.bg">
-      {{ t(config.labelKey) }}
-    </p>
+  <BaseCard as="li" :color="config.color">
+    <template #header>
+      <p class="tracking-wide">
+        {{ t(config.labelKey) }}
+      </p>
+    </template>
 
     <p class="whitespace-pre-wrap leading-7 px-3 py-2">
       {{ body(sign) }}
     </p>
-  </li>
+  </BaseCard>
 </template>

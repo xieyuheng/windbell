@@ -4,6 +4,7 @@ import { useHead } from "@unhead/vue"
 import { computed, onMounted, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink, useRoute, useRouter } from "vue-router"
+import BaseCard from "../../components/BaseCard.vue"
 import { sessionListMessages } from "./SessionList.i18n"
 import {
   loadSessionList,
@@ -91,8 +92,9 @@ useHead(() => ({
       class="flex flex-1 flex-col gap-4 p-5"
     >
       <li v-for="session in state.sessions" :key="session.id">
-        <RouterLink
-          class="block overflow-hidden rounded border-3 border-paper-deep transition-colors hover:border-ink-muted"
+        <BaseCard
+          :as="RouterLink"
+          class="transition-colors hover:border-ink-muted"
           :to="{
             name: 'session',
             params: {
@@ -100,18 +102,18 @@ useHead(() => ({
             },
           }"
         >
-          <div class="bg-paper-deep px-3 py-2">
+          <template #header>
             <h2 class="truncate text-base text-ink">
               {{ session.title }}
             </h2>
-          </div>
+          </template>
 
           <div class="px-3 py-2">
             <p class="truncate text-ink">
               {{ formatUpdatedAt(session.updatedAt) }}
             </p>
           </div>
-        </RouterLink>
+        </BaseCard>
       </li>
     </ol>
 
