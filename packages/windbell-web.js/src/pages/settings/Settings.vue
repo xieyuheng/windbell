@@ -55,7 +55,7 @@ useHead(() => ({
       >
         <h2
           id="settings-language"
-          class="bg-paper-deep px-3 py-2 font-medium text-ink"
+          class="bg-paper-deep px-3 py-2 text-ink"
         >
           {{ t("language") }}
         </h2>
@@ -85,7 +85,7 @@ useHead(() => ({
       >
         <h2
           id="settings-theme"
-          class="bg-paper-deep px-3 py-2 font-medium text-ink"
+          class="bg-paper-deep px-3 py-2 text-ink"
         >
           {{ t("theme") }}
         </h2>
@@ -115,7 +115,7 @@ useHead(() => ({
       >
         <h2
           id="settings-font"
-          class="bg-paper-deep px-3 py-2 font-medium text-ink"
+          class="bg-paper-deep px-3 py-2 text-ink"
         >
           {{ t("font") }}
         </h2>
@@ -145,7 +145,7 @@ useHead(() => ({
       >
         <h2
           id="settings-default-model"
-          class="bg-paper-deep px-3 py-2 font-medium text-ink"
+          class="bg-paper-deep px-3 py-2 text-ink"
         >
           {{ t("defaultModel") }}
         </h2>

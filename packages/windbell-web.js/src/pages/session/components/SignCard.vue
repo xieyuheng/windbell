@@ -36,7 +36,7 @@ function body(sign: S.Sign): string {
 
 <template>
   <li class="border-3 rounded" :class="config.border">
-    <p class="mb-1 tracking-wide px-3 py-2" :class="config.bg">
+    <p class="tracking-wide px-3 py-2" :class="config.bg">
       {{ t(config.labelKey) }}
     </p>
 
