@@ -145,7 +145,7 @@ useHead(() => ({
           type="text"
         />
         <button
-          class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-interactive/40 text-ink transition-transform duration-150 hover:scale-105 disabled:pointer-events-none disabled:opacity-50"
+          class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-interactive/60 text-ink transition-transform duration-150 hover:scale-110 disabled:pointer-events-none disabled:opacity-50"
           type="submit"
           :disabled="state.interpreting"
           :aria-label="state.interpreting ? t('sending') : t('send')"
