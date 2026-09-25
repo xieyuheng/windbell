@@ -121,17 +121,20 @@ useHead(() => ({
       {{ state.error }}
     </p>
 
-    <ul v-else class="flex flex-col gap-3">
+    <ul v-else class="flex flex-col gap-4">
       <li v-for="workspace in state.workspaces" :key="workspace.id">
         <RouterLink
-          class="flex flex-col gap-3 rounded-2xl border border-line px-4 py-4 transition-colors hover:border-ink-muted"
+          class="block overflow-hidden rounded border-3 border-paper-deep transition-colors hover:border-ink-muted"
           :to="{ name: 'session-list', params: { workspaceId: workspace.id } }"
         >
-          <div class="min-w-0">
-            <h2 class="truncate text-base font-semibold text-ink">
+          <div class="bg-paper-deep px-3 py-2">
+            <h2 class="truncate text-base text-ink">
               {{ workspace.name }}
             </h2>
-            <p class="mt-1 truncate font-mono text-ink">
+          </div>
+
+          <div class="px-3 py-2">
+            <p class="truncate font-mono text-ink">
               {{ workspace.root }}
             </p>
           </div>

@@ -86,14 +86,13 @@ useHead(() => ({
       {{ state.error }}
     </p>
 
-    <ol v-else-if="state.sessions.length > 0" class="flex flex-1 flex-col">
-      <li
-        v-for="session in state.sessions"
-        :key="session.id"
-        class="border-b border-line"
-      >
+    <ol
+      v-else-if="state.sessions.length > 0"
+      class="flex flex-1 flex-col gap-4 p-5"
+    >
+      <li v-for="session in state.sessions" :key="session.id">
         <RouterLink
-          class="flex flex-col gap-2 px-5 py-4 transition-colors hover:bg-paper-deep"
+          class="block overflow-hidden rounded border-3 border-paper-deep transition-colors hover:border-ink-muted"
           :to="{
             name: 'session',
             params: {
@@ -101,13 +100,16 @@ useHead(() => ({
             },
           }"
         >
-          <div class="flex items-baseline justify-between gap-4">
-            <h2 class="truncate text-base font-medium text-ink">
+          <div class="bg-paper-deep px-3 py-2">
+            <h2 class="truncate text-base text-ink">
               {{ session.title }}
             </h2>
-            <span class="shrink-0 text-ink">
+          </div>
+
+          <div class="px-3 py-2">
+            <p class="truncate text-ink">
               {{ formatUpdatedAt(session.updatedAt) }}
-            </span>
+            </p>
           </div>
         </RouterLink>
       </li>
