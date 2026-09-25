@@ -2,7 +2,7 @@ import * as Readline from "node:readline"
 import process from "node:process"
 import { errorReport } from "@xieyuheng/std.js/error"
 import { agentInterpret, type Agent } from "../agent/index.ts"
-import { formatSign } from "../format/index.ts"
+import { formatSign, formatSignTag } from "../format/index.ts"
 import { UserSign } from "../sign/index.ts"
 
 export type StartAgentReplOptions = {
@@ -28,7 +28,11 @@ export async function startAgentRepl(
 ): Promise<void> {
   const isInteractive = process.stdin.isTTY === true
   const useBracketedPaste = isInteractive && process.stdout.isTTY === true
-  const userPrompt = "[user]\n\n"
+  const useColor =
+    process.stdout.isTTY === true &&
+    process.env.NO_COLOR === undefined &&
+    process.env.TERM !== "dumb"
+  const userPrompt = `${formatSignTag("UserSign", "user", { color: useColor })}\n\n`
 
   const messages: Array<string> = []
   const buffer: Array<string> = []
@@ -100,7 +104,7 @@ export async function startAgentRepl(
   if (options.showContext) {
     const context = await agent.getContext()
     for (const sign of context) {
-      console.log(formatSign(sign))
+      console.log(formatSign(sign, { color: useColor }))
     }
   }
 
@@ -125,7 +129,7 @@ export async function startAgentRepl(
     try {
       console.log()
       for await (const sign of agentInterpret(agent, [UserSign(input)])) {
-        console.log(formatSign(sign))
+        console.log(formatSign(sign, { color: useColor }))
       }
     } catch (error) {
       console.log(errorReport(error))
