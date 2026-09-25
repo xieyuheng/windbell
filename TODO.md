@@ -1,4 +1,15 @@
-# windbell-web
+# semiosis.js
+
+[semiosis.js] makeReplHandler 在启动 startAgentRepl 之前，
+
+可否打印：
+- semiosis.js + 版本
+- workspace 和 session 相关的信息？
+
+# windbell-web.js
+
+[windbell-web.js] 改善 workspace-list 使用体验
+[windbell-web.js] 改善 session-list 使用体验
 
 [windbell-web.js] file tree -- IDE 的文件浏览器，从项目的根目录开始
 

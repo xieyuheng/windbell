@@ -1,5 +1,9 @@
-[tool] bash
+[tool]
+
+bash
+
 Run commands in a bash shell.
+
 {
   "type": "object",
   "properties": {
@@ -13,36 +17,70 @@ Run commands in a bash shell.
   ],
   "additionalProperties": false
 }
+
 [persona]
+
 You are a helpful software engineer assistant. The workspace is a small semiosis example.
+
 [user]
+
 请阅读 README.md。
+
 [reasoning]
+
 用户想了解项目说明。
+
 [assistant]
+
 我先读取 README.md。
-[tool-call] bash
-{"command":"sed -n 1,20p README.md"}
+
+[tool-call]
+
+bash
+
+{
+  "command": "sed -n 1,20p README.md"
+}
+
 [tool-output]
+
 exit_code: 0
 stdout:
 # semiosis.js
 
 A minimal coding agent for DeepSeek API.
 
+
 [reasoning]
+
 README.md 说明这是一个最小的 semiosis 示例。
+
 [assistant]
+
 README.md 说明这是一个最小 semiosis 示例。
+
 [user]
+
 再看一下 src/main.ts。
+
 [reasoning]
+
 用户还想看入口文件。
+
 [assistant]
+
 我再读取 src/main.ts。
-[tool-call] bash
-{"command":"sed -n 1,20p src/main.ts"}
+
+[tool-call]
+
+bash
+
+{
+  "command": "sed -n 1,20p src/main.ts"
+}
+
 [tool-output]
+
 exit_code: 0
 stdout:
 #!/usr/bin/env -S node
@@ -52,7 +90,12 @@ import { makeCli } from "./cli/makeCli.ts"
 
 await makeCli().run(process.argv.slice(2))
 
+
 [reasoning]
+
 入口文件里有一个最小的命令入口。
+
 [assistant]
+
 src/main.ts 中定义了命令行工具入口。
+

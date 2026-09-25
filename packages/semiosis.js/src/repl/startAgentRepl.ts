@@ -34,8 +34,6 @@ export async function startAgentRepl(
     wake = undefined
   })
 
-  console.log("semiosis.js repl")
-
   if (options.showContext) {
     const context = await agent.getContext()
     for (const sign of context) {
@@ -43,7 +41,7 @@ export async function startAgentRepl(
     }
   }
 
-  readline.setPrompt("> ")
+  readline.setPrompt("[user]\n\n")
   readline.prompt()
 
   while (true) {
@@ -66,6 +64,7 @@ export async function startAgentRepl(
     }
 
     try {
+      console.log()
       for await (const sign of agentInterpret(agent, [UserSign(input)])) {
         console.log(formatSign(sign))
       }
