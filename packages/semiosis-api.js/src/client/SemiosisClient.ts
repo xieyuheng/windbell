@@ -24,9 +24,10 @@ export type InterpretOptions = {
   input: Array<S.Sign>
 }
 
-export type InterpretResult = {
-  signs: Array<S.Sign>
-}
+export type InterpretEvent =
+  | { type: "sign"; sign: S.Sign }
+  | { type: "done" }
+  | { type: "error"; message: string }
 
 export type SemiosisClient = {
   health(): Promise<{
@@ -59,7 +60,7 @@ export type SemiosisClient = {
     interpret(
       id: S.SessionId,
       options: InterpretOptions,
-    ): Promise<InterpretResult>
+    ): AsyncGenerator<S.Sign>
     remove(id: S.SessionId): Promise<void>
   }
 }
@@ -141,13 +142,21 @@ export function makeSemiosisClient(
         )
       },
 
-      interpret: (id, options) => {
-        return call(
+      async *interpret(id, options) {
+        for await (const event of streamCall<InterpretEvent>(
           config.baseUrl,
           "POST",
           `/sessions/${encodeURIComponent(id)}/interpret`,
           options,
-        )
+        )) {
+          if (event.type === "sign") {
+            yield event.sign
+          } else if (event.type === "error") {
+            throw new Error(event.message)
+          } else if (event.type === "done") {
+            return
+          }
+        }
       },
 
       remove: async (id) => {
@@ -196,6 +205,57 @@ async function call<T>(
   }
 
   return value as T
+}
+
+async function* streamCall<T>(
+  baseUrl: string,
+  method: string,
+  path: string,
+  body?: unknown,
+): AsyncGenerator<T> {
+  const response = await fetch(joinUrl(baseUrl, path), {
+    method,
+    headers:
+      body === undefined
+        ? undefined
+        : {
+            "Content-Type": "application/json",
+          },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  })
+
+  if (!response.ok) {
+    const text = await response.text()
+    const value = text === "" ? null : parseJson(text)
+    throw new HttpRequestError(response.status, readErrorMessage(value, text))
+  }
+
+  if (response.body === null) {
+    throw new Error("response body is null")
+  }
+
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ""
+
+  while (true) {
+    const { done, value } = await reader.read()
+    buffer += decoder.decode(value, { stream: !done })
+
+    const lines = buffer.split("\n")
+    buffer = lines.pop() ?? ""
+
+    for (const line of lines) {
+      if (line.trim() === "") continue
+      yield JSON.parse(line) as T
+    }
+
+    if (done) break
+  }
+
+  if (buffer.trim() !== "") {
+    yield JSON.parse(buffer) as T
+  }
 }
 
 async function callOptional<T>(

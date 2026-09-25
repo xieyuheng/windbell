@@ -1,5 +1,6 @@
 import * as S from "@xieyuheng/semiosis.js"
 import { Hono, type Context } from "hono"
+import { stream } from "hono/streaming"
 import { HTTPException } from "hono/http-exception"
 import { makeSemiosisService } from "../service/index.ts"
 import type { SemiosisRouterOptions } from "./SemiosisRouterOptions.ts"
@@ -172,13 +173,33 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       makeToolRouter: () => toolRouter,
     })
 
-    const signs: Array<S.Sign> = []
+    c.header("Content-Type", "application/x-ndjson; charset=utf-8")
+    c.header("Cache-Control", "no-store")
+    c.header("X-Accel-Buffering", "no")
 
-    for await (const sign of S.agentInterpret(agent, input)) {
-      signs.push(sign)
-    }
+    return stream(c, async (stream) => {
+      try {
+        for await (const sign of S.agentInterpret(agent, input)) {
+          await stream.writeln(
+            JSON.stringify({
+              type: "sign",
+              sign,
+            }),
+          )
+        }
 
-    return sendJson(200, { signs })
+        await stream.writeln(JSON.stringify({ type: "done" }))
+      } catch (error) {
+        if (stream.aborted) return
+
+        await stream.writeln(
+          JSON.stringify({
+            type: "error",
+            message: error instanceof Error ? error.message : String(error),
+          }),
+        )
+      }
+    })
   })
 
   app.onError((error) => sendError(error))

@@ -82,13 +82,18 @@ test("semiosis client and server", async (t) => {
   assert.ok(session.context.length > 0)
   assert.equal(session.context[0]?.kind, "ToolSign")
 
-  const result = await client.sessions.interpret(session.id, {
+  const signs: Array<S.Sign> = []
+
+  for await (const sign of client.sessions.interpret(session.id, {
     model: {
       qualifiedName: "mock/conversation",
     },
     input: [S.UserSign("hello")],
-  })
-  assert.ok(result.signs.length > 0)
+  })) {
+    signs.push(sign)
+  }
+
+  assert.ok(signs.length > 0)
 
   const gotSession = await client.sessions.get(session.id)
   assert.ok((gotSession?.context.length ?? 0) > 1)

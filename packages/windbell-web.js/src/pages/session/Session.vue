@@ -28,15 +28,14 @@ const bottomAnchor = ref<HTMLElement | null>(null)
 const bottomAnchorVisible = ref(true)
 const title = computed(() => state.title || t("notFound"))
 
-const AUTO_SCROLL_DELAY = 500
 let bottomObserver: IntersectionObserver | undefined
-let autoScrollTimeout: number | undefined
 
 async function send(): Promise<void> {
   const content = input.value.trim()
   if (content === "" || state.interpreting) return
 
   input.value = ""
+  await scrollToBottom()
   await interpretSession(state, content)
 }
 
@@ -52,30 +51,13 @@ async function scrollToBottom(): Promise<void> {
   window.scrollTo({ top: document.documentElement.scrollHeight })
 }
 
-function cancelAutoScroll(): void {
-  if (autoScrollTimeout === undefined) return
-
-  window.clearTimeout(autoScrollTimeout)
-  autoScrollTimeout = undefined
-}
-
 function scheduleAutoScroll(): void {
   if (!bottomAnchorVisible.value) return
 
-  cancelAutoScroll()
-
-  autoScrollTimeout = window.setTimeout(async () => {
-    autoScrollTimeout = undefined
-    await scrollToBottom()
-  }, AUTO_SCROLL_DELAY)
+  void scrollToBottom()
 }
 
 onMounted(async () => {
-  window.addEventListener("scroll", cancelAutoScroll, {
-    capture: true,
-    passive: true,
-  })
-
   if (bottomAnchor.value !== null) {
     bottomObserver = new IntersectionObserver((entries) => {
       const entry = entries[0]
@@ -104,8 +86,6 @@ watch(
 
 onBeforeUnmount(() => {
   bottomObserver?.disconnect()
-  cancelAutoScroll()
-  window.removeEventListener("scroll", cancelAutoScroll, { capture: true })
 })
 
 useHead(() => ({

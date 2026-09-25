@@ -74,14 +74,14 @@ export async function interpretSession(
 
     state.context.push(input)
 
-    const result = await semiosis.sessions.interpret(state.sessionId, {
+    for await (const sign of semiosis.sessions.interpret(state.sessionId, {
       model: {
         qualifiedName: settings.defaultModel.qualifiedName,
       },
       input: [input],
-    })
-
-    state.context.push(...result.signs)
+    })) {
+      state.context.push(sign)
+    }
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
   } finally {
