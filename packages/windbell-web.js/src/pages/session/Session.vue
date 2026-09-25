@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SendHorizontal } from "@lucide/vue"
 import { useHead } from "@unhead/vue"
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, nextTick, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
 import BackButton from "../../components/BackButton.vue"
@@ -23,6 +23,7 @@ const { t } = useI18n({
 })
 
 const state = makeSessionState(sessionId.value)
+const scroller = ref<HTMLElement | null>(null)
 const title = computed(() => state.title || t("notFound"))
 
 async function send(): Promise<void> {
@@ -33,13 +34,34 @@ async function send(): Promise<void> {
   await interpretSession(state, content)
 }
 
+async function scrollToBottom(): Promise<void> {
+  await nextTick()
+
+  const element = scroller.value
+  if (element !== null && element.scrollHeight > element.clientHeight) {
+    element.scrollTop = element.scrollHeight
+    return
+  }
+
+  window.scrollTo({ top: document.documentElement.scrollHeight })
+}
+
 onMounted(async () => {
   await loadSessionState(state, sessionId.value)
+  await scrollToBottom()
 })
 
 watch(sessionId, async (value) => {
   await loadSessionState(state, value)
+  await scrollToBottom()
 })
+
+watch(
+  () => state.context.length,
+  async () => {
+    await scrollToBottom()
+  },
+)
 
 useHead(() => ({
   title: title.value,
@@ -58,7 +80,7 @@ useHead(() => ({
   >
     <BackButton floating />
 
-    <div class="flex-1 overflow-y-auto px-4 pt-6 pb-19">
+    <div ref="scroller" class="flex-1 overflow-y-auto px-4 pt-6 pb-19">
       <div class="flex w-full flex-col gap-6">
         <h1 class="text-xl text-ink">
           {{ title }}
