@@ -10,7 +10,3 @@
   markdown 的预览在上面，
   类似 ranger，但是宽度不够，
   所以用高度。
-
-# agent
-
-为 semiosis.js package 增加文学式编程文档

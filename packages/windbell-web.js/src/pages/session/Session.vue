@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SendHorizontal } from "@lucide/vue"
+import { ArrowUp, Square } from "@lucide/vue"
 import { useHead } from "@unhead/vue"
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
@@ -145,13 +145,20 @@ useHead(() => ({
           type="text"
         />
         <button
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-paper-deep text-ink transition-colors hover:bg-line disabled:opacity-50"
+          class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-interactive/40 text-ink transition-transform duration-150 hover:scale-105 disabled:pointer-events-none disabled:opacity-50"
           type="submit"
           :disabled="state.interpreting"
           :aria-label="state.interpreting ? t('sending') : t('send')"
           :title="state.interpreting ? t('sending') : t('send')"
         >
-          <SendHorizontal :size="18" :stroke-width="1.5" aria-hidden="true" />
+          <Square
+            v-if="state.interpreting"
+            :size="12"
+            class="fill-current"
+            aria-hidden="true"
+          />
+
+          <ArrowUp v-else :size="18" :stroke-width="1.5" aria-hidden="true" />
         </button>
       </form>
     </div>
