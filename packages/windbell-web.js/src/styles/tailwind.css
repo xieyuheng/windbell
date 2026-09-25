@@ -10,7 +10,7 @@
 
 @theme {
   --color-paper: #fafaf9;
-  --color-paper-deep: #f2f2f0;
+  --color-paper-deep: #e2e2e0;
 
   --color-ink: #1f1f1e;
   --color-ink-muted: #6b6b68;
@@ -35,7 +35,7 @@
 
 .dark {
   --color-paper: #181818;
-  --color-paper-deep: #222222;
+  --color-paper-deep: #323232;
 
   --color-ink: #f2f2f1;
   --color-ink-muted: #a6a6a3;
