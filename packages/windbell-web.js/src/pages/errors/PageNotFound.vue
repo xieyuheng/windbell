@@ -2,7 +2,7 @@
 import { useHead } from "@unhead/vue"
 import { useI18n } from "vue-i18n"
 import { pageNotFoundMessages } from "./PageNotFound.i18n"
-import BackButton from "../../components/BackButton.vue"
+import Toolbar from "../../components/Toolbar.vue"
 
 const { t } = useI18n({
   messages: pageNotFoundMessages,
@@ -26,7 +26,7 @@ useHead(() => ({
       <h1 class="text-xl text-ink">404</h1>
 
       <div class="flex flex-wrap items-center gap-2">
-        <BackButton />
+        <Toolbar />
       </div>
     </header>
   </main>

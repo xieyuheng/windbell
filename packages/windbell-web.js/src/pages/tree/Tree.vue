@@ -2,7 +2,7 @@
 import { useHead } from "@unhead/vue"
 import { useI18n } from "vue-i18n"
 import { treeMessages } from "./Tree.i18n"
-import BackButton from "../../components/BackButton.vue"
+import Toolbar from "../../components/Toolbar.vue"
 
 const { t } = useI18n({
   messages: treeMessages,
@@ -28,7 +28,7 @@ useHead(() => ({
       </h1>
 
       <div class="flex flex-wrap items-center gap-2">
-        <BackButton />
+        <Toolbar />
       </div>
     </header>
   </main>

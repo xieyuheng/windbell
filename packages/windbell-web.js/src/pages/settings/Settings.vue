@@ -4,7 +4,7 @@ import { onMounted } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRouter } from "vue-router"
 import BaseCard from "../../components/BaseCard.vue"
-import BackButton from "../../components/BackButton.vue"
+import Toolbar from "../../components/Toolbar.vue"
 import { useFont, type Font } from "../../app/font"
 import { setLocale, supportedLocales } from "../../app/i18n"
 import { useTheme, type ThemeMode } from "../../app/theme"
@@ -52,7 +52,7 @@ useHead(() => ({
       </h1>
 
       <div class="flex flex-wrap items-center gap-2">
-        <BackButton />
+        <Toolbar />
       </div>
     </header>
 
