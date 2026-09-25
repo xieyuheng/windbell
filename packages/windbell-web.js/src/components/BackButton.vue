@@ -16,7 +16,11 @@ function goBack(): void {
 </script>
 
 <template>
-  <button type="button" @click="goBack()">
+  <button
+    type="button"
+    class="inline-flex items-center gap-2 rounded border-2 border-line px-2 py-1.5 text-ink transition-colors hover:bg-line"
+    @click="goBack()"
+  >
     <ArrowLeft :size="16" :stroke-width="1.5" aria-hidden="true" />
     <span>{{ t("app.back") }}</span>
   </button>

@@ -5,7 +5,7 @@ import { computed, onMounted, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink, useRoute, useRouter } from "vue-router"
 import BaseCard from "../../components/BaseCard.vue"
-import Toolbar from "../../components/Toolbar.vue"
+import BackButton from "../../components/BackButton.vue"
 import { sessionListMessages } from "./SessionList.i18n"
 import {
   loadSessionList,
@@ -75,7 +75,7 @@ useHead(() => ({
       </h1>
 
       <div class="flex flex-wrap items-center gap-2">
-        <Toolbar />
+        <BackButton />
       </div>
     </header>
 

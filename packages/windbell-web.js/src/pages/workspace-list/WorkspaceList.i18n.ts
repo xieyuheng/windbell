@@ -2,7 +2,6 @@ export const workspaceListMessages = {
   "zh-CN": {
     title: "工作区",
     description: "选择一个工作区开始。",
-    settings: "设置",
     createWorkspace: "创建工作区",
     name: "名称",
     root: "路径",
@@ -13,7 +12,6 @@ export const workspaceListMessages = {
   "en-US": {
     title: "Workspaces",
     description: "Choose a workspace to start.",
-    settings: "Settings",
     createWorkspace: "Create workspace",
     name: "Name",
     root: "Root",

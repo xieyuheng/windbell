@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { Plus, Settings } from "@lucide/vue"
+import { Plus } from "@lucide/vue"
 import { useHead } from "@unhead/vue"
 import { onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
+import SettingsButton from "../../components/SettingsButton.vue"
 import BaseCard from "../../components/BaseCard.vue"
 import { workspaceListMessages } from "./WorkspaceList.i18n"
 import {
@@ -65,13 +66,7 @@ useHead(() => ({
       </h1>
 
       <div class="flex flex-wrap items-center gap-2">
-        <RouterLink
-          class="inline-flex items-center gap-2 rounded px-2 py-1.5 text-ink transition-colors hover:bg-paper-deep"
-          :to="{ name: 'settings' }"
-        >
-          <Settings :size="16" :stroke-width="1.5" aria-hidden="true" />
-          <span>{{ t("settings") }}</span>
-        </RouterLink>
+        <SettingsButton />
       </div>
     </header>
 
