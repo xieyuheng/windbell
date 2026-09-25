@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Settings } from "@lucide/vue"
+import { Plus, Settings } from "@lucide/vue"
 import { useHead } from "@unhead/vue"
 import { onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
@@ -58,10 +58,10 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="flex flex-1 flex-col gap-6 px-5 py-6">
+  <main class="flex flex-1 flex-col gap-6 px-5 py-6 max-w-4xl">
     <header class="flex items-start justify-between gap-4">
       <div class="flex flex-col gap-2">
-        <h1 class="text-2xl font-bold text-ink">
+        <h1 class="text-xl text-ink">
           {{ t("title") }}
         </h1>
         <p class="text-ink">
@@ -79,40 +79,42 @@ useHead(() => ({
       </RouterLink>
     </header>
 
-    <form
-      class="flex flex-col gap-3 rounded-2xl border border-line p-4"
-      @submit.prevent="createWorkspace"
-    >
-      <h2 class="font-medium text-ink">
-        {{ t("createWorkspace") }}
-      </h2>
+    <BaseCard as="form" @submit.prevent="createWorkspace">
+      <template #header>
+        <h2 class="text-ink">
+          {{ t("createWorkspace") }}
+        </h2>
+      </template>
 
-      <input
-        v-model="name"
-        class="rounded border border-line bg-transparent px-3 py-2 text-ink outline-none"
-        :placeholder="t('name')"
-        type="text"
-      />
+      <div class="flex flex-col gap-2 p-2">
+        <input
+          v-model="name"
+          class="w-full rounded border border-line bg-transparent px-2 py-1.5 text-ink outline-none placeholder:text-ink-muted"
+          :placeholder="t('name')"
+          type="text"
+        />
 
-      <input
-        v-model="root"
-        class="rounded border border-line bg-transparent px-3 py-2 font-mono text-ink outline-none"
-        :placeholder="t('root')"
-        type="text"
-      />
+        <input
+          v-model="root"
+          class="w-full rounded border border-line bg-transparent px-2 py-1.5 font-mono text-ink outline-none placeholder:text-ink-muted"
+          :placeholder="t('root')"
+          type="text"
+        />
 
-      <button
-        class="rounded-full px-4 py-2 font-medium disabled:opacity-50"
-        type="submit"
-        :disabled="creating"
-      >
-        {{ creating ? t("creating") : t("create") }}
-      </button>
+        <button
+          class="inline-flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-ink transition-colors hover:bg-paper-deep disabled:opacity-50"
+          type="submit"
+          :disabled="creating"
+        >
+          <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ creating ? t("creating") : t("create") }}</span>
+        </button>
 
-      <p v-if="createError !== undefined" class="text-danger">
-        {{ createError }}
-      </p>
-    </form>
+        <p v-if="createError !== undefined" class="px-2 text-danger">
+          {{ createError }}
+        </p>
+      </div>
+    </BaseCard>
 
     <p v-if="state.loading" class="text-ink">
       {{ t("loading") }}

@@ -67,10 +67,10 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="flex flex-1 flex-col">
+  <main class="flex flex-1 flex-col max-w-4xl">
     <header class="flex flex-col gap-2 border-b border-line px-5 py-6">
       <div class="flex flex-col gap-1">
-        <h1 class="text-2xl font-bold text-ink">
+        <h1 class="text-xl text-ink">
           {{ title }}
         </h1>
         <p class="text-ink">
@@ -78,6 +78,27 @@ useHead(() => ({
         </p>
       </div>
     </header>
+
+    <div class="px-5 pt-5">
+      <BaseCard as="section">
+        <template #header>
+          <h2 class="text-ink">
+            {{ t("newSession") }}
+          </h2>
+        </template>
+
+        <div class="p-2">
+          <button
+            class="inline-flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-ink transition-colors hover:bg-paper-deep"
+            type="button"
+            @click="createSession"
+          >
+            <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
+            <span>{{ t("create") }}</span>
+          </button>
+        </div>
+      </BaseCard>
+    </div>
 
     <p v-if="state.loading" class="px-5 py-4 text-ink">
       {{ t("loading") }}
@@ -120,16 +141,5 @@ useHead(() => ({
     <div v-else class="flex flex-1 items-center justify-center px-6 text-ink">
       {{ t("empty") }}
     </div>
-
-    <footer class="sticky bottom-0 border-t border-line bg-paper p-4">
-      <button
-        class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-4 py-3 font-medium text-paper transition-opacity hover:opacity-80"
-        type="button"
-        @click="createSession"
-      >
-        <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
-        <span>{{ t("newSession") }}</span>
-      </button>
-    </footer>
   </main>
 </template>
