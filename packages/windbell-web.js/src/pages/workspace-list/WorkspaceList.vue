@@ -58,25 +58,21 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="flex flex-1 flex-col gap-6 px-5 py-6 max-w-4xl">
-    <header class="flex items-start justify-between gap-4">
-      <div class="flex flex-col gap-2">
-        <h1 class="text-xl text-ink">
-          {{ t("title") }}
-        </h1>
-        <p class="text-ink">
-          {{ t("description") }}
-        </p>
-      </div>
+  <main class="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-5 py-6">
+    <header class="flex flex-col gap-3">
+      <h1 class="text-xl text-ink">
+        {{ t("title") }}
+      </h1>
 
-      <RouterLink
-        class="flex h-8 w-8 items-center justify-center rounded-full border border-line text-ink-muted transition-colors hover:border-ink-muted hover:text-ink"
-        :to="{ name: 'settings' }"
-        :aria-label="t('settings')"
-        :title="t('settings')"
-      >
-        <Settings :size="16" :stroke-width="1.5" aria-hidden="true" />
-      </RouterLink>
+      <div class="flex flex-wrap items-center gap-2">
+        <RouterLink
+          class="inline-flex items-center gap-2 rounded px-2 py-1.5 text-ink transition-colors hover:bg-paper-deep"
+          :to="{ name: 'settings' }"
+        >
+          <Settings :size="16" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("settings") }}</span>
+        </RouterLink>
+      </div>
     </header>
 
     <BaseCard as="form" @submit.prevent="createWorkspace">

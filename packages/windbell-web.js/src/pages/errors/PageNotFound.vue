@@ -2,6 +2,7 @@
 import { useHead } from "@unhead/vue"
 import { useI18n } from "vue-i18n"
 import { pageNotFoundMessages } from "./PageNotFound.i18n"
+import BackButton from "../../components/BackButton.vue"
 
 const { t } = useI18n({
   messages: pageNotFoundMessages,
@@ -20,10 +21,13 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="flex flex-1 flex-col items-center justify-center gap-3 px-6">
-    <h1 class="text-2xl font-bold text-ink">404</h1>
-    <p class="text-ink">
-      {{ t("description") }}
-    </p>
+  <main class="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-5 py-6">
+    <header class="flex flex-col gap-3">
+      <h1 class="text-xl text-ink">404</h1>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <BackButton />
+      </div>
+    </header>
   </main>
 </template>

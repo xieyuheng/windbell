@@ -4,6 +4,7 @@ import { onMounted } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRouter } from "vue-router"
 import BaseCard from "../../components/BaseCard.vue"
+import BackButton from "../../components/BackButton.vue"
 import { useFont, type Font } from "../../app/font"
 import { setLocale, supportedLocales } from "../../app/i18n"
 import { useTheme, type ThemeMode } from "../../app/theme"
@@ -44,9 +45,15 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="flex flex-1 flex-col gap-6 px-5 py-6 max-w-4xl">
-    <header class="flex flex-col gap-2">
-      <h1 class="text-xl text-ink">{{ t("title") }}</h1>
+  <main class="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-5 py-6">
+    <header class="flex flex-col gap-3">
+      <h1 class="text-xl text-ink">
+        {{ t("title") }}
+      </h1>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <BackButton />
+      </div>
     </header>
 
     <div class="flex flex-col gap-4">

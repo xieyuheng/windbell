@@ -5,6 +5,7 @@ import { computed, onMounted, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink, useRoute, useRouter } from "vue-router"
 import BaseCard from "../../components/BaseCard.vue"
+import BackButton from "../../components/BackButton.vue"
 import { sessionListMessages } from "./SessionList.i18n"
 import {
   loadSessionList,
@@ -67,50 +68,47 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="flex flex-1 flex-col max-w-4xl">
-    <header class="flex flex-col gap-2 border-b border-line px-5 py-6">
-      <div class="flex flex-col gap-1">
-        <h1 class="text-xl text-ink">
-          {{ title }}
-        </h1>
-        <p class="text-ink">
-          {{ t("description") }}
-        </p>
+  <main class="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-5 py-6">
+    <header class="flex flex-col gap-3">
+      <h1 class="text-xl text-ink">
+        {{ title }}
+      </h1>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <BackButton />
       </div>
     </header>
 
-    <div class="px-5 pt-5">
-      <BaseCard as="section">
-        <template #header>
-          <h2 class="text-ink">
-            {{ t("newSession") }}
-          </h2>
-        </template>
+    <BaseCard as="section">
+      <template #header>
+        <h2 class="text-ink">
+          {{ t("newSession") }}
+        </h2>
+      </template>
 
-        <div class="p-2">
-          <button
-            class="inline-flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-ink transition-colors hover:bg-paper-deep"
-            type="button"
-            @click="createSession"
-          >
-            <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
-            <span>{{ t("create") }}</span>
-          </button>
-        </div>
-      </BaseCard>
-    </div>
+      <div class="p-2">
+        <button
+          class="inline-flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-ink transition-colors hover:bg-paper-deep"
+          type="button"
+          @click="createSession"
+        >
+          <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("create") }}</span>
+        </button>
+      </div>
+    </BaseCard>
 
-    <p v-if="state.loading" class="px-5 py-4 text-ink">
+    <p v-if="state.loading" class="text-ink">
       {{ t("loading") }}
     </p>
 
-    <p v-else-if="state.error !== undefined" class="px-5 py-4 text-danger">
+    <p v-else-if="state.error !== undefined" class="text-danger">
       {{ state.error }}
     </p>
 
     <ol
       v-else-if="state.sessions.length > 0"
-      class="flex flex-1 flex-col gap-4 p-5"
+      class="flex flex-1 flex-col gap-4"
     >
       <li v-for="session in state.sessions" :key="session.id">
         <BaseCard
@@ -138,7 +136,7 @@ useHead(() => ({
       </li>
     </ol>
 
-    <div v-else class="flex flex-1 items-center justify-center px-6 text-ink">
+    <div v-else class="flex flex-1 items-center justify-center text-ink">
       {{ t("empty") }}
     </div>
   </main>

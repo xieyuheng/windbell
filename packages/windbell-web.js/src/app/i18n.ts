@@ -11,21 +11,13 @@ const messages = {
   "zh-CN": {
     app: {
       name: "风铃",
-    },
-    sidebar: {
-      workspaces: "工作区",
-      sessions: "对话",
-      settings: "设置",
+      back: "返回",
     },
   },
   "en-US": {
     app: {
       name: "Windbell",
-    },
-    sidebar: {
-      workspaces: "Workspaces",
-      sessions: "Sessions",
-      settings: "Settings",
+      back: "Back",
     },
   },
 }
