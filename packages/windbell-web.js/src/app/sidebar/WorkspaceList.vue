@@ -28,7 +28,7 @@ const { t } = useI18n()
 <template>
   <section class="flex flex-col gap-1 px-3 py-4">
     <div class="flex items-center justify-between px-2">
-      <h2 class="text-xs font-medium tracking-wide text-ink">
+      <h2 class="font-medium tracking-wide text-ink">
         {{ t("sidebar.workspaces") }}
       </h2>
 

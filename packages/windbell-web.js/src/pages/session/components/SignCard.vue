@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type * as S from "@xieyuheng/semiosis.js"
+import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { sessionMessages } from "../Session.i18n"
+import { signCardConfig } from "./SignCard.config"
 
-defineProps<{
+const props = defineProps<{
   sign: S.Sign
 }>()
 
@@ -12,26 +14,7 @@ const { t } = useI18n({
   useScope: "local",
 })
 
-function kindLabel(kind: S.Sign["kind"]): string {
-  switch (kind) {
-    case "UserSign":
-      return t("signKind.user")
-    case "ReasoningSign":
-      return t("signKind.reasoning")
-    case "AssistantSign":
-      return t("signKind.assistant")
-    case "ToolCallSign":
-      return t("signKind.toolCall")
-    case "ToolSign":
-      return t("signKind.tool")
-    case "ToolOutputSign":
-      return t("signKind.toolOutput")
-    case "PersonaSign":
-      return t("signKind.persona")
-    case "ErrorSign":
-      return t("signKind.error")
-  }
-}
+const config = computed(() => signCardConfig[props.sign.kind])
 
 function body(sign: S.Sign): string {
   switch (sign.kind) {
@@ -49,54 +32,15 @@ function body(sign: S.Sign): string {
       return sign.message
   }
 }
-
-function borderClass(kind: S.Sign["kind"]): string {
-  switch (kind) {
-    case "UserSign":
-      return "border-ink-muted"
-    case "ReasoningSign":
-    case "AssistantSign":
-      return "border-accent"
-    case "ToolCallSign":
-    case "ToolSign":
-    case "PersonaSign":
-      return "border-info"
-    case "ToolOutputSign":
-      return "border-warning"
-    case "ErrorSign":
-      return "border-danger"
-  }
-}
-
-function textClass(kind: S.Sign["kind"]): string {
-  switch (kind) {
-    case "UserSign":
-      return "text-ink"
-    case "ReasoningSign":
-    case "AssistantSign":
-      return "text-accent"
-    case "ToolCallSign":
-    case "ToolSign":
-    case "PersonaSign":
-      return "text-info"
-    case "ToolOutputSign":
-      return "text-warning"
-    case "ErrorSign":
-      return "text-danger"
-  }
-}
 </script>
 
 <template>
-  <li class="border-2 rounded-md p-2" :class="borderClass(sign.kind)">
-    <p
-      class="mb-1 text-sm font-medium tracking-wide"
-      :class="textClass(sign.kind)"
-    >
-      {{ kindLabel(sign.kind) }}
+  <li class="border-3 rounded" :class="config.border">
+    <p class="mb-1 font-medium tracking-wide px-3 py-2" :class="config.bg">
+      {{ t(config.labelKey) }}
     </p>
 
-    <p class="whitespace-pre-wrap text-sm leading-7 text-ink">
+    <p class="whitespace-pre-wrap leading-7 px-3 py-2">
       {{ body(sign) }}
     </p>
   </li>

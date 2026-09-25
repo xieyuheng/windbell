@@ -24,7 +24,7 @@ useHead(() => ({
     <h1 class="text-2xl font-bold text-ink">
       {{ t("title") }}
     </h1>
-    <p class="text-sm text-ink">
+    <p class="text-ink">
       {{ t("description") }}
     </p>
   </main>

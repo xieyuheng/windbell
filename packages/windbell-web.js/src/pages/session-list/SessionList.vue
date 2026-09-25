@@ -72,20 +72,17 @@ useHead(() => ({
         <h1 class="text-2xl font-bold text-ink">
           {{ title }}
         </h1>
-        <p class="text-sm text-ink">
+        <p class="text-ink">
           {{ t("description") }}
         </p>
       </div>
     </header>
 
-    <p v-if="state.loading" class="px-5 py-4 text-sm text-ink">
+    <p v-if="state.loading" class="px-5 py-4 text-ink">
       {{ t("loading") }}
     </p>
 
-    <p
-      v-else-if="state.error !== undefined"
-      class="px-5 py-4 text-sm text-danger"
-    >
+    <p v-else-if="state.error !== undefined" class="px-5 py-4 text-danger">
       {{ state.error }}
     </p>
 
@@ -108,7 +105,7 @@ useHead(() => ({
             <h2 class="truncate text-base font-medium text-ink">
               {{ session.title }}
             </h2>
-            <span class="shrink-0 text-sm text-ink">
+            <span class="shrink-0 text-ink">
               {{ formatUpdatedAt(session.updatedAt) }}
             </span>
           </div>
@@ -116,16 +113,13 @@ useHead(() => ({
       </li>
     </ol>
 
-    <div
-      v-else
-      class="flex flex-1 items-center justify-center px-6 text-sm text-ink"
-    >
+    <div v-else class="flex flex-1 items-center justify-center px-6 text-ink">
       {{ t("empty") }}
     </div>
 
     <footer class="sticky bottom-0 border-t border-line bg-paper p-4">
       <button
-        class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-4 py-3 text-sm font-medium text-paper transition-opacity hover:opacity-80"
+        class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-4 py-3 font-medium text-paper transition-opacity hover:opacity-80"
         type="button"
         @click="createSession"
       >

@@ -52,22 +52,22 @@ useHead(() => ({
       <fieldset
         class="flex flex-col gap-3 border-b border-line pb-6 last:border-b-0"
       >
-        <legend class="text-sm font-medium text-ink">
+        <legend class="font-medium text-ink">
           {{ t("defaultModel") }}
         </legend>
 
-        <p v-if="state.loading" class="text-sm text-ink">
+        <p v-if="state.loading" class="text-ink">
           {{ t("loading") }}
         </p>
 
-        <p v-else-if="state.models.length === 0" class="text-sm text-ink-muted">
+        <p v-else-if="state.models.length === 0" class="text-ink-muted">
           {{ t("noModels") }}
         </p>
 
         <label
           v-for="item in state.models"
           :key="item.qualifiedName"
-          class="flex cursor-pointer items-center gap-2 text-sm text-ink"
+          class="flex cursor-pointer items-center gap-2 text-ink"
         >
           <input
             class="accent-ink"
@@ -81,7 +81,7 @@ useHead(() => ({
           <span class="font-mono">{{ item.qualifiedName }}</span>
         </label>
 
-        <p v-if="state.error !== undefined" class="text-sm text-danger">
+        <p v-if="state.error !== undefined" class="text-danger">
           {{ state.error }}
         </p>
       </fieldset>
@@ -89,14 +89,14 @@ useHead(() => ({
       <fieldset
         class="flex flex-col gap-3 border-b border-line pb-6 last:border-b-0"
       >
-        <legend class="text-sm font-medium text-ink">
+        <legend class="font-medium text-ink">
           {{ t("language") }}
         </legend>
 
         <label
           v-for="item in supportedLocales"
           :key="item.value"
-          class="flex cursor-pointer items-center gap-2 text-sm text-ink"
+          class="flex cursor-pointer items-center gap-2 text-ink"
         >
           <input
             class="accent-ink"
@@ -113,14 +113,14 @@ useHead(() => ({
       <fieldset
         class="flex flex-col gap-3 border-b border-line pb-6 last:border-b-0"
       >
-        <legend class="text-sm font-medium text-ink">
+        <legend class="font-medium text-ink">
           {{ t("theme") }}
         </legend>
 
         <label
           v-for="item in themeOptions"
           :key="item.value"
-          class="flex cursor-pointer items-center gap-2 text-sm text-ink"
+          class="flex cursor-pointer items-center gap-2 text-ink"
         >
           <input
             class="accent-ink"
@@ -137,14 +137,14 @@ useHead(() => ({
       <fieldset
         class="flex flex-col gap-3 border-b border-line pb-6 last:border-b-0"
       >
-        <legend class="text-sm font-medium text-ink">
+        <legend class="font-medium text-ink">
           {{ t("font") }}
         </legend>
 
         <label
           v-for="item in fontOptions"
           :key="item.value"
-          class="flex cursor-pointer items-center gap-2 text-sm text-ink"
+          class="flex cursor-pointer items-center gap-2 text-ink"
         >
           <input
             class="accent-ink"

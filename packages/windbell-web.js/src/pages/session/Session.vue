@@ -53,7 +53,7 @@ useHead(() => ({
 <template>
   <main class="flex flex-1 flex-col gap-6 px-5 py-6">
     <header class="flex flex-col gap-2">
-      <p class="font-mono text-sm text-ink">
+      <p class="font-mono text-ink">
         {{ state.sessionId }}
       </p>
       <h1 class="text-2xl font-bold text-ink">
@@ -61,11 +61,11 @@ useHead(() => ({
       </h1>
     </header>
 
-    <p v-if="state.loading" class="text-sm text-ink">
+    <p v-if="state.loading" class="text-ink">
       {{ t("loading") }}
     </p>
 
-    <p v-else-if="state.error !== undefined" class="text-sm text-danger">
+    <p v-else-if="state.error !== undefined" class="text-danger">
       {{ state.error }}
     </p>
 
@@ -80,12 +80,12 @@ useHead(() => ({
     <form class="flex gap-2" @submit.prevent="send">
       <input
         v-model="input"
-        class="flex-1 rounded border border-line bg-transparent px-3 py-2 text-sm text-ink outline-none"
+        class="flex-1 rounded border border-line bg-transparent px-3 py-2 text-ink outline-none"
         :placeholder="t('inputPlaceholder')"
         type="text"
       />
       <button
-        class="rounded-full bg-ink px-4 py-2 text-sm font-medium text-paper disabled:opacity-50"
+        class="rounded-full bg-ink px-4 py-2 font-medium text-paper disabled:opacity-50"
         type="submit"
         :disabled="state.interpreting"
       >

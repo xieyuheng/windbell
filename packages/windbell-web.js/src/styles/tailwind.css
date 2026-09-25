@@ -21,7 +21,17 @@
   --color-warning: #a66a1f;
   --color-info: #4f7f99;
   --color-danger: #b4514b;
+
+  --color-sign-persona:     oklch(0.92 0.04 310);
+  --color-sign-user:        oklch(0.92 0.04 253);
+  --color-sign-reasoning:   oklch(0.92 0.04 294);
+  --color-sign-assistant:   oklch(0.92 0.04 153);
+  --color-sign-tool-call:   oklch(0.92 0.04 96);
+  --color-sign-tool:        oklch(0.92 0.04 213);
+  --color-sign-tool-output: oklch(0.92 0.04 83);
+  --color-sign-error:       oklch(0.92 0.04 17);
 }
+
 
 .dark {
   --color-paper: #181818;
@@ -36,6 +46,15 @@
   --color-warning: #d0a04e;
   --color-info: #7fa8bf;
   --color-danger: #d98c82;
+
+  --color-sign-persona:      oklch(0.4 0.2 310);
+  --color-sign-user:         oklch(0.4 0.2 253);
+  --color-sign-reasoning:    oklch(0.4 0.2 294);
+  --color-sign-assistant:    oklch(0.4 0.2 153);
+  --color-sign-tool-call:    oklch(0.4 0.2 96);
+  --color-sign-tool:         oklch(0.4 0.2 213);
+  --color-sign-tool-output:  oklch(0.4 0.2 83);
+  --color-sign-error:        oklch(0.4 0.2 17);
 }
 
 :root {

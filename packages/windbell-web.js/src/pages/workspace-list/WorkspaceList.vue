@@ -63,7 +63,7 @@ useHead(() => ({
         <h1 class="text-2xl font-bold text-ink">
           {{ t("title") }}
         </h1>
-        <p class="text-sm text-ink">
+        <p class="text-ink">
           {{ t("description") }}
         </p>
       </div>
@@ -82,42 +82,42 @@ useHead(() => ({
       class="flex flex-col gap-3 rounded-2xl border border-line p-4"
       @submit.prevent="createWorkspace"
     >
-      <h2 class="text-sm font-medium text-ink">
+      <h2 class="font-medium text-ink">
         {{ t("createWorkspace") }}
       </h2>
 
       <input
         v-model="name"
-        class="rounded border border-line bg-transparent px-3 py-2 text-sm text-ink outline-none"
+        class="rounded border border-line bg-transparent px-3 py-2 text-ink outline-none"
         :placeholder="t('name')"
         type="text"
       />
 
       <input
         v-model="root"
-        class="rounded border border-line bg-transparent px-3 py-2 font-mono text-sm text-ink outline-none"
+        class="rounded border border-line bg-transparent px-3 py-2 font-mono text-ink outline-none"
         :placeholder="t('root')"
         type="text"
       />
 
       <button
-        class="rounded-full bg-ink px-4 py-2 text-sm font-medium text-paper disabled:opacity-50"
+        class="rounded-full bg-ink px-4 py-2 font-medium text-paper disabled:opacity-50"
         type="submit"
         :disabled="creating"
       >
         {{ creating ? t("creating") : t("create") }}
       </button>
 
-      <p v-if="createError !== undefined" class="text-sm text-danger">
+      <p v-if="createError !== undefined" class="text-danger">
         {{ createError }}
       </p>
     </form>
 
-    <p v-if="state.loading" class="text-sm text-ink">
+    <p v-if="state.loading" class="text-ink">
       {{ t("loading") }}
     </p>
 
-    <p v-else-if="state.error !== undefined" class="text-sm text-danger">
+    <p v-else-if="state.error !== undefined" class="text-danger">
       {{ state.error }}
     </p>
 
@@ -131,7 +131,7 @@ useHead(() => ({
             <h2 class="truncate text-base font-semibold text-ink">
               {{ workspace.name }}
             </h2>
-            <p class="mt-1 truncate font-mono text-sm text-ink">
+            <p class="mt-1 truncate font-mono text-ink">
               {{ workspace.root }}
             </p>
           </div>
