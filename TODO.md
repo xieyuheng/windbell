@@ -1,13 +1,5 @@
 # windbell-web
 
-[windbell-web.js] workspace manager
-
-- 项目列表，每个项目对应一个本地路径
-
-[windbell-web.js] session -- 一个对话的页面
-
-- signs -- 对话中的符号列表
-
 [windbell-web.js] file tree -- IDE 的文件浏览器，从项目的根目录开始
 
 [windbell-web.js] markdown file -- 对文件的预览，包括文学式编程支持

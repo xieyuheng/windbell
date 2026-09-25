@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SendHorizontal } from "@lucide/vue"
 import { useHead } from "@unhead/vue"
-import { computed, nextTick, onMounted, ref, watch } from "vue"
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
 import BackButton from "../../components/BackButton.vue"
@@ -24,7 +24,13 @@ const { t } = useI18n({
 
 const state = makeSessionState(sessionId.value)
 const scroller = ref<HTMLElement | null>(null)
+const bottomAnchor = ref<HTMLElement | null>(null)
+const bottomAnchorVisible = ref(true)
 const title = computed(() => state.title || t("notFound"))
+
+const AUTO_SCROLL_DELAY = 500
+let bottomObserver: IntersectionObserver | undefined
+let autoScrollTimeout: number | undefined
 
 async function send(): Promise<void> {
   const content = input.value.trim()
@@ -46,7 +52,40 @@ async function scrollToBottom(): Promise<void> {
   window.scrollTo({ top: document.documentElement.scrollHeight })
 }
 
+function cancelAutoScroll(): void {
+  if (autoScrollTimeout === undefined) return
+
+  window.clearTimeout(autoScrollTimeout)
+  autoScrollTimeout = undefined
+}
+
+function scheduleAutoScroll(): void {
+  if (!bottomAnchorVisible.value) return
+
+  cancelAutoScroll()
+
+  autoScrollTimeout = window.setTimeout(async () => {
+    autoScrollTimeout = undefined
+    await scrollToBottom()
+  }, AUTO_SCROLL_DELAY)
+}
+
 onMounted(async () => {
+  window.addEventListener("scroll", cancelAutoScroll, {
+    capture: true,
+    passive: true,
+  })
+
+  if (bottomAnchor.value !== null) {
+    bottomObserver = new IntersectionObserver((entries) => {
+      const entry = entries[0]
+      if (entry !== undefined) {
+        bottomAnchorVisible.value = entry.isIntersecting
+      }
+    })
+    bottomObserver.observe(bottomAnchor.value)
+  }
+
   await loadSessionState(state, sessionId.value)
   await scrollToBottom()
 })
@@ -58,10 +97,16 @@ watch(sessionId, async (value) => {
 
 watch(
   () => state.context.length,
-  async () => {
-    await scrollToBottom()
+  () => {
+    scheduleAutoScroll()
   },
 )
+
+onBeforeUnmount(() => {
+  bottomObserver?.disconnect()
+  cancelAutoScroll()
+  window.removeEventListener("scroll", cancelAutoScroll, { capture: true })
+})
 
 useHead(() => ({
   title: title.value,
@@ -102,6 +147,8 @@ useHead(() => ({
           />
         </ol>
       </div>
+
+      <div ref="bottomAnchor" class="h-px w-full" />
     </div>
 
     <div
