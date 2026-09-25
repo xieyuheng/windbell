@@ -1,18 +1,3 @@
-# semiosis.js
-
-【方案讨论（先不改代码）】
-
-[semiosis.js] makeReplHandler 在启动 startAgentRepl 之前，
-
-可否打印：
-
-- semiosis.js + 版本
-- workspace 和 session 相关的信息？
-
-【方案讨论（先不改代码）】
-
-[semiosis.js] formatSign 打印 sign tag 时 比如 [user] 带有颜色
-
 # windbell-web.js
 
 [windbell-web.js] 改善 workspace-list 使用体验
