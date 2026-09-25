@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SendHorizontal } from "@lucide/vue"
 import { useHead } from "@unhead/vue"
 import { computed, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
@@ -51,46 +52,54 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="flex flex-1 flex-col gap-6 px-5 py-6">
-    <header class="flex flex-col gap-2">
-      <p class="font-mono text-ink">
-        {{ state.sessionId }}
-      </p>
-      <h1 class="text-2xl font-bold text-ink">
-        {{ title }}
-      </h1>
-    </header>
+  <main class="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+    <div class="flex-1 overflow-y-auto px-5 pt-6 pb-24">
+      <div class="flex w-full max-w-4xl flex-col gap-6">
+        <h1 class="text-xl text-ink">
+          {{ title }}
+        </h1>
 
-    <p v-if="state.loading" class="text-ink">
-      {{ t("loading") }}
-    </p>
+        <p v-if="state.loading" class="text-ink">
+          {{ t("loading") }}
+        </p>
 
-    <p v-else-if="state.error !== undefined" class="text-danger">
-      {{ state.error }}
-    </p>
+        <p v-else-if="state.error !== undefined" class="text-danger">
+          {{ state.error }}
+        </p>
 
-    <ol v-else class="flex flex-col gap-4">
-      <SignCard
-        v-for="(sign, index) in state.context"
-        :key="index"
-        :sign="sign"
-      />
-    </ol>
+        <ol v-else class="flex flex-col gap-4">
+          <SignCard
+            v-for="(sign, index) in state.context"
+            :key="index"
+            :sign="sign"
+          />
+        </ol>
+      </div>
+    </div>
 
-    <form class="flex gap-2" @submit.prevent="send">
-      <input
-        v-model="input"
-        class="flex-1 rounded border border-line bg-transparent px-3 py-2 text-ink outline-none"
-        :placeholder="t('inputPlaceholder')"
-        type="text"
-      />
-      <button
-        class="rounded-full bg-ink px-4 py-2 font-medium text-paper disabled:opacity-50"
-        type="submit"
-        :disabled="state.interpreting"
+    <div
+      class="pointer-events-none fixed inset-x-0 bottom-[env(safe-area-inset-bottom,0px)] z-10 px-5 pb-6 md:absolute md:bottom-0"
+    >
+      <form
+        class="pointer-events-auto flex w-full max-w-4xl items-center gap-2 rounded-full border border-line/60 bg-paper/80 p-1.5 backdrop-blur transition-colors"
+        @submit.prevent="send"
       >
-        {{ state.interpreting ? t("sending") : t("send") }}
-      </button>
-    </form>
+        <input
+          v-model="input"
+          class="min-w-0 flex-1 bg-transparent px-4 py-2 text-ink outline-none placeholder:text-ink-muted"
+          :placeholder="t('inputPlaceholder')"
+          type="text"
+        />
+        <button
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-paper-deep text-ink transition-colors hover:bg-line disabled:opacity-50"
+          type="submit"
+          :disabled="state.interpreting"
+          :aria-label="state.interpreting ? t('sending') : t('send')"
+          :title="state.interpreting ? t('sending') : t('send')"
+        >
+          <SendHorizontal :size="18" :stroke-width="1.5" aria-hidden="true" />
+        </button>
+      </form>
+    </div>
   </main>
 </template>

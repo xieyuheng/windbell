@@ -101,7 +101,7 @@ useHead(() => ({
       />
 
       <button
-        class="rounded-full bg-ink px-4 py-2 font-medium text-paper disabled:opacity-50"
+        class="rounded-full px-4 py-2 font-medium disabled:opacity-50"
         type="submit"
         :disabled="creating"
       >
