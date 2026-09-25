@@ -52,9 +52,9 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-    <div class="flex-1 overflow-y-auto px-5 pt-6 pb-24">
-      <div class="flex w-full max-w-4xl flex-col gap-6">
+  <main class="relative flex min-h-0 max-w-4xl flex-1 flex-col overflow-hidden">
+    <div class="flex-1 overflow-y-auto px-4 pt-6 pb-22">
+      <div class="flex w-full flex-col gap-6">
         <h1 class="text-xl text-ink">
           {{ title }}
         </h1>
@@ -78,10 +78,10 @@ useHead(() => ({
     </div>
 
     <div
-      class="pointer-events-none fixed inset-x-0 bottom-[env(safe-area-inset-bottom,0px)] z-10 px-5 pb-6 md:absolute md:bottom-0"
+      class="pointer-events-none fixed inset-x-0 bottom-[env(safe-area-inset-bottom,0px)] z-10 px-2 py-4 md:absolute md:bottom-0"
     >
       <form
-        class="pointer-events-auto flex w-full max-w-4xl items-center gap-2 rounded-full border border-line/60 bg-paper/80 p-1.5 backdrop-blur transition-colors"
+        class="pointer-events-auto flex w-full items-center gap-2 rounded-full border border-line/60 bg-paper/60 p-1.5 backdrop-blur transition-colors"
         @submit.prevent="send"
       >
         <input
