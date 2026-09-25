@@ -1,7 +1,5 @@
 # semiosis.js
 
-[semiosis.js] repl 没法处理多行输入，可能需要 TUI 
-
 【方案讨论（先不改代码）】
 
 [semiosis.js] makeReplHandler 在启动 startAgentRepl 之前，
