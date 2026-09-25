@@ -4,7 +4,7 @@ import { useI18n } from "vue-i18n"
 import { sessionMessages } from "../Session.i18n"
 
 defineProps<{
-  signs: Array<S.Sign>
+  sign: S.Sign
 }>()
 
 const { t } = useI18n({
@@ -88,23 +88,16 @@ function textClass(kind: S.Sign["kind"]): string {
 </script>
 
 <template>
-  <ol class="flex flex-col gap-4">
-    <li
-      v-for="(sign, index) in signs"
-      :key="index"
-      class="border-l-2 p-2"
-      :class="borderClass(sign.kind)"
+  <li class="border-2 rounded-md p-2" :class="borderClass(sign.kind)">
+    <p
+      class="mb-1 text-sm font-medium tracking-wide"
+      :class="textClass(sign.kind)"
     >
-      <p
-        class="mb-1 text-sm font-medium tracking-wide"
-        :class="textClass(sign.kind)"
-      >
-        {{ kindLabel(sign.kind) }}
-      </p>
+      {{ kindLabel(sign.kind) }}
+    </p>
 
-      <p class="whitespace-pre-wrap text-sm leading-7 text-ink">
-        {{ body(sign) }}
-      </p>
-    </li>
-  </ol>
+    <p class="whitespace-pre-wrap text-sm leading-7 text-ink">
+      {{ body(sign) }}
+    </p>
+  </li>
 </template>

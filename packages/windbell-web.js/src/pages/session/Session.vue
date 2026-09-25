@@ -3,7 +3,7 @@ import { useHead } from "@unhead/vue"
 import { computed, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
-import SignList from "./components/SignList.vue"
+import SignCard from "./components/SignCard.vue"
 import { sessionMessages } from "./Session.i18n"
 import {
   interpretSession,
@@ -69,7 +69,13 @@ useHead(() => ({
       {{ state.error }}
     </p>
 
-    <SignList v-else :signs="state.context" />
+    <ol v-else class="flex flex-col gap-4">
+      <SignCard
+        v-for="(sign, index) in state.context"
+        :key="index"
+        :sign="sign"
+      />
+    </ol>
 
     <form class="flex gap-2" @submit.prevent="send">
       <input
