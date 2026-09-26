@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Plus } from "@lucide/vue"
+import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
 import { computed, onMounted, watch } from "vue"
 import { useI18n } from "vue-i18n"
@@ -12,6 +13,8 @@ import {
   loadSessionList,
   makeSession,
   makeSessionListState,
+  removeSession,
+  updateSessionTitle,
 } from "./SessionListState"
 
 const route = useRoute()
@@ -36,6 +39,25 @@ async function createSession(): Promise<void> {
         sessionId: session.id,
       },
     })
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+  }
+}
+
+async function deleteSession(session: S.Session): Promise<void> {
+  try {
+    await removeSession(state, session.id)
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+  }
+}
+
+async function editSessionTitle(
+  session: S.Session,
+  title: string,
+): Promise<void> {
+  try {
+    await updateSessionTitle(state, session.id, title)
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
   }
@@ -105,7 +127,12 @@ useHead(() => ({
       class="flex flex-1 flex-col gap-4"
     >
       <li v-for="session in state.sessions" :key="session.id">
-        <SessionCard :session="session" :previewLimit="5" />
+        <SessionCard
+          :session="session"
+          :previewLimit="5"
+          @delete="deleteSession(session)"
+          @update-title="editSessionTitle(session, $event)"
+        />
       </li>
     </ol>
 

@@ -63,3 +63,31 @@ export async function makeSession(
   state.sessions.push(session)
   return session
 }
+
+export async function removeSession(
+  state: SessionListState,
+  sessionId: S.SessionId,
+): Promise<void> {
+  await semiosis.sessions.remove(sessionId)
+  state.sessions = state.sessions.filter((session) => session.id !== sessionId)
+}
+
+export async function updateSessionTitle(
+  state: SessionListState,
+  sessionId: S.SessionId,
+  title: string,
+): Promise<void> {
+  const index = state.sessions.findIndex((session) => session.id === sessionId)
+  const current = state.sessions[index]
+
+  if (current === undefined) return
+
+  const session: S.Session = {
+    ...current,
+    title,
+    updatedAt: Date.now(),
+  }
+
+  await semiosis.sessions.put(session)
+  state.sessions[index] = session
+}

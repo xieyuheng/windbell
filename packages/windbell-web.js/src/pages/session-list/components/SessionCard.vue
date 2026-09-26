@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Pencil, Trash2 } from "@lucide/vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
@@ -16,15 +17,28 @@ const props = withDefaults(
   },
 )
 
+const emit = defineEmits<{
+  delete: []
+  updateTitle: [title: string]
+}>()
+
 const { t } = useI18n({
   messages: {
     "zh-CN": {
       updatedAt: "更新于：",
       createdAt: "创建于：",
+      editTitle: "修改标题",
+      delete: "删除",
+      editTitlePrompt: "输入新的对话标题",
+      deleteConfirm: "确定删除这个对话吗？",
     },
     "en-US": {
       updatedAt: "Updated at:",
       createdAt: "Created at:",
+      editTitle: "Edit title",
+      delete: "Delete",
+      editTitlePrompt: "Enter a new session title",
+      deleteConfirm: "Delete this session?",
     },
   },
   useScope: "local",
@@ -50,6 +64,22 @@ function formatDateTime(value: number): string {
 
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
+
+function requestEditTitle(): void {
+  const title = window.prompt(t("editTitlePrompt"), props.session.title)
+  if (title === null) return
+
+  const nextTitle = title.trim()
+  if (nextTitle === "" || nextTitle === props.session.title) return
+
+  emit("updateTitle", nextTitle)
+}
+
+function requestDelete(): void {
+  if (!window.confirm(t("deleteConfirm"))) return
+
+  emit("delete")
+}
 </script>
 
 <template>
@@ -60,6 +90,26 @@ function formatDateTime(value: number): string {
           {{ session.title }}
         </h2>
       </RouterLink>
+
+      <div class="mt-2 flex items-center gap-1">
+        <button
+          class="inline-flex items-center gap-1 rounded px-1.5 py-1 text-xs text-ink-muted transition-colors hover:bg-paper/60 hover:text-ink"
+          type="button"
+          @click="requestEditTitle"
+        >
+          <Pencil :size="14" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("editTitle") }}</span>
+        </button>
+
+        <button
+          class="inline-flex items-center gap-1 rounded px-1.5 py-1 text-xs text-ink-muted transition-colors hover:bg-paper/60 hover:text-danger"
+          type="button"
+          @click="requestDelete"
+        >
+          <Trash2 :size="14" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("delete") }}</span>
+        </button>
+      </div>
     </template>
 
     <RouterLink class="block" :to="sessionRoute">
