@@ -15,6 +15,7 @@ export type RangerFocus = "sidebar" | "view"
 
 export type RangerState = {
   workspaceId: S.WorkspaceId
+  locationStorageKey: string
   workspace: S.Workspace | undefined
   root: string
   currentDirectory: string
@@ -34,9 +35,13 @@ const fileSystem = makeFileSystemClient({
   baseUrl: "/api/fs",
 })
 
-export function makeRangerState(workspaceId: S.WorkspaceId): RangerState {
+export function makeRangerState(
+  workspaceId: S.WorkspaceId,
+  locationStorageKey: string,
+): RangerState {
   return reactive<RangerState>({
     workspaceId,
+    locationStorageKey,
     workspace: undefined,
     root: "",
     currentDirectory: "",
@@ -50,7 +55,7 @@ export function makeRangerState(workspaceId: S.WorkspaceId): RangerState {
 }
 
 function persistLocation(state: RangerState): void {
-  writeStoredRangerLocation(state.workspaceId, {
+  writeStoredRangerLocation(state.locationStorageKey, {
     currentDirectory: state.currentDirectory,
     selectedPath: state.selectedEntry?.path ?? null,
   })
@@ -83,7 +88,7 @@ export async function loadRanger(state: RangerState): Promise<void> {
     state.workspace = workspace
     state.root = workspace.root
 
-    const storedLocation = readStoredRangerLocation(state.workspaceId)
+    const storedLocation = readStoredRangerLocation(state.locationStorageKey)
 
     if (storedLocation !== undefined) {
       const restored = await loadDirectory(

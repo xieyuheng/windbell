@@ -8,10 +8,10 @@ export function rangerLocationStorageKey(workspaceId: string): string {
 }
 
 export function readStoredRangerLocation(
-  workspaceId: string,
+  storageKey: string,
 ): StoredRangerLocation | undefined {
   try {
-    const raw = localStorage.getItem(rangerLocationStorageKey(workspaceId))
+    const raw = localStorage.getItem(storageKey)
     if (raw === null) return undefined
 
     const value: unknown = JSON.parse(raw)
@@ -43,14 +43,11 @@ export function readStoredRangerLocation(
 }
 
 export function writeStoredRangerLocation(
-  workspaceId: string,
+  storageKey: string,
   location: StoredRangerLocation,
 ): void {
   try {
-    localStorage.setItem(
-      rangerLocationStorageKey(workspaceId),
-      JSON.stringify(location),
-    )
+    localStorage.setItem(storageKey, JSON.stringify(location))
   } catch {
     // ignore storage errors
   }

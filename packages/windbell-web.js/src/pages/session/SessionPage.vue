@@ -16,19 +16,31 @@ import {
   makeSessionState,
 } from "./SessionState"
 
-const rangerOpenStorageKey = "windbell.session.rangerOpen"
+function sessionRangerOpenStorageKey(sessionId: string): string {
+  return `windbell.session.${sessionId}.rangerOpen`
+}
 
-function readStoredRangerOpen(): boolean {
+function sessionWidthRatioStorageKey(sessionId: string): string {
+  return `windbell.session.${sessionId}.sessionWidthRatio`
+}
+
+function sessionRangerLocationStorageKey(sessionId: string): string {
+  return `windbell.session.${sessionId}.rangerLocation`
+}
+
+function readStoredRangerOpen(sessionId: string): boolean {
   try {
-    return localStorage.getItem(rangerOpenStorageKey) === "true"
+    return (
+      localStorage.getItem(sessionRangerOpenStorageKey(sessionId)) === "true"
+    )
   } catch {
     return false
   }
 }
 
-function writeStoredRangerOpen(value: boolean): void {
+function writeStoredRangerOpen(sessionId: string, value: boolean): void {
   try {
-    localStorage.setItem(rangerOpenStorageKey, String(value))
+    localStorage.setItem(sessionRangerOpenStorageKey(sessionId), String(value))
   } catch {
     // ignore storage errors
   }
@@ -44,20 +56,30 @@ const { t } = useI18n({
   useScope: "local",
 })
 
-const state = makeSessionState(sessionId.value)
-const rangerOpen = ref(readStoredRangerOpen())
-const sessionDivider = makeDividerState({
+const sessionDividerOptions = {
   defaultRatio: 0.6,
   minRatio: 0.4,
   maxRatio: 0.8,
-  storageKey: "windbell.session.sessionWidthRatio",
-})
+}
+
+const state = makeSessionState(sessionId.value)
+const rangerOpen = ref(readStoredRangerOpen(sessionId.value))
+const sessionDivider = ref(
+  makeDividerState({
+    ...sessionDividerOptions,
+    storageKey: sessionWidthRatioStorageKey(sessionId.value),
+  }),
+)
+const locationStorageKey = computed(() =>
+  sessionRangerLocationStorageKey(sessionId.value),
+)
 const signList = ref<InstanceType<typeof SessionSignList> | null>(null)
 const title = computed(() => state.title || t("notFound"))
+const rangerPaneVisible = computed(
+  () => rangerOpen.value && state.workspaceId !== "" && !state.loading,
+)
 const sessionPaneWidth = computed(() =>
-  rangerOpen.value && state.workspaceId !== ""
-    ? `${sessionDivider.ratio * 100}%`
-    : "100%",
+  rangerPaneVisible.value ? `${sessionDivider.value.ratio * 100}%` : "100%",
 )
 
 function goBack(): void {
@@ -89,12 +111,18 @@ onMounted(async () => {
 })
 
 watch(sessionId, async (value) => {
+  rangerOpen.value = readStoredRangerOpen(value)
+  sessionDivider.value = makeDividerState({
+    ...sessionDividerOptions,
+    storageKey: sessionWidthRatioStorageKey(value),
+  })
+
   await loadSessionState(state, value)
   await signList.value?.scrollToBottom()
 })
 
 watch(rangerOpen, (value) => {
-  writeStoredRangerOpen(value)
+  writeStoredRangerOpen(sessionId.value, value)
 })
 
 useHead(() => ({
@@ -134,16 +162,16 @@ useHead(() => ({
       </div>
     </section>
 
-    <ResizeDivider
-      v-if="rangerOpen && state.workspaceId !== ''"
-      :state="sessionDivider"
-    />
+    <ResizeDivider v-if="rangerPaneVisible" :state="sessionDivider" />
 
     <div
-      v-if="rangerOpen && state.workspaceId !== ''"
+      v-if="rangerPaneVisible"
       class="h-screen min-w-0 flex-1 overflow-hidden"
     >
-      <RangerPanel :workspace-id="state.workspaceId" />
+      <RangerPanel
+        :workspace-id="state.workspaceId"
+        :location-storage-key="locationStorageKey"
+      />
     </div>
   </main>
 </template>

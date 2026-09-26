@@ -18,6 +18,7 @@ import {
 
 const props = defineProps<{
   workspaceId: string
+  locationStorageKey: string
 }>()
 
 const { t } = useI18n({
@@ -25,7 +26,7 @@ const { t } = useI18n({
   useScope: "local",
 })
 
-const state = makeRangerState(props.workspaceId)
+const state = makeRangerState(props.workspaceId, props.locationStorageKey)
 const sidebarDivider = makeDividerState({
   defaultRatio: 0.25,
   minRatio: 0.15,
@@ -114,10 +115,11 @@ onMounted(async () => {
 })
 
 watch(
-  () => props.workspaceId,
-  async (value) => {
+  () => [props.workspaceId, props.locationStorageKey] as const,
+  async ([workspaceId, locationStorageKey]) => {
     stopWatching()
-    state.workspaceId = value
+    state.workspaceId = workspaceId
+    state.locationStorageKey = locationStorageKey
     await loadRanger(state)
     startWatching()
   },
