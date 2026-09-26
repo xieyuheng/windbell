@@ -59,6 +59,12 @@ function persistLocation(state: RangerState): void {
 export async function loadRanger(state: RangerState): Promise<void> {
   state.loading = true
   state.error = undefined
+  state.workspace = undefined
+  state.root = ""
+  state.currentDirectory = ""
+  state.entries = []
+  state.selectedIndex = -1
+  state.selectedEntry = undefined
 
   try {
     const workspace = await semiosis.workspaces.get(state.workspaceId)
@@ -133,6 +139,89 @@ export async function loadDirectory(
     return false
   } finally {
     state.loading = false
+  }
+}
+
+export async function refreshRanger(state: RangerState): Promise<void> {
+  if (state.currentDirectory === "") return
+
+  const directory = state.currentDirectory
+
+  try {
+    const entries = await fileSystem.listEntries(directory)
+
+    if (state.loading || directory !== state.currentDirectory) return
+
+    const selectedPath = state.selectedEntry?.path
+    const selectedIndex =
+      selectedPath === undefined
+        ? -1
+        : entries.findIndex((entry) => entry.path === selectedPath)
+    const index = selectedIndex === -1 ? 0 : selectedIndex
+
+    state.entries = entries
+    state.selectedIndex = entries.length > 0 ? index : -1
+    state.selectedEntry = entries[index]
+    state.error = undefined
+
+    persistLocation(state)
+  } catch (error) {
+    if (state.loading || directory !== state.currentDirectory) return
+
+    if (!isSamePath(directory, state.root)) {
+      await loadDirectory(state, state.root)
+      return
+    }
+
+    state.error = error instanceof Error ? error.message : String(error)
+  }
+}
+
+export function watchRanger(
+  state: RangerState,
+  onError?: (error: Error) => void,
+): () => void {
+  if (state.root === "") return () => {}
+
+  let refreshTimer: ReturnType<typeof setTimeout> | undefined
+
+  const stop = fileSystem.watch(
+    state.root,
+    (event) => {
+      if (event.type === "watch-error") {
+        onError?.(new Error(event.message))
+        return
+      }
+
+      if (event.type === "ready") {
+        state.error = undefined
+        return
+      }
+
+      if (event.type !== "change") return
+
+      if (refreshTimer !== undefined) {
+        clearTimeout(refreshTimer)
+      }
+
+      refreshTimer = setTimeout(() => {
+        refreshTimer = undefined
+
+        if (!state.loading) {
+          void refreshRanger(state)
+        }
+      }, 150)
+    },
+    onError,
+  )
+
+  return () => {
+    if (refreshTimer !== undefined) {
+      clearTimeout(refreshTimer)
+      refreshTimer = undefined
+    }
+
+    stop()
   }
 }
 

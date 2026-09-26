@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue"
+import { onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { rangerMessages } from "./Ranger.i18n"
 import { readStoredSidebarRatio } from "./RangerLayout"
@@ -13,6 +13,7 @@ import {
   moveSelection,
   openSelectedEntry,
   selectEntry,
+  watchRanger,
 } from "./RangerState"
 
 const props = defineProps<{
@@ -28,8 +29,22 @@ const state = makeRangerState(props.workspaceId)
 const sidebarRatio = ref(readStoredSidebarRatio())
 const panel = ref<HTMLElement | null>(null)
 
+let stopWatch: (() => void) | undefined
+
 function focusPanel(): void {
   panel.value?.focus({ preventScroll: true })
+}
+
+function startWatching(): void {
+  stopWatching()
+  stopWatch = watchRanger(state, (error) => {
+    state.error = error.message
+  })
+}
+
+function stopWatching(): void {
+  stopWatch?.()
+  stopWatch = undefined
 }
 
 function handleSelect(index: number): void {
@@ -90,15 +105,22 @@ function onKeydown(event: KeyboardEvent): void {
 onMounted(async () => {
   focusPanel()
   await loadRanger(state)
+  startWatching()
 })
 
 watch(
   () => props.workspaceId,
   async (value) => {
+    stopWatching()
     state.workspaceId = value
     await loadRanger(state)
+    startWatching()
   },
 )
+
+onBeforeUnmount(() => {
+  stopWatching()
+})
 </script>
 
 <template>
