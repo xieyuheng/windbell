@@ -19,6 +19,7 @@ export type FileSystemWatchHandler = (event: FileSystemWatchEvent) => void
 export type FileSystemWatchErrorHandler = (error: Error) => void
 
 export type FileSystemClient = {
+  home(): Promise<string>
   exists(path: string): Promise<boolean>
   isFile(path: string): Promise<boolean>
   isDirectory(path: string): Promise<boolean>
@@ -49,6 +50,7 @@ export function makeFileSystemClient(
   config: FileSystemClientConfig,
 ): FileSystemClient {
   return {
+    home: () => call(config.baseUrl, "home", {}),
     exists: (path) => call(config.baseUrl, "exists", { path }),
     isFile: (path) => call(config.baseUrl, "is-file", { path }),
     isDirectory: (path) => call(config.baseUrl, "is-directory", { path }),

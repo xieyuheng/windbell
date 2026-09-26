@@ -8,6 +8,7 @@ import * as service from "../service/index.ts"
 type Handler = (body: unknown) => Promise<unknown>
 
 const handlers: Record<string, Handler> = {
+  home: async () => service.home(),
   exists: async (body) => service.exists(readPath(body)),
   "is-file": async (body) => service.isFile(readPath(body)),
   "is-directory": async (body) => service.isDirectory(readPath(body)),

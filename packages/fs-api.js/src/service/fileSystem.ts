@@ -1,5 +1,10 @@
 import fs from "node:fs/promises"
+import Os from "node:os"
 import Path from "node:path"
+
+export function home(): string {
+  return Os.homedir()
+}
 
 export async function exists(path: string): Promise<boolean> {
   try {

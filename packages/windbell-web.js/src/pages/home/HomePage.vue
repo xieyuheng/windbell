@@ -6,8 +6,8 @@ import PageLayout from "../../components/layout/PageLayout.vue"
 import { onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import MediumButton from "../../components/buttons/MediumButton.vue"
-import Card from "../../components/card/Card.vue"
 import WorkspaceCard from "./components/WorkspaceCard.vue"
+import WorkspaceCreateDialog from "./components/WorkspaceCreateDialog.vue"
 import { homeMessages } from "./Home.i18n"
 import {
   ensureWorkspace,
@@ -23,8 +23,7 @@ const { t } = useI18n({
 })
 
 const state = makeHomeState()
-const name = ref("")
-const root = ref("")
+const createDialogOpen = ref(false)
 const creating = ref(false)
 const createError = ref<string | undefined>(undefined)
 
@@ -32,18 +31,27 @@ onMounted(async () => {
   await loadHomeState(state)
 })
 
-async function createWorkspace(): Promise<void> {
+function openCreateDialog(): void {
+  createError.value = undefined
+  createDialogOpen.value = true
+}
+
+function closeCreateDialog(): void {
+  if (creating.value) return
+
+  createDialogOpen.value = false
+}
+
+async function createWorkspace(options: {
+  name: string
+  root: string
+}): Promise<void> {
   creating.value = true
   createError.value = undefined
 
   try {
-    await ensureWorkspace(state, {
-      name: name.value,
-      root: root.value,
-    })
-
-    name.value = ""
-    root.value = ""
+    await ensureWorkspace(state, options)
+    createDialogOpen.value = false
   } catch (error) {
     createError.value = error instanceof Error ? error.message : String(error)
   } finally {
@@ -101,46 +109,16 @@ useHead(() => ({
       </div>
     </header>
 
-    <Card as="form" @submit.prevent="createWorkspace">
-      <template #header>
-        <h2 class="text-ink">
-          {{ t("createWorkspace") }}
-        </h2>
-      </template>
+    <div class="flex flex-col gap-2">
+      <h2 class="text-base text-ink">
+        {{ t("workspaces") }}
+      </h2>
 
-      <div class="flex flex-col gap-2 p-2">
-        <input
-          v-model="name"
-          class="w-full rounded border border-line bg-transparent px-2 py-1.5 text-ink outline-none placeholder:text-ink-muted"
-          :placeholder="t('name')"
-          type="text"
-        />
-
-        <input
-          v-model="root"
-          class="w-full rounded border border-line bg-transparent px-2 py-1.5 font-mono text-ink outline-none placeholder:text-ink-muted"
-          :placeholder="t('root')"
-          type="text"
-        />
-
-        <button
-          class="inline-flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-ink transition-colors hover:bg-paper-deep disabled:opacity-50"
-          type="submit"
-          :disabled="creating"
-        >
-          <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
-          <span>{{ creating ? t("creating") : t("create") }}</span>
-        </button>
-
-        <p v-if="createError !== undefined" class="px-2 text-danger">
-          {{ createError }}
-        </p>
-      </div>
-    </Card>
-
-    <h2 class="text-base text-ink">
-      {{ t("workspaces") }}
-    </h2>
+      <MediumButton class="self-start" type="button" @click="openCreateDialog">
+        <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
+        <span>{{ t("newWorkspace") }}</span>
+      </MediumButton>
+    </div>
 
     <p v-if="state.loading" class="text-ink">
       {{ t("loading") }}
@@ -159,5 +137,13 @@ useHead(() => ({
         />
       </li>
     </ul>
+
+    <WorkspaceCreateDialog
+      v-if="createDialogOpen"
+      :creating="creating"
+      :error="createError"
+      @close="closeCreateDialog"
+      @create="createWorkspace"
+    />
   </PageLayout>
 </template>

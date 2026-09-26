@@ -159,6 +159,7 @@ test("fileSystem client and server", async (t) => {
     await fs.rm(root, { recursive: true, force: true })
   })
 
+  assert.equal(await client.home(), Os.homedir())
   assert.equal(await client.exists(root), true)
   assert.equal(await client.isDirectory(root), true)
   assert.equal(await client.isFile(root), false)
