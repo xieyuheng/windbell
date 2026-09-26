@@ -156,7 +156,9 @@ export function makeSessionStore(options: SessionStoreOptions): SessionStore {
         indexes.push(index)
       }
 
-      indexes.sort((a, b) => a.createdAt - b.createdAt)
+      indexes.sort(
+        (a, b) => b.updatedAt - a.updatedAt || b.createdAt - a.createdAt,
+      )
       return indexes
     },
 

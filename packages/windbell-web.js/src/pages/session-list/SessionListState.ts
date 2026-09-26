@@ -14,6 +14,12 @@ const semiosis = makeSemiosisClient({
   baseUrl: "/api/semiosis",
 })
 
+function sortSessionsByUpdatedAt(sessions: Array<S.Session>): void {
+  sessions.sort(
+    (a, b) => b.updatedAt - a.updatedAt || b.createdAt - a.createdAt,
+  )
+}
+
 export function makeSessionListState(
   workspaceId: S.WorkspaceId,
 ): SessionListState {
@@ -39,11 +45,15 @@ export async function loadSessionList(state: SessionListState): Promise<void> {
     ])
 
     state.workspace = workspace
-    state.sessions = (
+
+    const loadedSessions = (
       await Promise.all(
         sessions.map((session) => semiosis.sessions.get(session.id)),
       )
     ).filter((session): session is S.Session => session !== undefined)
+
+    sortSessionsByUpdatedAt(loadedSessions)
+    state.sessions = loadedSessions
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
   } finally {
@@ -61,6 +71,7 @@ export async function makeSession(
   })
 
   state.sessions.push(session)
+  sortSessionsByUpdatedAt(state.sessions)
   return session
 }
 
@@ -90,4 +101,5 @@ export async function updateSessionTitle(
 
   await semiosis.sessions.put(session)
   state.sessions[index] = session
+  sortSessionsByUpdatedAt(state.sessions)
 }
