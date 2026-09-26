@@ -129,7 +129,7 @@ useHead(() => ({
       @select="handleSelect($event)"
     />
 
-    <RangerDivider />
+    <RangerDivider v-model:ratio="sidebarRatio" />
 
     <section
       v-if="state.loading"
