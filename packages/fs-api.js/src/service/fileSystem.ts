@@ -39,9 +39,29 @@ export async function write(path: string, text: string): Promise<void> {
   await fs.writeFile(path, text, "utf8")
 }
 
+export type FileSystemEntry = {
+  name: string
+  path: string
+  kind: "File" | "Directory"
+}
+
 export async function list(path: string): Promise<Array<string>> {
   const names = await fs.readdir(path)
   return names.sort().map((name) => Path.join(path, name))
+}
+
+export async function listEntries(
+  path: string,
+): Promise<Array<FileSystemEntry>> {
+  const entries = await fs.readdir(path, { withFileTypes: true })
+
+  return entries
+    .sort((left, right) => left.name.localeCompare(right.name))
+    .map((entry) => ({
+      name: entry.name,
+      path: Path.join(path, entry.name),
+      kind: entry.isDirectory() ? "Directory" : "File",
+    }))
 }
 
 export async function listRecursive(path: string): Promise<Array<string>> {

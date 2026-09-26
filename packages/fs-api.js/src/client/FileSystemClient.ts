@@ -1,3 +1,5 @@
+import type { FileSystemEntry } from "../service/fileSystem.ts"
+
 export type FileSystemClient = {
   exists(path: string): Promise<boolean>
   isFile(path: string): Promise<boolean>
@@ -5,6 +7,7 @@ export type FileSystemClient = {
   read(path: string): Promise<string>
   write(path: string, text: string): Promise<void>
   list(path: string): Promise<Array<string>>
+  listEntries(path: string): Promise<Array<FileSystemEntry>>
   listRecursive(path: string): Promise<Array<string>>
   ensureFile(path: string): Promise<void>
   ensureDirectory(path: string): Promise<void>
@@ -30,6 +33,7 @@ export function makeFileSystemClient(
       await call(config.baseUrl, "write", { path, text })
     },
     list: (path) => call(config.baseUrl, "list", { path }),
+    listEntries: (path) => call(config.baseUrl, "list-entries", { path }),
     listRecursive: (path) => call(config.baseUrl, "list-recursive", { path }),
     ensureFile: async (path) => {
       await call(config.baseUrl, "ensure-file", { path })

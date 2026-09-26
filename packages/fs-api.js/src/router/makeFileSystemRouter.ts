@@ -11,6 +11,7 @@ const handlers: Record<string, Handler> = {
   read: async (body) => service.read(readPath(body)),
   write: async (body) => service.write(readPath(body), readText(body)),
   list: async (body) => service.list(readPath(body)),
+  "list-entries": async (body) => service.listEntries(readPath(body)),
   "list-recursive": async (body) => service.listRecursive(readPath(body)),
   "ensure-file": async (body) => service.ensureFile(readPath(body)),
   "ensure-directory": async (body) => service.ensureDirectory(readPath(body)),

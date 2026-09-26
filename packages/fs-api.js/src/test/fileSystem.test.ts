@@ -64,6 +64,25 @@ test("fileSystem client and server", async (t) => {
     Path.join(root, "notes"),
   ])
 
+  const entries = await client.listEntries(root)
+  assert.deepEqual(entries, [
+    {
+      name: "empty-dir",
+      path: Path.join(root, "empty-dir"),
+      kind: "Directory",
+    },
+    {
+      name: "empty.txt",
+      path: emptyFile,
+      kind: "File",
+    },
+    {
+      name: "notes",
+      path: Path.join(root, "notes"),
+      kind: "Directory",
+    },
+  ])
+
   const recursive = await client.listRecursive(root)
   assert.deepEqual(recursive, [
     Path.join(root, "empty-dir"),
