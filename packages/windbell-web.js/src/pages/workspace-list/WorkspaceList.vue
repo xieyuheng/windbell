@@ -3,9 +3,9 @@ import { Plus } from "@lucide/vue"
 import { useHead } from "@unhead/vue"
 import { onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
-import { RouterLink } from "vue-router"
 import SettingsButton from "../../components/SettingsButton.vue"
 import Card from "../../components/Card.vue"
+import WorkspaceCard from "./components/WorkspaceCard.vue"
 import { workspaceListMessages } from "./WorkspaceList.i18n"
 import {
   ensureWorkspace,
@@ -117,35 +117,7 @@ useHead(() => ({
 
     <ul v-else class="flex flex-col gap-4">
       <li v-for="workspace in state.workspaces" :key="workspace.id">
-        <Card as="article">
-          <template #header>
-            <RouterLink
-              class="block min-w-0"
-              :to="{
-                name: 'session-list',
-                params: { workspaceId: workspace.id },
-              }"
-            >
-              <h2 class="truncate text-base text-ink">
-                {{ workspace.name }}
-              </h2>
-            </RouterLink>
-          </template>
-
-          <RouterLink
-            class="block"
-            :to="{
-              name: 'session-list',
-              params: { workspaceId: workspace.id },
-            }"
-          >
-            <div class="px-3 py-2">
-              <p class="truncate font-mono text-ink">
-                {{ workspace.root }}
-              </p>
-            </div>
-          </RouterLink>
-        </Card>
+        <WorkspaceCard :workspace="workspace" />
       </li>
     </ul>
   </main>
