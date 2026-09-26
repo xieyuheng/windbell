@@ -24,7 +24,7 @@ const { t } = useI18n({
 <template>
   <div
     class="pointer-events-none absolute inset-x-0 z-50 flex items-center justify-between px-2"
-    :style="{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }"
+    :style="{ top: 'calc(env(safe-area-inset-top, 0px) + 0.5rem)' }"
   >
     <RoundButton type="button" @click="emit('back')">
       <ArrowLeft :size="18" :stroke-width="1.5" aria-hidden="true" />
