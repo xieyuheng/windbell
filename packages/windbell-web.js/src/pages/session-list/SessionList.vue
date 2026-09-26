@@ -5,7 +5,6 @@ import { useHead } from "@unhead/vue"
 import { computed, onMounted, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink, useRoute, useRouter } from "vue-router"
-import Card from "../../components/card/Card.vue"
 import BackButton from "../../components/buttons/BackButton.vue"
 import SessionCard from "./components/SessionCard.vue"
 import { sessionListMessages } from "./SessionList.i18n"
@@ -93,6 +92,15 @@ useHead(() => ({
       <div class="flex flex-wrap items-center gap-2">
         <BackButton />
 
+        <button
+          class="inline-flex items-center gap-2 rounded border-2 border-line px-2 py-1.5 text-ink transition-colors hover:bg-line"
+          type="button"
+          @click="createSession"
+        >
+          <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("newSession") }}</span>
+        </button>
+
         <RouterLink
           class="inline-flex items-center gap-2 rounded border-2 border-line px-2 py-1.5 text-ink transition-colors hover:bg-line"
           :to="{
@@ -105,25 +113,6 @@ useHead(() => ({
         </RouterLink>
       </div>
     </header>
-
-    <Card as="section">
-      <template #header>
-        <h2 class="text-ink">
-          {{ t("newSession") }}
-        </h2>
-      </template>
-
-      <div class="p-2">
-        <button
-          class="inline-flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-ink transition-colors hover:bg-paper-deep"
-          type="button"
-          @click="createSession"
-        >
-          <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
-          <span>{{ t("create") }}</span>
-        </button>
-      </div>
-    </Card>
 
     <p v-if="state.loading" class="text-ink">
       {{ t("loading") }}
