@@ -3,8 +3,8 @@ import { useHead } from "@unhead/vue"
 import { computed, onMounted, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
-import BackButton from "../../components/buttons/BackButton.vue"
 import { rangerMessages } from "./Ranger.i18n"
+import RangerSidebar from "./components/RangerSidebar.vue"
 import { loadRanger, makeRangerState } from "./RangerState"
 
 const route = useRoute()
@@ -38,38 +38,23 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-5 py-6">
-    <header class="flex flex-col gap-3">
-      <h1 class="text-xl text-ink">
-        {{ t("title") }}
-      </h1>
+  <main class="flex h-screen w-full overflow-hidden">
+    <RangerSidebar
+      class="w-1/4 shrink-0"
+      :root="state.root"
+      :current-directory="state.currentDirectory"
+      :entries="state.entries"
+      :selected-index="0"
+    />
 
-      <div class="flex flex-wrap items-center gap-2">
-        <BackButton
-          :to="{
-            name: 'workspace',
-            params: { workspaceId },
-          }"
-        />
-      </div>
-    </header>
+    <section class="flex-1 bg-paper px-4 py-3">
+      <p v-if="state.loading" class="text-ink">
+        {{ t("loading") }}
+      </p>
 
-    <p v-if="state.loading" class="text-ink">
-      {{ t("loading") }}
-    </p>
-
-    <p v-else-if="state.error !== undefined" class="text-danger">
-      {{ state.error }}
-    </p>
-
-    <ul v-else-if="state.entries.length > 0" class="flex flex-col gap-1">
-      <li v-for="entry in state.entries" :key="entry.path" class="text-ink">
-        {{ entry.kind }} - {{ entry.name }}
-      </li>
-    </ul>
-
-    <div v-else class="text-ink">
-      {{ t("empty") }}
-    </div>
+      <p v-else-if="state.error !== undefined" class="text-danger">
+        {{ state.error }}
+      </p>
+    </section>
   </main>
 </template>
