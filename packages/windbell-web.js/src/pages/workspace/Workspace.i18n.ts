@@ -2,6 +2,7 @@ export const workspaceMessages = {
   "zh-CN": {
     title: "对话",
     description: "当前工作区下的对话列表。",
+    sessions: "对话列表",
     newSession: "新建对话",
     empty: "还没有对话。",
     untitled: "未命名",
@@ -11,6 +12,7 @@ export const workspaceMessages = {
   "en-US": {
     title: "Sessions",
     description: "Sessions in the current workspace.",
+    sessions: "Sessions",
     newSession: "New session",
     empty: "No sessions yet.",
     untitled: "Untitled",

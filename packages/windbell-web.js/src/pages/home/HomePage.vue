@@ -103,6 +103,10 @@ useHead(() => ({
       </div>
     </Card>
 
+    <h2 class="text-base text-ink">
+      {{ t("workspaces") }}
+    </h2>
+
     <p v-if="state.loading" class="text-ink">
       {{ t("loading") }}
     </p>
