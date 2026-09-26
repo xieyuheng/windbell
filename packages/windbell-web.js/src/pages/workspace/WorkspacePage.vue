@@ -90,7 +90,7 @@ useHead(() => ({
       </h1>
 
       <div class="flex flex-wrap items-center gap-2">
-        <BackButton :to="{ name: 'dashboard' }" />
+        <BackButton :to="{ name: 'home' }" />
 
         <button
           class="inline-flex items-center gap-2 rounded border-2 border-line px-2 py-1.5 text-ink transition-colors hover:bg-line"

@@ -1,6 +1,6 @@
-export const dashboardMessages = {
+export const homeMessages = {
   "zh-CN": {
-    title: "工作区",
+    title: "首页",
     description: "选择一个工作区开始。",
     createWorkspace: "创建工作区",
     name: "名称",
@@ -10,7 +10,7 @@ export const dashboardMessages = {
     loading: "加载中...",
   },
   "en-US": {
-    title: "Workspaces",
+    title: "Home",
     description: "Choose a workspace to start.",
     createWorkspace: "Create workspace",
     name: "Name",

@@ -32,7 +32,7 @@ let bottomObserver: IntersectionObserver | undefined
 
 function goBack(): void {
   if (state.workspaceId === "") {
-    void router.push({ name: "dashboard" })
+    void router.push({ name: "home" })
     return
   }
 

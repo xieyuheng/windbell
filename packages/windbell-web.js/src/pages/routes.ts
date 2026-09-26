@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from "vue-router"
-import DashboardPage from "./dashboard/DashboardPage.vue"
+import HomePage from "./home/HomePage.vue"
 import NotFoundPage from "./errors/NotFoundPage.vue"
 import SessionDustbinPage from "./session-dustbin/SessionDustbinPage.vue"
 import SessionPage from "./session/SessionPage.vue"
@@ -10,16 +10,20 @@ import WorkspacePage from "./workspace/WorkspacePage.vue"
 export const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    redirect: "/dashboard",
+    redirect: "/home",
+  },
+  {
+    path: "/home",
+    name: "home",
+    component: HomePage,
   },
   {
     path: "/dashboard",
-    name: "dashboard",
-    component: DashboardPage,
+    redirect: "/home",
   },
   {
     path: "/workspaces",
-    redirect: "/dashboard",
+    redirect: "/home",
   },
   {
     path: "/workspaces/:workspaceId/sessions",
