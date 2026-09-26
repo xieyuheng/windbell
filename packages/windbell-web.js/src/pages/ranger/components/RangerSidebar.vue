@@ -22,14 +22,16 @@ function pathName(value: string): string {
 </script>
 
 <template>
-  <aside class="flex h-full min-h-0 flex-col overflow-hidden bg-paper-deep">
-    <header class="shrink-0 border-b border-line px-3 py-2">
-      <p class="truncate text-sm text-ink">
+  <aside
+    class="flex h-full min-h-0 flex-col overflow-hidden border-r border-line bg-paper"
+  >
+    <header class="shrink-0 px-3 py-2">
+      <p class="truncate text-ink">
         {{ currentName }}
       </p>
     </header>
 
-    <ol class="min-h-0 flex-1 overflow-y-auto">
+    <ol class="min-h-0 flex-1 overflow-y-auto border-t border-line">
       <li
         v-for="(entry, index) in entries"
         :key="entry.path"
