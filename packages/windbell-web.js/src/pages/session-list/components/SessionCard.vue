@@ -4,7 +4,7 @@ import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
 import Card from "../../../components/Card.vue"
-import SignLine from "../../session/components/SignLine.vue"
+import SignLine from "./SignLine.vue"
 
 const props = withDefaults(
   defineProps<{
