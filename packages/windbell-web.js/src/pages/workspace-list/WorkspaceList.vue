@@ -5,7 +5,7 @@ import { onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
 import SettingsButton from "../../components/SettingsButton.vue"
-import BaseCard from "../../components/BaseCard.vue"
+import Card from "../../components/Card.vue"
 import { workspaceListMessages } from "./WorkspaceList.i18n"
 import {
   ensureWorkspace,
@@ -70,7 +70,7 @@ useHead(() => ({
       </div>
     </header>
 
-    <BaseCard as="form" @submit.prevent="createWorkspace">
+    <Card as="form" @submit.prevent="createWorkspace">
       <template #header>
         <h2 class="text-ink">
           {{ t("createWorkspace") }}
@@ -105,7 +105,7 @@ useHead(() => ({
           {{ createError }}
         </p>
       </div>
-    </BaseCard>
+    </Card>
 
     <p v-if="state.loading" class="text-ink">
       {{ t("loading") }}
@@ -117,7 +117,7 @@ useHead(() => ({
 
     <ul v-else class="flex flex-col gap-4">
       <li v-for="workspace in state.workspaces" :key="workspace.id">
-        <BaseCard
+        <Card
           :as="RouterLink"
           class="transition-colors hover:border-ink-muted"
           :to="{ name: 'session-list', params: { workspaceId: workspace.id } }"
@@ -133,7 +133,7 @@ useHead(() => ({
               {{ workspace.root }}
             </p>
           </div>
-        </BaseCard>
+        </Card>
       </li>
     </ul>
   </main>

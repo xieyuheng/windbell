@@ -3,7 +3,7 @@ import { useHead } from "@unhead/vue"
 import { onMounted } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRouter } from "vue-router"
-import BaseCard from "../../components/BaseCard.vue"
+import Card from "../../components/Card.vue"
 import BackButton from "../../components/BackButton.vue"
 import { useFont, type Font } from "../../app/font"
 import { setLocale, supportedLocales } from "../../app/i18n"
@@ -57,7 +57,7 @@ useHead(() => ({
     </header>
 
     <div class="flex flex-col gap-4">
-      <BaseCard as="section">
+      <Card as="section">
         <template #header>
           <h2 class="text-ink">
             {{ t("language") }}
@@ -81,9 +81,9 @@ useHead(() => ({
             <span>{{ item.label }}</span>
           </label>
         </div>
-      </BaseCard>
+      </Card>
 
-      <BaseCard as="section">
+      <Card as="section">
         <template #header>
           <h2 class="text-ink">
             {{ t("theme") }}
@@ -107,9 +107,9 @@ useHead(() => ({
             <span>{{ t(item.labelKey) }}</span>
           </label>
         </div>
-      </BaseCard>
+      </Card>
 
-      <BaseCard as="section">
+      <Card as="section">
         <template #header>
           <h2 class="text-ink">
             {{ t("font") }}
@@ -133,9 +133,9 @@ useHead(() => ({
             <span>{{ t(item.labelKey) }}</span>
           </label>
         </div>
-      </BaseCard>
+      </Card>
 
-      <BaseCard as="section">
+      <Card as="section">
         <template #header>
           <h2 class="text-ink">
             {{ t("defaultModel") }}
@@ -175,7 +175,7 @@ useHead(() => ({
             {{ state.error }}
           </p>
         </div>
-      </BaseCard>
+      </Card>
     </div>
   </main>
 </template>

@@ -3,7 +3,7 @@ import type * as S from "@xieyuheng/semiosis.js"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
-import BaseCard from "../../../components/BaseCard.vue"
+import Card from "../../../components/Card.vue"
 import SignLine from "../../session/components/SignLine.vue"
 
 const props = withDefaults(
@@ -34,7 +34,7 @@ function formatUpdatedAt(value: number): string {
 </script>
 
 <template>
-  <BaseCard
+  <Card
     :as="RouterLink"
     class="transition-colors hover:border-ink-muted"
     :to="{
@@ -63,5 +63,5 @@ function formatUpdatedAt(value: number): string {
         />
       </ol>
     </div>
-  </BaseCard>
+  </Card>
 </template>

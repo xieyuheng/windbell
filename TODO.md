@@ -1,5 +1,7 @@
 # windbell-web.js
 
+[windbell-web.js] 改善 session-list 使用体验
+
 [windbell-web.js] 改善 workspace-list 使用体验
 
 [windbell-web.js] file tree -- IDE 的文件浏览器，从项目的根目录开始

@@ -4,7 +4,7 @@ import { useHead } from "@unhead/vue"
 import { computed, onMounted, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute, useRouter } from "vue-router"
-import BaseCard from "../../components/BaseCard.vue"
+import Card from "../../components/Card.vue"
 import BackButton from "../../components/BackButton.vue"
 import SessionCard from "./components/SessionCard.vue"
 import { sessionListMessages } from "./SessionList.i18n"
@@ -73,7 +73,7 @@ useHead(() => ({
       </div>
     </header>
 
-    <BaseCard as="section">
+    <Card as="section">
       <template #header>
         <h2 class="text-ink">
           {{ t("newSession") }}
@@ -90,7 +90,7 @@ useHead(() => ({
           <span>{{ t("create") }}</span>
         </button>
       </div>
-    </BaseCard>
+    </Card>
 
     <p v-if="state.loading" class="text-ink">
       {{ t("loading") }}
