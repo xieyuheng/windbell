@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
-import { onMounted } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import Card from "../../components/card/Card.vue"
 import BackButton from "../../components/buttons/BackButton.vue"
@@ -13,6 +13,12 @@ import {
   makeSettingsState,
   setDefaultModel,
 } from "./SettingsState"
+import {
+  clearStorageKeys,
+  clearWindbellStorage,
+  readWindbellStorage,
+  type StorageGroup,
+} from "./SettingsStorage"
 
 const { locale, t } = useI18n({
   messages: settingsMessages,
@@ -21,6 +27,63 @@ const { locale, t } = useI18n({
 const theme = useTheme()
 const font = useFont()
 const state = makeSettingsState()
+const storageEntries = ref(readWindbellStorage())
+const storageGroupLabelKeys: Record<StorageGroup, string> = {
+  app: "storageApp",
+  ranger: "storageRanger",
+  session: "storageSession",
+  other: "storageOther",
+}
+const storageGroups = computed(() => {
+  const order: Array<StorageGroup> = ["app", "ranger", "session", "other"]
+
+  return order
+    .map((id) => {
+      const entries = storageEntries.value.filter((entry) => entry.group === id)
+
+      return {
+        id,
+        labelKey: storageGroupLabelKeys[id],
+        count: entries.length,
+        bytes: entries.reduce((sum, entry) => sum + entry.bytes, 0),
+      }
+    })
+    .filter((group) => group.count > 0)
+})
+const storageTotalBytes = computed(() =>
+  storageEntries.value.reduce((sum, entry) => sum + entry.bytes, 0),
+)
+const hasSessionStorage = computed(() =>
+  storageEntries.value.some((entry) => entry.group === "session"),
+)
+
+function refreshStorage(): void {
+  storageEntries.value = readWindbellStorage()
+}
+
+function formatStorageBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+
+  return `${(bytes / 1024).toFixed(1)} KB`
+}
+
+function clearSessionStorage(): void {
+  if (!window.confirm(t("confirmClearSession"))) return
+
+  clearStorageKeys(
+    storageEntries.value
+      .filter((entry) => entry.group === "session")
+      .map((entry) => entry.key),
+  )
+  refreshStorage()
+}
+
+function clearAllStorage(): void {
+  if (!window.confirm(t("confirmClearAllWindbell"))) return
+
+  clearWindbellStorage()
+  refreshStorage()
+}
 
 const themeOptions: Array<{ value: ThemeMode; labelKey: string }> = [
   { value: "system", labelKey: "themeSystem" },
@@ -172,6 +235,92 @@ useHead(() => ({
           <p v-if="state.error !== undefined" class="px-2 py-1.5 text-danger">
             {{ state.error }}
           </p>
+        </div>
+      </Card>
+
+      <Card as="section">
+        <template #header>
+          <h2 class="text-ink">
+            {{ t("browserData") }}
+          </h2>
+        </template>
+
+        <div class="flex flex-col gap-3 p-2">
+          <p class="px-2 text-sm text-ink-muted">
+            {{ t("browserDataDescription") }}
+          </p>
+
+          <p v-if="storageEntries.length === 0" class="px-2 py-1.5 text-ink">
+            {{ t("storageEmpty") }}
+          </p>
+
+          <template v-else>
+            <p class="px-2 text-sm text-ink-muted">
+              {{
+                t("storageSummary", {
+                  count: storageEntries.length,
+                  size: formatStorageBytes(storageTotalBytes),
+                })
+              }}
+            </p>
+
+            <dl class="flex flex-col gap-1 px-2">
+              <div
+                v-for="group in storageGroups"
+                :key="group.id"
+                class="flex items-center justify-between gap-3 text-sm"
+              >
+                <dt class="text-ink">{{ t(group.labelKey) }}</dt>
+                <dd class="text-ink-muted">
+                  {{ group.count }} · {{ formatStorageBytes(group.bytes) }}
+                </dd>
+              </div>
+            </dl>
+
+            <details class="px-2">
+              <summary
+                class="cursor-pointer text-sm text-ink-muted transition-colors hover:text-ink"
+              >
+                {{ t("showRawStorage") }}
+              </summary>
+
+              <ul
+                class="mt-2 flex max-h-64 flex-col gap-2 overflow-auto rounded border border-line/60 p-2"
+              >
+                <li
+                  v-for="entry in storageEntries"
+                  :key="entry.key"
+                  class="flex flex-col gap-1"
+                >
+                  <code class="break-all font-mono text-xs text-ink">
+                    {{ entry.key }}
+                  </code>
+                  <code class="break-all font-mono text-xs text-ink-muted">
+                    {{ entry.value }}
+                  </code>
+                </li>
+              </ul>
+            </details>
+
+            <div class="flex flex-wrap items-center gap-2 px-2">
+              <button
+                v-if="hasSessionStorage"
+                type="button"
+                class="inline-flex items-center justify-center rounded border border-line px-3 py-2 text-ink transition-colors hover:bg-line"
+                @click="clearSessionStorage"
+              >
+                {{ t("clearSessionData") }}
+              </button>
+
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded border border-danger/60 px-3 py-2 text-danger transition-colors hover:bg-danger/10"
+                @click="clearAllStorage"
+              >
+                {{ t("clearAllWindbellData") }}
+              </button>
+            </div>
+          </template>
         </div>
       </Card>
     </div>
