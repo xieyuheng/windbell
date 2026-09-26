@@ -6,6 +6,7 @@
   "dependencies": {
     "@lucide/vue": "1.48.0",
     "@unhead/vue": "3.4.1",
+    "@xieyuheng/fs-api.js": "workspace:*",
     "@xieyuheng/semiosis-api.js": "workspace:*",
     "@xieyuheng/semiosis.js": "workspace:*",
     "markdown-it": "15.0.2",

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
-import { computed } from "vue"
+import { computed, onMounted, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
 import BackButton from "../../components/buttons/BackButton.vue"
 import { rangerMessages } from "./Ranger.i18n"
+import { loadRanger, makeRangerState } from "./RangerState"
 
 const route = useRoute()
 const workspaceId = computed(() => String(route.params.workspaceId ?? ""))
@@ -12,6 +13,17 @@ const workspaceId = computed(() => String(route.params.workspaceId ?? ""))
 const { t } = useI18n({
   messages: rangerMessages,
   useScope: "local",
+})
+
+const state = makeRangerState(workspaceId.value)
+
+onMounted(async () => {
+  await loadRanger(state)
+})
+
+watch(workspaceId, async (value) => {
+  state.workspaceId = value
+  await loadRanger(state)
 })
 
 useHead(() => ({
@@ -41,5 +53,23 @@ useHead(() => ({
         />
       </div>
     </header>
+
+    <p v-if="state.loading" class="text-ink">
+      {{ t("loading") }}
+    </p>
+
+    <p v-else-if="state.error !== undefined" class="text-danger">
+      {{ state.error }}
+    </p>
+
+    <ul v-else-if="state.entries.length > 0" class="flex flex-col gap-1">
+      <li v-for="entry in state.entries" :key="entry.path" class="text-ink">
+        {{ entry.kind }} - {{ entry.name }}
+      </li>
+    </ul>
+
+    <div v-else class="text-ink">
+      {{ t("empty") }}
+    </div>
   </main>
 </template>
