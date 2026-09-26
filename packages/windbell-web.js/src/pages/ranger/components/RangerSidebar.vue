@@ -39,9 +39,7 @@ function pathName(value: string): string {
 </script>
 
 <template>
-  <aside
-    class="flex h-full min-h-0 flex-col overflow-hidden border-r border-line bg-paper"
-  >
+  <aside class="flex h-full min-h-0 flex-col overflow-hidden bg-paper">
     <header class="shrink-0 px-3 py-2">
       <p class="truncate text-ink">
         {{ currentName }}

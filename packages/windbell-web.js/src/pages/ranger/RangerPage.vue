@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
-import { computed, onBeforeUnmount, onMounted, watch } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
 import { rangerMessages } from "./Ranger.i18n"
+import RangerDivider from "./components/RangerDivider.vue"
 import RangerSidebar from "./components/RangerSidebar.vue"
 import RangerView from "./components/RangerView.vue"
 import {
@@ -24,6 +25,7 @@ const { t } = useI18n({
 })
 
 const state = makeRangerState(workspaceId.value)
+const sidebarRatio = ref(0.25)
 
 function handleSelect(index: number): void {
   state.focus = "sidebar"
@@ -117,7 +119,8 @@ useHead(() => ({
 <template>
   <main class="flex h-screen w-full overflow-hidden">
     <RangerSidebar
-      class="w-1/4 shrink-0"
+      class="shrink-0"
+      :style="{ width: `${sidebarRatio * 100}%` }"
       :root="state.root"
       :current-directory="state.currentDirectory"
       :entries="state.entries"
@@ -126,7 +129,12 @@ useHead(() => ({
       @select="handleSelect($event)"
     />
 
-    <section v-if="state.loading" class="flex flex-1 items-start px-4 py-3">
+    <RangerDivider />
+
+    <section
+      v-if="state.loading"
+      class="flex min-w-0 flex-1 items-start px-4 py-3"
+    >
       <p class="text-ink">
         {{ t("loading") }}
       </p>
@@ -134,13 +142,13 @@ useHead(() => ({
 
     <section
       v-else-if="state.error !== undefined"
-      class="flex flex-1 items-start px-4 py-3"
+      class="flex min-w-0 flex-1 items-start px-4 py-3"
     >
       <p class="text-danger">
         {{ state.error }}
       </p>
     </section>
 
-    <RangerView v-else class="flex-1" :entry="state.selectedEntry" />
+    <RangerView v-else class="min-w-0 flex-1" :entry="state.selectedEntry" />
   </main>
 </template>
