@@ -7,6 +7,7 @@ export const sessionListMessages = {
     empty: "还没有对话。",
     untitled: "未命名",
     loading: "加载中...",
+    sessionDustbin: "对话回收站",
   },
   "en-US": {
     title: "Sessions",
@@ -16,5 +17,6 @@ export const sessionListMessages = {
     empty: "No sessions yet.",
     untitled: "Untitled",
     loading: "Loading...",
+    sessionDustbin: "Session Dustbin",
   },
 }

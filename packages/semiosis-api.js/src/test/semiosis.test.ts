@@ -118,8 +118,14 @@ test("semiosis client and server", async (t) => {
   assert.equal(dustbinSessions[0]?.id, session.id)
   assert.equal(typeof dustbinSessions[0]?.deletedAt, "number")
 
+  const dustbinSession = await client.dustbin.sessions.get(session.id)
+  assert.ok(dustbinSession !== undefined)
+  assert.equal(dustbinSession.id, session.id)
+  assert.ok(dustbinSession.context.length > 1)
+
   await client.dustbin.sessions.restore(session.id)
   assert.ok((await client.sessions.get(session.id)) !== undefined)
+  assert.equal(await client.dustbin.sessions.get(session.id), undefined)
   assert.equal(
     (await client.dustbin.sessions.list({ workspaceId: workspace.id })).length,
     0,

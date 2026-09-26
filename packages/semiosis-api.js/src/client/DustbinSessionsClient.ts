@@ -1,6 +1,6 @@
 import type * as S from "@xieyuheng/semiosis.js"
 import type { SemiosisClientConfig } from "./SemiosisClientConfig.ts"
-import { call, withQuery } from "./http.ts"
+import { call, callOptional, withQuery } from "./http.ts"
 
 export type ListDustbinSessionsOptions = {
   workspaceId: S.WorkspaceId | undefined
@@ -10,6 +10,7 @@ export type DustbinSessionsClient = {
   list(
     options: ListDustbinSessionsOptions,
   ): Promise<Array<S.DustbinSessionIndex>>
+  get(sessionId: S.SessionId): Promise<S.Session | undefined>
   trash(sessionId: S.SessionId): Promise<void>
   restore(sessionId: S.SessionId): Promise<void>
   remove(sessionId: S.SessionId): Promise<void>
@@ -27,6 +28,13 @@ export function makeDustbinSessionsClient(
 
       return call(config.baseUrl, "GET", withQuery("/dustbin/sessions", query))
     },
+
+    get: (id) =>
+      callOptional(
+        config.baseUrl,
+        "GET",
+        `/dustbin/sessions/${encodeURIComponent(id)}`,
+      ),
 
     trash: async (id) => {
       await call(config.baseUrl, "POST", "/dustbin/sessions", {

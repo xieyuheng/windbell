@@ -2,11 +2,13 @@ import fs from "node:fs/promises"
 import Path from "node:path"
 import type {
   DustbinSessionIndex,
+  Session,
   SessionId,
   SessionIndex,
 } from "../session/Session.ts"
 import type { WorkspaceId } from "../workspace/Workspace.ts"
 import { assertId, isValidId } from "./id.ts"
+import { makeSessionStore } from "./SessionStore.ts"
 import {
   ensureDir,
   isEnoent,
@@ -25,6 +27,7 @@ export type ListDustbinSessionOptions = {
 }
 
 export type DustbinSessionStore = {
+  get(sessionId: SessionId): Promise<Session | undefined>
   trash(sessionId: SessionId): Promise<void>
   list(options: ListDustbinSessionOptions): Promise<Array<DustbinSessionIndex>>
   restore(sessionId: SessionId): Promise<void>
@@ -58,6 +61,7 @@ export function makeDustbinSessionStore(
 ): DustbinSessionStore {
   const sessionsRoot = Path.resolve(options.sessionsRoot)
   const dustbinSessionsRoot = Path.resolve(options.dustbinSessionsRoot)
+  const sessionStore = makeSessionStore({ root: dustbinSessionsRoot })
 
   const sessionDir = (id: SessionId): string => {
     return Path.join(sessionsRoot, id)
@@ -98,6 +102,8 @@ export function makeDustbinSessionStore(
   }
 
   return {
+    get: (sessionId) => sessionStore.get(sessionId),
+
     async trash(sessionId) {
       assertId(sessionId)
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { Plus } from "@lucide/vue"
+import { Plus, Trash2 } from "@lucide/vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
 import { computed, onMounted, watch } from "vue"
 import { useI18n } from "vue-i18n"
-import { useRoute, useRouter } from "vue-router"
+import { RouterLink, useRoute, useRouter } from "vue-router"
 import Card from "../../components/Card.vue"
 import BackButton from "../../components/BackButton.vue"
 import SessionCard from "./components/SessionCard.vue"
@@ -92,6 +92,17 @@ useHead(() => ({
 
       <div class="flex flex-wrap items-center gap-2">
         <BackButton />
+
+        <RouterLink
+          class="inline-flex items-center gap-2 rounded border-2 border-line px-2 py-1.5 text-ink transition-colors hover:bg-line"
+          :to="{
+            name: 'session-dustbin',
+            params: { workspaceId },
+          }"
+        >
+          <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("sessionDustbin") }}</span>
+        </RouterLink>
       </div>
     </header>
 

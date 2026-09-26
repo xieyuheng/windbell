@@ -146,6 +146,18 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     return sendJson(200, await service.dustbin.sessions.list({ workspaceId }))
   })
 
+  app.get("/dustbin/sessions/:sessionId", async (c) => {
+    const session = await service.dustbin.sessions.get(c.req.param("sessionId"))
+
+    if (session === undefined) {
+      throw new HTTPException(404, {
+        message: "session not found in dustbin",
+      })
+    }
+
+    return sendJson(200, session)
+  })
+
   app.post("/dustbin/sessions", async (c) => {
     const body = readRecord(await readJsonBody(c))
     const sessionId = readString(body, "sessionId")
