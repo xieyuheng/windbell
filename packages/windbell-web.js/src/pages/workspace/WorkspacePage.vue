@@ -85,9 +85,19 @@ useHead(() => ({
 <template>
   <main class="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-5 py-6">
     <header class="flex flex-col gap-3">
-      <h1 class="text-xl text-ink">
-        {{ title }}
-      </h1>
+      <div class="flex min-w-0 flex-col gap-1">
+        <h1 class="text-xl text-ink">
+          {{ title }}
+        </h1>
+
+        <p
+          v-if="state.workspace"
+          class="truncate font-mono text-sm"
+          :title="state.workspace.root"
+        >
+          {{ state.workspace.root }}
+        </p>
+      </div>
 
       <div class="flex flex-wrap items-center gap-2">
         <BackButton :to="{ name: 'home' }" />
