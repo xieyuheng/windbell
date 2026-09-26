@@ -4,8 +4,6 @@
 
 - 包括 WorkspaceCard 和 DustbinWorkspaceCard
 
-[windbell-web.js] 改善创建新 workspace 的 card
-
 # windbell-web.js
 
 [windbell-web.js] markdown file -- 对文件的预览，包括文学式编程支持
