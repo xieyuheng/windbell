@@ -104,7 +104,7 @@ test("semiosis client and server", async (t) => {
   assert.equal(indexes.length, 1)
   assert.equal(indexes[0]?.id, session.id)
 
-  await client.sessions.moveToDustbin(session.id)
+  await client.dustbin.sessions.trash(session.id)
   assert.equal(await client.sessions.get(session.id), undefined)
   assert.equal(
     (await client.sessions.list({ workspaceId: workspace.id })).length,

@@ -29,7 +29,6 @@ export type SessionsClient = {
   get(id: S.SessionId): Promise<S.Session | undefined>
   put(session: S.Session): Promise<void>
   interpret(id: S.SessionId, options: InterpretOptions): AsyncGenerator<S.Sign>
-  moveToDustbin(id: S.SessionId): Promise<void>
   remove(id: S.SessionId): Promise<void>
 }
 
@@ -79,12 +78,6 @@ export function makeSessionsClient(
           return
         }
       }
-    },
-
-    moveToDustbin: async (id) => {
-      await call(config.baseUrl, "POST", "/dustbin/sessions", {
-        sessionId: id,
-      })
     },
 
     remove: async (id) => {

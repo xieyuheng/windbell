@@ -13,7 +13,7 @@ import {
   loadSessionList,
   makeSession,
   makeSessionListState,
-  removeSession,
+  trashSession,
   updateSessionTitle,
 } from "./SessionListState"
 
@@ -44,9 +44,9 @@ async function createSession(): Promise<void> {
   }
 }
 
-async function deleteSession(session: S.Session): Promise<void> {
+async function handleTrashSession(session: S.Session): Promise<void> {
   try {
-    await removeSession(state, session.id)
+    await trashSession(state, session.id)
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
   }
@@ -130,7 +130,7 @@ useHead(() => ({
         <SessionCard
           :session="session"
           :previewLimit="5"
-          @delete="deleteSession(session)"
+          @trash="handleTrashSession(session)"
           @update-title="editSessionTitle(session, $event)"
         />
       </li>

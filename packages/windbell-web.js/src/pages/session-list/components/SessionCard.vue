@@ -18,7 +18,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  delete: []
+  trash: []
   updateTitle: [title: string]
 }>()
 
@@ -28,17 +28,18 @@ const { t } = useI18n({
       updatedAt: "更新于：",
       createdAt: "创建于：",
       editTitle: "修改标题",
-      delete: "删除",
+      trash: "移入回收站",
       editTitlePrompt: "输入新的对话标题",
-      deleteConfirm: "确定删除这个对话吗？",
+      trashConfirm: "确定将这个对话移入回收站吗？之后可以从回收站恢复。",
     },
     "en-US": {
       updatedAt: "Updated at:",
       createdAt: "Created at:",
       editTitle: "Edit title",
-      delete: "Delete",
+      trash: "Move to dustbin",
       editTitlePrompt: "Enter a new session title",
-      deleteConfirm: "Delete this session?",
+      trashConfirm:
+        "Move this session to the dustbin? You can restore it later.",
     },
   },
   useScope: "local",
@@ -75,10 +76,10 @@ function requestEditTitle(): void {
   emit("updateTitle", nextTitle)
 }
 
-function requestDelete(): void {
-  if (!window.confirm(t("deleteConfirm"))) return
+function requestTrash(): void {
+  if (!window.confirm(t("trashConfirm"))) return
 
-  emit("delete")
+  emit("trash")
 }
 </script>
 
@@ -104,10 +105,10 @@ function requestDelete(): void {
         <button
           class="inline-flex items-center gap-1 rounded px-1 py-1 text-sm transition-colors hover:bg-paper/60 hover:text-danger"
           type="button"
-          @click="requestDelete"
+          @click="requestTrash"
         >
           <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
-          <span>{{ t("delete") }}</span>
+          <span>{{ t("trash") }}</span>
         </button>
       </div>
     </template>

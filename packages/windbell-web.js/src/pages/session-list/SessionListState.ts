@@ -64,11 +64,11 @@ export async function makeSession(
   return session
 }
 
-export async function removeSession(
+export async function trashSession(
   state: SessionListState,
   sessionId: S.SessionId,
 ): Promise<void> {
-  await semiosis.sessions.remove(sessionId)
+  await semiosis.dustbin.sessions.trash(sessionId)
   state.sessions = state.sessions.filter((session) => session.id !== sessionId)
 }
 
