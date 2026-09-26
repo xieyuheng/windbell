@@ -16,7 +16,19 @@ const props = withDefaults(
   },
 )
 
-const { locale } = useI18n()
+const { t } = useI18n({
+  messages: {
+    "zh-CN": {
+      updatedAt: "更新于：",
+      createdAt: "创建于：",
+    },
+    "en-US": {
+      updatedAt: "Updated at:",
+      createdAt: "Created at:",
+    },
+  },
+  useScope: "local",
+})
 
 const sessionRoute = computed(() => ({
   name: "session",
@@ -32,11 +44,11 @@ const previewSigns = computed(() => {
   return signs.slice(Math.max(0, signs.length - limit))
 })
 
-function formatUpdatedAt(value: number): string {
-  return new Intl.DateTimeFormat(locale.value, {
-    month: "short",
-    day: "numeric",
-  }).format(value)
+function formatDateTime(value: number): string {
+  const date = new Date(value)
+  const pad = (value: number): string => String(value).padStart(2, "0")
+
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 </script>
 
@@ -52,10 +64,6 @@ function formatUpdatedAt(value: number): string {
 
     <RouterLink class="block" :to="sessionRoute">
       <div class="flex flex-col gap-2 px-3 py-2">
-        <p class="truncate text-sm text-ink-muted">
-          {{ formatUpdatedAt(session.updatedAt) }}
-        </p>
-
         <ol v-if="previewSigns.length > 0" class="flex flex-col gap-1">
           <SignLine
             v-for="(sign, index) in previewSigns"
@@ -65,5 +73,16 @@ function formatUpdatedAt(value: number): string {
         </ol>
       </div>
     </RouterLink>
+
+    <template #footer>
+      <div class="flex flex-col gap-1 text-sm text-ink-muted">
+        <p class="truncate">
+          {{ t("updatedAt") }} {{ formatDateTime(session.updatedAt) }}
+        </p>
+        <p class="truncate">
+          {{ t("createdAt") }} {{ formatDateTime(session.createdAt) }}
+        </p>
+      </div>
+    </template>
   </Card>
 </template>
