@@ -4,8 +4,8 @@ import type * as S from "@xieyuheng/semiosis.js"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
-import Card from "../../../components/Card.vue"
-import SignLine from "./SignLine.vue"
+import Card from "../../../components/card/Card.vue"
+import SignLine from "../../../components/sign/SignLine.vue"
 
 const props = withDefaults(
   defineProps<{

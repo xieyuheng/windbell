@@ -2,9 +2,9 @@
 import type * as S from "@xieyuheng/semiosis.js"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
-import Card from "../../../components/Card.vue"
-import { sessionMessages } from "../Session.i18n"
-import { signBody } from "../signBody"
+import Card from "../card/Card.vue"
+import { signMessages } from "./Sign.i18n"
+import { signBody } from "./signBody"
 import { signCardConfig } from "./SignCard.config"
 
 const props = defineProps<{
@@ -12,7 +12,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n({
-  messages: sessionMessages,
+  messages: signMessages,
   useScope: "local",
 })
 

@@ -2,7 +2,7 @@
 import { useHead } from "@unhead/vue"
 import { useI18n } from "vue-i18n"
 import { pageNotFoundMessages } from "./PageNotFound.i18n"
-import BackButton from "../../components/BackButton.vue"
+import BackButton from "../../components/buttons/BackButton.vue"
 
 const { t } = useI18n({
   messages: pageNotFoundMessages,

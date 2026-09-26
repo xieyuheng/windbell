@@ -7,16 +7,6 @@ export const sessionMessages = {
     inputPlaceholder: "输入内容...",
     send: "发送",
     sending: "发送中...",
-    signKind: {
-      user: "用户",
-      reasoning: "思考",
-      assistant: "助手",
-      toolCall: "工具调用",
-      tool: "工具",
-      toolOutput: "工具输出",
-      persona: "人设",
-      error: "错误",
-    },
   },
   "en-US": {
     title: "Session",
@@ -26,15 +16,5 @@ export const sessionMessages = {
     inputPlaceholder: "Type a message...",
     send: "Send",
     sending: "Sending...",
-    signKind: {
-      user: "User",
-      reasoning: "Reasoning",
-      assistant: "Assistant",
-      toolCall: "Tool Call",
-      tool: "Tool",
-      toolOutput: "Tool Output",
-      persona: "Persona",
-      error: "Error",
-    },
   },
 }

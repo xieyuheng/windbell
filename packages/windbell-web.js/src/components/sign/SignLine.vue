@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import type * as S from "@xieyuheng/semiosis.js"
 import { useI18n } from "vue-i18n"
-import { sessionMessages } from "../../session/Session.i18n"
-import { signBody } from "../../session/signBody"
-import { signCardConfig } from "../../session/components/SignCard.config"
+import { signMessages } from "./Sign.i18n"
+import { signBody } from "./signBody"
+import { signCardConfig } from "./SignCard.config"
 
 defineProps<{
   sign: S.Sign
 }>()
 
 const { t } = useI18n({
-  messages: sessionMessages,
+  messages: signMessages,
   useScope: "local",
 })
 </script>

@@ -4,7 +4,7 @@ import { useHead } from "@unhead/vue"
 import { computed, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
-import BackButton from "../../components/BackButton.vue"
+import BackButton from "../../components/buttons/BackButton.vue"
 import DustbinSessionsCard from "./components/DustbinSessionsCard.vue"
 import { sessionDustbinMessages } from "./SessionDustbin.i18n"
 import {

@@ -2,7 +2,7 @@
 import type * as S from "@xieyuheng/semiosis.js"
 import { computed } from "vue"
 import { RouterLink } from "vue-router"
-import Card from "../../../components/Card.vue"
+import Card from "../../../components/card/Card.vue"
 
 const props = defineProps<{
   workspace: S.Workspace
