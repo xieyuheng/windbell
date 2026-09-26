@@ -180,6 +180,48 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     return sendEmpty(204)
   })
 
+  app.get("/dustbin/workspaces", async () => {
+    return sendJson(200, await service.dustbin.workspaces.list())
+  })
+
+  app.get("/dustbin/workspaces/:workspaceId", async (c) => {
+    const workspace = await service.dustbin.workspaces.get(
+      c.req.param("workspaceId"),
+    )
+
+    if (workspace === undefined) {
+      throw new HTTPException(404, {
+        message: "workspace not found in dustbin",
+      })
+    }
+
+    return sendJson(200, workspace)
+  })
+
+  app.post("/dustbin/workspaces", async (c) => {
+    const body = readRecord(await readJsonBody(c))
+    const workspaceId = readString(body, "workspaceId")
+
+    await runDustbinAction(() => service.dustbin.workspaces.trash(workspaceId))
+
+    return sendEmpty(204)
+  })
+
+  app.post("/dustbin/workspaces/:workspaceId/restore", async (c) => {
+    const workspaceId = c.req.param("workspaceId")
+
+    await runDustbinAction(() =>
+      service.dustbin.workspaces.restore(workspaceId),
+    )
+
+    return sendEmpty(204)
+  })
+
+  app.delete("/dustbin/workspaces/:workspaceId", async (c) => {
+    await service.dustbin.workspaces.remove(c.req.param("workspaceId"))
+    return sendEmpty(204)
+  })
+
   app.post("/sessions/:sessionId/interpret", async (c) => {
     const sessionId = c.req.param("sessionId")
     const body = readRecord(await readJsonBody(c))
@@ -262,7 +304,10 @@ async function runDustbinAction(action: () => Promise<void>): Promise<void> {
   try {
     await action()
   } catch (error) {
-    if (error instanceof S.DustbinSessionError) {
+    if (
+      error instanceof S.DustbinSessionError ||
+      error instanceof S.DustbinWorkspaceError
+    ) {
       const status = error.code === "not-found" ? 404 : 409
       throw new HTTPException(status, { message: error.message })
     }

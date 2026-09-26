@@ -2,6 +2,7 @@ import type { RouteRecordRaw } from "vue-router"
 import HomePage from "./home/HomePage.vue"
 import NotFoundPage from "./errors/NotFoundPage.vue"
 import SessionDustbinPage from "./session-dustbin/SessionDustbinPage.vue"
+import WorkspaceDustbinPage from "./workspace-dustbin/WorkspaceDustbinPage.vue"
 import SessionPage from "./session/SessionPage.vue"
 import SettingsPage from "./settings/SettingsPage.vue"
 import TreePage from "./tree/TreePage.vue"
@@ -38,6 +39,11 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/workspaces/:workspaceId",
     name: "workspace",
     component: WorkspacePage,
+  },
+  {
+    path: "/workspace-dustbin",
+    name: "workspace-dustbin",
+    component: WorkspaceDustbinPage,
   },
   {
     path: "/workspaces/:workspaceId/session-dustbin",

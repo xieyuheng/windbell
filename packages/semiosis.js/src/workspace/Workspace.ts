@@ -7,3 +7,7 @@ export type Workspace = {
   createdAt: number
   updatedAt: number
 }
+
+export type DustbinWorkspace = Workspace & {
+  deletedAt: number
+}

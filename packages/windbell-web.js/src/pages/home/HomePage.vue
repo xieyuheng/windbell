@@ -1,13 +1,21 @@
 <script setup lang="ts">
-import { Plus } from "@lucide/vue"
+import { Plus, Trash2 } from "@lucide/vue"
+import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
 import { onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
+import { RouterLink } from "vue-router"
 import SettingsButton from "../../components/buttons/SettingsButton.vue"
 import Card from "../../components/card/Card.vue"
 import WorkspaceCard from "./components/WorkspaceCard.vue"
 import { homeMessages } from "./Home.i18n"
-import { ensureWorkspace, loadHomeState, makeHomeState } from "./HomeState"
+import {
+  ensureWorkspace,
+  loadHomeState,
+  makeHomeState,
+  trashWorkspace,
+  updateWorkspaceTitle,
+} from "./HomeState"
 
 const { t } = useI18n({
   messages: homeMessages,
@@ -43,6 +51,25 @@ async function createWorkspace(): Promise<void> {
   }
 }
 
+async function handleTrashWorkspace(workspace: S.Workspace): Promise<void> {
+  try {
+    await trashWorkspace(state, workspace.id)
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+  }
+}
+
+async function handleUpdateWorkspaceTitle(
+  workspace: S.Workspace,
+  name: string,
+): Promise<void> {
+  try {
+    await updateWorkspaceTitle(state, workspace.id, name)
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+  }
+}
+
 useHead(() => ({
   title: t("title"),
   meta: [
@@ -63,6 +90,14 @@ useHead(() => ({
 
       <div class="flex flex-wrap items-center gap-2">
         <SettingsButton />
+
+        <RouterLink
+          class="inline-flex items-center gap-2 rounded border-2 border-line px-2 py-1.5 text-ink transition-colors hover:bg-line"
+          :to="{ name: 'workspace-dustbin' }"
+        >
+          <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("workspaceDustbin") }}</span>
+        </RouterLink>
       </div>
     </header>
 
@@ -117,7 +152,11 @@ useHead(() => ({
 
     <ul v-else class="flex flex-col gap-4">
       <li v-for="workspace in state.workspaces" :key="workspace.id">
-        <WorkspaceCard :workspace="workspace" />
+        <WorkspaceCard
+          :workspace="workspace"
+          @trash="handleTrashWorkspace(workspace)"
+          @update-title="handleUpdateWorkspaceTitle(workspace, $event)"
+        />
       </li>
     </ul>
   </main>

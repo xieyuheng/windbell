@@ -9,6 +9,7 @@ export type SemiosisService = {
   sessions: S.Database["sessions"]
   dustbin: {
     sessions: S.Database["dustbin"]["sessions"]
+    workspaces: S.Database["dustbin"]["workspaces"]
   }
 }
 
@@ -20,6 +21,7 @@ export function makeSemiosisService(
     sessions: options.database.sessions,
     dustbin: {
       sessions: options.database.dustbin.sessions,
+      workspaces: options.database.dustbin.workspaces,
     },
   }
 }

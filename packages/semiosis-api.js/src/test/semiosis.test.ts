@@ -147,6 +147,29 @@ test("semiosis client and server", async (t) => {
     /session not found in dustbin/,
   )
 
+  await client.dustbin.workspaces.trash(workspace.id)
+  assert.equal(await client.workspaces.get(workspace.id), undefined)
+
+  const dustbinWorkspaces = await client.dustbin.workspaces.list()
+  assert.equal(dustbinWorkspaces.length, 1)
+  assert.equal(dustbinWorkspaces[0]?.id, workspace.id)
+  assert.equal(typeof dustbinWorkspaces[0]?.deletedAt, "number")
+
+  const dustbinWorkspace = await client.dustbin.workspaces.get(workspace.id)
+  assert.ok(dustbinWorkspace !== undefined)
+  assert.equal(dustbinWorkspace.id, workspace.id)
+  assert.equal(dustbinWorkspace.name, "test")
+
+  await client.dustbin.workspaces.restore(workspace.id)
+  assert.ok((await client.workspaces.get(workspace.id)) !== undefined)
+  assert.equal(await client.dustbin.workspaces.get(workspace.id), undefined)
+  assert.equal((await client.dustbin.workspaces.list()).length, 0)
+
+  await client.dustbin.workspaces.trash(workspace.id)
+  await client.dustbin.workspaces.remove(workspace.id)
+  assert.equal(await client.workspaces.get(workspace.id), undefined)
+  assert.equal((await client.dustbin.workspaces.list()).length, 0)
+
   await client.workspaces.remove(workspace.id)
   assert.equal(await client.workspaces.get(workspace.id), undefined)
 })

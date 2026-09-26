@@ -51,3 +51,35 @@ export async function ensureWorkspace(
 
   return workspace
 }
+
+export async function trashWorkspace(
+  state: HomeState,
+  workspaceId: S.WorkspaceId,
+): Promise<void> {
+  await semiosis.dustbin.workspaces.trash(workspaceId)
+  state.workspaces = state.workspaces.filter(
+    (workspace) => workspace.id !== workspaceId,
+  )
+}
+
+export async function updateWorkspaceTitle(
+  state: HomeState,
+  workspaceId: S.WorkspaceId,
+  name: string,
+): Promise<void> {
+  const index = state.workspaces.findIndex(
+    (workspace) => workspace.id === workspaceId,
+  )
+  const current = state.workspaces[index]
+
+  if (current === undefined) return
+
+  const workspace: S.Workspace = {
+    ...current,
+    name,
+    updatedAt: Date.now(),
+  }
+
+  await semiosis.workspaces.put(workspace)
+  state.workspaces[index] = workspace
+}
