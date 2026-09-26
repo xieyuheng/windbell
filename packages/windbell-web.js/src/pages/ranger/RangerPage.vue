@@ -4,6 +4,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
 import { rangerMessages } from "./Ranger.i18n"
+import { readStoredSidebarRatio } from "./RangerLayout"
 import RangerDivider from "./components/RangerDivider.vue"
 import RangerSidebar from "./components/RangerSidebar.vue"
 import RangerView from "./components/RangerView.vue"
@@ -25,7 +26,7 @@ const { t } = useI18n({
 })
 
 const state = makeRangerState(workspaceId.value)
-const sidebarRatio = ref(0.25)
+const sidebarRatio = ref(readStoredSidebarRatio())
 
 function handleSelect(index: number): void {
   state.focus = "sidebar"
