@@ -117,22 +117,34 @@ useHead(() => ({
 
     <ul v-else class="flex flex-col gap-4">
       <li v-for="workspace in state.workspaces" :key="workspace.id">
-        <Card
-          :as="RouterLink"
-          class="transition-colors hover:border-ink-muted"
-          :to="{ name: 'session-list', params: { workspaceId: workspace.id } }"
-        >
+        <Card as="article">
           <template #header>
-            <h2 class="truncate text-base text-ink">
-              {{ workspace.name }}
-            </h2>
+            <RouterLink
+              class="block min-w-0"
+              :to="{
+                name: 'session-list',
+                params: { workspaceId: workspace.id },
+              }"
+            >
+              <h2 class="truncate text-base text-ink">
+                {{ workspace.name }}
+              </h2>
+            </RouterLink>
           </template>
 
-          <div class="px-3 py-2">
-            <p class="truncate font-mono text-ink">
-              {{ workspace.root }}
-            </p>
-          </div>
+          <RouterLink
+            class="block"
+            :to="{
+              name: 'session-list',
+              params: { workspaceId: workspace.id },
+            }"
+          >
+            <div class="px-3 py-2">
+              <p class="truncate font-mono text-ink">
+                {{ workspace.root }}
+              </p>
+            </div>
+          </RouterLink>
         </Card>
       </li>
     </ul>

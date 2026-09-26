@@ -18,6 +18,13 @@ const props = withDefaults(
 
 const { locale } = useI18n()
 
+const sessionRoute = computed(() => ({
+  name: "session",
+  params: {
+    sessionId: props.session.id,
+  },
+}))
+
 const previewSigns = computed(() => {
   const signs = props.session.context
   const limit = Math.max(0, props.previewLimit)
@@ -34,34 +41,29 @@ function formatUpdatedAt(value: number): string {
 </script>
 
 <template>
-  <Card
-    :as="RouterLink"
-    class="transition-colors hover:border-ink-muted"
-    :to="{
-      name: 'session',
-      params: {
-        sessionId: session.id,
-      },
-    }"
-  >
+  <Card as="article">
     <template #header>
-      <h2 class="truncate text-base text-ink">
-        {{ session.title }}
-      </h2>
+      <RouterLink class="block min-w-0" :to="sessionRoute">
+        <h2 class="truncate text-base text-ink">
+          {{ session.title }}
+        </h2>
+      </RouterLink>
     </template>
 
-    <div class="flex flex-col gap-2 px-3 py-2">
-      <p class="truncate text-sm text-ink-muted">
-        {{ formatUpdatedAt(session.updatedAt) }}
-      </p>
+    <RouterLink class="block" :to="sessionRoute">
+      <div class="flex flex-col gap-2 px-3 py-2">
+        <p class="truncate text-sm text-ink-muted">
+          {{ formatUpdatedAt(session.updatedAt) }}
+        </p>
 
-      <ol v-if="previewSigns.length > 0" class="flex flex-col gap-1">
-        <SignLine
-          v-for="(sign, index) in previewSigns"
-          :key="index"
-          :sign="sign"
-        />
-      </ol>
-    </div>
+        <ol v-if="previewSigns.length > 0" class="flex flex-col gap-1">
+          <SignLine
+            v-for="(sign, index) in previewSigns"
+            :key="index"
+            :sign="sign"
+          />
+        </ol>
+      </div>
+    </RouterLink>
   </Card>
 </template>
