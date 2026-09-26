@@ -1,5 +1,8 @@
+import { watch } from "node:fs"
+import Path from "node:path"
 import { Hono, type Context } from "hono"
 import { HTTPException } from "hono/http-exception"
+import { streamSSE } from "hono/streaming"
 import * as service from "../service/index.ts"
 
 type Handler = (body: unknown) => Promise<unknown>
@@ -27,6 +30,104 @@ export function makeFileSystemRouter(): Hono {
 
   app.get("/health", async (c) => {
     return c.json(await service.health())
+  })
+
+  app.post("/watch", async (c) => {
+    const body = await readJsonBody(c)
+    const path = readPath(body)
+
+    if (!(await service.exists(path))) {
+      throw new HTTPException(404, {
+        message: `path not found: ${path}`,
+      })
+    }
+
+    if (!(await service.isDirectory(path))) {
+      throw new HTTPException(400, {
+        message: `path is not a directory: ${path}`,
+      })
+    }
+
+    return streamSSE(c, async (stream) => {
+      let watcher: ReturnType<typeof watch> | undefined
+      let heartbeat: ReturnType<typeof setInterval> | undefined
+      let cleanedUp = false
+
+      function cleanup(): void {
+        if (cleanedUp) return
+
+        cleanedUp = true
+
+        if (heartbeat !== undefined) {
+          clearInterval(heartbeat)
+        }
+
+        watcher?.close()
+      }
+
+      try {
+        watcher = watch(path, { recursive: true }, (eventType, filename) => {
+          const name = filename === null ? null : filename.toString()
+          const changedPath = name === null ? path : Path.join(path, name)
+
+          void stream.writeSSE({
+            event: "change",
+            data: JSON.stringify({
+              path: changedPath,
+              eventType,
+              filename: name,
+            }),
+          })
+        })
+      } catch (error) {
+        await stream.writeSSE({
+          event: "watch-error",
+          data: JSON.stringify({
+            message: error instanceof Error ? error.message : String(error),
+          }),
+        })
+        return
+      }
+
+      if (watcher === undefined) return
+
+      watcher.on("error", (error) => {
+        void stream
+          .writeSSE({
+            event: "watch-error",
+            data: JSON.stringify({
+              message: error instanceof Error ? error.message : String(error),
+            }),
+          })
+          .finally(() => {
+            cleanup()
+            stream.abort()
+          })
+      })
+
+      const closed = new Promise<void>((resolve) => {
+        stream.onAbort(() => {
+          cleanup()
+          resolve()
+        })
+      })
+
+      await stream.writeSSE({
+        event: "ready",
+        data: JSON.stringify({ path }),
+      })
+
+      heartbeat = setInterval(() => {
+        if (stream.aborted) return
+
+        void stream.writeSSE({
+          event: "ping",
+          data: "{}",
+        })
+      }, 15_000)
+
+      await closed
+    })
   })
 
   app.post("/:method", async (c) => {

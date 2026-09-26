@@ -17,6 +17,80 @@ test("GET /health", async () => {
   })
 })
 
+test("POST /watch streams file changes", async (t) => {
+  const root = await fs.mkdtemp(Path.join(Os.tmpdir(), "windbell-watch-"))
+  const app = makeFileSystemRouter()
+  const controller = new AbortController()
+  let reader: ReadableStreamDefaultReader<Uint8Array> | undefined
+
+  t.after(async () => {
+    controller.abort()
+
+    if (reader !== undefined) {
+      await reader.cancel().catch(() => {})
+    }
+
+    await fs.rm(root, { recursive: true, force: true })
+  })
+
+  const response = await app.request("/watch", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ path: root }),
+    signal: controller.signal,
+  })
+
+  assert.equal(response.status, 200)
+  assert.match(response.headers.get("content-type") ?? "", /text\/event-stream/)
+
+  const body = response.body
+  if (body === null) throw new Error("response body is null")
+
+  reader = body.getReader()
+
+  const decoder = new TextDecoder()
+  let text = ""
+
+  async function readWithTimeout(
+    timeoutMs: number,
+  ): Promise<ReadableStreamReadResult<Uint8Array> | "timeout"> {
+    return await Promise.race([
+      reader!.read(),
+      new Promise<"timeout">((resolve) => {
+        setTimeout(() => resolve("timeout"), timeoutMs)
+      }),
+    ])
+  }
+
+  while (!text.includes("event: ready")) {
+    const result = await readWithTimeout(2_000)
+    if (result === "timeout") break
+
+    if (result.done) break
+
+    text += decoder.decode(result.value, { stream: true })
+  }
+
+  assert.match(text, /event: ready/)
+
+  await fs.writeFile(Path.join(root, "a.txt"), "hello")
+
+  const deadline = Date.now() + 3_000
+  while (!text.includes("event: change") && Date.now() < deadline) {
+    const result = await readWithTimeout(200)
+    if (result === "timeout") continue
+
+    if (result.done) break
+
+    text += decoder.decode(result.value, { stream: true })
+  }
+
+  assert.match(text, /event: change/)
+  assert.match(text, /"filename":"a\.txt"/)
+})
+
 test("fileSystem client and server", async (t) => {
   const root = await fs.mkdtemp(Path.join(Os.tmpdir(), "windbell-fs-"))
   const { server, url } = await startFileSystemServer({
