@@ -105,7 +105,7 @@ useHead(() => ({
       class="flex flex-1 flex-col gap-4"
     >
       <li v-for="session in state.sessions" :key="session.id">
-        <SessionCard :session="session" />
+        <SessionCard :session="session" :previewLimit="5" />
       </li>
     </ol>
 
