@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const sessionListRoute = computed(() => ({
-  name: "session-list",
+  name: "workspace",
   params: {
     workspaceId: props.workspace.id,
   },

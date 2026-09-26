@@ -7,25 +7,25 @@ import { useI18n } from "vue-i18n"
 import { RouterLink, useRoute, useRouter } from "vue-router"
 import BackButton from "../../components/buttons/BackButton.vue"
 import SessionCard from "./components/SessionCard.vue"
-import { sessionListMessages } from "./SessionList.i18n"
+import { workspaceMessages } from "./Workspace.i18n"
 import {
-  loadSessionList,
+  loadWorkspaceState,
   makeSession,
-  makeSessionListState,
+  makeWorkspaceState,
   trashSession,
   updateSessionTitle,
-} from "./SessionListState"
+} from "./WorkspaceState"
 
 const route = useRoute()
 const router = useRouter()
 
 const { t } = useI18n({
-  messages: sessionListMessages,
+  messages: workspaceMessages,
   useScope: "local",
 })
 
 const workspaceId = computed(() => String(route.params.workspaceId ?? ""))
-const state = makeSessionListState(workspaceId.value)
+const state = makeWorkspaceState(workspaceId.value)
 const title = computed(() => state.workspace?.name ?? t("title"))
 
 async function createSession(): Promise<void> {
@@ -63,12 +63,12 @@ async function editSessionTitle(
 }
 
 onMounted(async () => {
-  await loadSessionList(state)
+  await loadWorkspaceState(state)
 })
 
 watch(workspaceId, async (value) => {
   state.workspaceId = value
-  await loadSessionList(state)
+  await loadWorkspaceState(state)
 })
 
 useHead(() => ({

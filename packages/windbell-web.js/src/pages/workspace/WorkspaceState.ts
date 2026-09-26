@@ -2,7 +2,7 @@ import { makeSemiosisClient } from "@xieyuheng/semiosis-api.js/client"
 import type * as S from "@xieyuheng/semiosis.js"
 import { reactive } from "vue"
 
-export type SessionListState = {
+export type WorkspaceState = {
   workspaceId: S.WorkspaceId
   workspace: S.Workspace | undefined
   sessions: Array<S.Session>
@@ -20,10 +20,8 @@ function sortSessionsByUpdatedAt(sessions: Array<S.Session>): void {
   )
 }
 
-export function makeSessionListState(
-  workspaceId: S.WorkspaceId,
-): SessionListState {
-  return reactive<SessionListState>({
+export function makeWorkspaceState(workspaceId: S.WorkspaceId): WorkspaceState {
+  return reactive<WorkspaceState>({
     workspaceId,
     workspace: undefined,
     sessions: [],
@@ -32,7 +30,7 @@ export function makeSessionListState(
   })
 }
 
-export async function loadSessionList(state: SessionListState): Promise<void> {
+export async function loadWorkspaceState(state: WorkspaceState): Promise<void> {
   state.loading = true
   state.error = undefined
 
@@ -62,7 +60,7 @@ export async function loadSessionList(state: SessionListState): Promise<void> {
 }
 
 export async function makeSession(
-  state: SessionListState,
+  state: WorkspaceState,
   title: string,
 ): Promise<S.Session> {
   const session = await semiosis.sessions.make({
@@ -76,7 +74,7 @@ export async function makeSession(
 }
 
 export async function trashSession(
-  state: SessionListState,
+  state: WorkspaceState,
   sessionId: S.SessionId,
 ): Promise<void> {
   await semiosis.dustbin.sessions.trash(sessionId)
@@ -84,7 +82,7 @@ export async function trashSession(
 }
 
 export async function updateSessionTitle(
-  state: SessionListState,
+  state: WorkspaceState,
   sessionId: S.SessionId,
   title: string,
 ): Promise<void> {

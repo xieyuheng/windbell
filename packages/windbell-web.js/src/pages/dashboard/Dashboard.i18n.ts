@@ -1,4 +1,4 @@
-export const workspaceListMessages = {
+export const dashboardMessages = {
   "zh-CN": {
     title: "工作区",
     description: "选择一个工作区开始。",

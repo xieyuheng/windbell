@@ -27,7 +27,7 @@ export function makeSettingsState(router: Router): SettingsState {
       if (window.history.length > 1) {
         router.back()
       } else {
-        router.push({ name: "workspace-list" })
+        router.push({ name: "dashboard" })
       }
     },
   })

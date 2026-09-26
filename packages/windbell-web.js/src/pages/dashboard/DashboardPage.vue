@@ -6,26 +6,26 @@ import { useI18n } from "vue-i18n"
 import SettingsButton from "../../components/buttons/SettingsButton.vue"
 import Card from "../../components/card/Card.vue"
 import WorkspaceCard from "./components/WorkspaceCard.vue"
-import { workspaceListMessages } from "./WorkspaceList.i18n"
+import { dashboardMessages } from "./Dashboard.i18n"
 import {
   ensureWorkspace,
-  loadWorkspaceList,
-  makeWorkspaceListState,
-} from "./WorkspaceListState"
+  loadDashboardState,
+  makeDashboardState,
+} from "./DashboardState"
 
 const { t } = useI18n({
-  messages: workspaceListMessages,
+  messages: dashboardMessages,
   useScope: "local",
 })
 
-const state = makeWorkspaceListState()
+const state = makeDashboardState()
 const name = ref("")
 const root = ref("")
 const creating = ref(false)
 const createError = ref<string | undefined>(undefined)
 
 onMounted(async () => {
-  await loadWorkspaceList(state)
+  await loadDashboardState(state)
 })
 
 async function createWorkspace(): Promise<void> {

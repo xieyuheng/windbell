@@ -10,7 +10,7 @@ function goBack(): void {
   if (window.history.length > 1) {
     router.back()
   } else {
-    router.push({ name: "workspace-list" })
+    router.push({ name: "dashboard" })
   }
 }
 </script>

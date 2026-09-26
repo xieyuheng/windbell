@@ -2,7 +2,7 @@ import { makeSemiosisClient } from "@xieyuheng/semiosis-api.js/client"
 import type * as S from "@xieyuheng/semiosis.js"
 import { reactive } from "vue"
 
-export type WorkspaceListState = {
+export type DashboardState = {
   workspaces: Array<S.Workspace>
   loading: boolean
   error: string | undefined
@@ -12,17 +12,15 @@ const semiosis = makeSemiosisClient({
   baseUrl: "/api/semiosis",
 })
 
-export function makeWorkspaceListState(): WorkspaceListState {
-  return reactive<WorkspaceListState>({
+export function makeDashboardState(): DashboardState {
+  return reactive<DashboardState>({
     workspaces: [],
     loading: false,
     error: undefined,
   })
 }
 
-export async function loadWorkspaceList(
-  state: WorkspaceListState,
-): Promise<void> {
+export async function loadDashboardState(state: DashboardState): Promise<void> {
   state.loading = true
   state.error = undefined
 
@@ -36,7 +34,7 @@ export async function loadWorkspaceList(
 }
 
 export async function ensureWorkspace(
-  state: WorkspaceListState,
+  state: DashboardState,
   options: {
     name: string
     root: string

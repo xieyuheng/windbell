@@ -1,4 +1,4 @@
-export const pageNotFoundMessages = {
+export const notFoundPageMessages = {
   "zh-CN": {
     title: "页面不存在",
     description: "这里没有风。",

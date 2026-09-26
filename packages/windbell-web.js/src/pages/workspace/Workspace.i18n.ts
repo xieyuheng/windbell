@@ -1,4 +1,4 @@
-export const sessionListMessages = {
+export const workspaceMessages = {
   "zh-CN": {
     title: "对话",
     description: "当前工作区下的对话列表。",

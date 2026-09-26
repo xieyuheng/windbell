@@ -1,59 +1,63 @@
 import type { RouteRecordRaw } from "vue-router"
-import PageNotFound from "./errors/PageNotFound.vue"
-import Session from "./session/Session.vue"
-import SessionList from "./session-list/SessionList.vue"
-import SessionDustbin from "./session-dustbin/SessionDustbin.vue"
-import Settings from "./settings/Settings.vue"
-import Tree from "./tree/Tree.vue"
-import WorkspaceList from "./workspace-list/WorkspaceList.vue"
+import DashboardPage from "./dashboard/DashboardPage.vue"
+import NotFoundPage from "./errors/NotFoundPage.vue"
+import SessionDustbinPage from "./session-dustbin/SessionDustbinPage.vue"
+import SessionPage from "./session/SessionPage.vue"
+import SettingsPage from "./settings/SettingsPage.vue"
+import TreePage from "./tree/TreePage.vue"
+import WorkspacePage from "./workspace/WorkspacePage.vue"
 
 export const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    redirect: "/workspaces",
+    redirect: "/dashboard",
+  },
+  {
+    path: "/dashboard",
+    name: "dashboard",
+    component: DashboardPage,
   },
   {
     path: "/workspaces",
-    name: "workspace-list",
-    component: WorkspaceList,
+    redirect: "/dashboard",
   },
   {
-    path: "/workspaces/:workspaceId",
+    path: "/workspaces/:workspaceId/sessions",
     redirect: (to) => ({
-      name: "session-list",
+      name: "workspace",
       params: {
         workspaceId: to.params.workspaceId,
       },
     }),
   },
   {
-    path: "/workspaces/:workspaceId/sessions",
-    name: "session-list",
-    component: SessionList,
+    path: "/workspaces/:workspaceId",
+    name: "workspace",
+    component: WorkspacePage,
   },
   {
     path: "/workspaces/:workspaceId/session-dustbin",
     name: "session-dustbin",
-    component: SessionDustbin,
+    component: SessionDustbinPage,
   },
   {
     path: "/sessions/:sessionId",
     name: "session",
-    component: Session,
+    component: SessionPage,
   },
   {
     path: "/workspaces/:workspaceId/tree",
     name: "tree",
-    component: Tree,
+    component: TreePage,
   },
   {
     path: "/settings",
     name: "settings",
-    component: Settings,
+    component: SettingsPage,
   },
   {
     path: "/:pathMatch(.*)*",
     name: "not-found",
-    component: PageNotFound,
+    component: NotFoundPage,
   },
 ]
