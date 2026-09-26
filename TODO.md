@@ -2,6 +2,16 @@
 
 [windbell-web.js] file tree -- IDE 的文件浏览器，从项目的根目录开始
 
+# windbell-web.js
+
+[windbell-web.js] 改善 workspace card 的 body 的内容设计
+
+- 包括 WorkspaceCard 和 DustbinWorkspaceCard
+
+[windbell-web.js] 改善创建新 workspace 的 card
+
+# windbell-web.js
+
 [windbell-web.js] markdown file -- 对文件的预览，包括文学式编程支持
 
 [windbell-web.js] 支持 markdown 的极简 IDE
