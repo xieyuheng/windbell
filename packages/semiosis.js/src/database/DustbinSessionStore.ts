@@ -26,9 +26,13 @@ export type ListDustbinSessionOptions = {
   workspaceId: WorkspaceId | undefined
 }
 
+export type TrashSessionOptions = {
+  trashedWithWorkspace?: boolean
+}
+
 export type DustbinSessionStore = {
   get(sessionId: SessionId): Promise<Session | undefined>
-  trash(sessionId: SessionId): Promise<void>
+  trash(sessionId: SessionId, options?: TrashSessionOptions): Promise<void>
   list(options: ListDustbinSessionOptions): Promise<Array<DustbinSessionIndex>>
   restore(sessionId: SessionId): Promise<void>
   remove(sessionId: SessionId): Promise<void>
@@ -104,7 +108,7 @@ export function makeDustbinSessionStore(
   return {
     get: (sessionId) => sessionStore.get(sessionId),
 
-    async trash(sessionId) {
+    async trash(sessionId, options) {
       assertId(sessionId)
 
       const index = await readSessionIndex(sessionId)
@@ -129,6 +133,9 @@ export function makeDustbinSessionStore(
       const dustbinIndex: DustbinSessionIndex = {
         ...index,
         deletedAt: Date.now(),
+        ...(options?.trashedWithWorkspace === true
+          ? { trashedWithWorkspace: true }
+          : {}),
       }
 
       try {

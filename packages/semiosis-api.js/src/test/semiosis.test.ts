@@ -147,13 +147,55 @@ test("semiosis client and server", async (t) => {
     /session not found in dustbin/,
   )
 
+  const cascadeSession = await client.sessions.make({
+    workspaceId: workspace.id,
+    title: "cascade session",
+  })
+  const individualSession = await client.sessions.make({
+    workspaceId: workspace.id,
+    title: "individual session",
+  })
+
+  await client.dustbin.sessions.trash(individualSession.id)
+
+  {
+    const sessions = await client.dustbin.sessions.list({
+      workspaceId: workspace.id,
+    })
+    const index = sessions.find(
+      (session) => session.id === individualSession.id,
+    )
+    assert.equal(index?.trashedWithWorkspace, undefined)
+  }
+
   await client.dustbin.workspaces.trash(workspace.id)
   assert.equal(await client.workspaces.get(workspace.id), undefined)
+  assert.equal(
+    (await client.sessions.list({ workspaceId: workspace.id })).length,
+    0,
+  )
 
   const dustbinWorkspaces = await client.dustbin.workspaces.list()
   assert.equal(dustbinWorkspaces.length, 1)
   assert.equal(dustbinWorkspaces[0]?.id, workspace.id)
   assert.equal(typeof dustbinWorkspaces[0]?.deletedAt, "number")
+
+  {
+    const sessions = await client.dustbin.sessions.list({
+      workspaceId: workspace.id,
+    })
+    assert.equal(sessions.length, 2)
+
+    const cascadeIndex = sessions.find(
+      (session) => session.id === cascadeSession.id,
+    )
+    assert.equal(cascadeIndex?.trashedWithWorkspace, true)
+
+    const individualIndex = sessions.find(
+      (session) => session.id === individualSession.id,
+    )
+    assert.equal(individualIndex?.trashedWithWorkspace, undefined)
+  }
 
   const dustbinWorkspace = await client.dustbin.workspaces.get(workspace.id)
   assert.ok(dustbinWorkspace !== undefined)
@@ -162,12 +204,29 @@ test("semiosis client and server", async (t) => {
 
   await client.dustbin.workspaces.restore(workspace.id)
   assert.ok((await client.workspaces.get(workspace.id)) !== undefined)
-  assert.equal(await client.dustbin.workspaces.get(workspace.id), undefined)
-  assert.equal((await client.dustbin.workspaces.list()).length, 0)
+  assert.ok((await client.sessions.get(cascadeSession.id)) !== undefined)
+  assert.equal(await client.sessions.get(individualSession.id), undefined)
+  assert.equal(
+    (await client.dustbin.sessions.list({ workspaceId: workspace.id })).length,
+    1,
+  )
 
   await client.dustbin.workspaces.trash(workspace.id)
+  assert.equal(
+    (await client.dustbin.sessions.list({ workspaceId: workspace.id })).length,
+    2,
+  )
+
   await client.dustbin.workspaces.remove(workspace.id)
   assert.equal(await client.workspaces.get(workspace.id), undefined)
+  assert.equal(
+    (await client.sessions.list({ workspaceId: workspace.id })).length,
+    0,
+  )
+  assert.equal(
+    (await client.dustbin.sessions.list({ workspaceId: workspace.id })).length,
+    0,
+  )
   assert.equal((await client.dustbin.workspaces.list()).length, 0)
 
   await client.workspaces.remove(workspace.id)

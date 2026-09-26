@@ -202,7 +202,17 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const body = readRecord(await readJsonBody(c))
     const workspaceId = readString(body, "workspaceId")
 
-    await runDustbinAction(() => service.dustbin.workspaces.trash(workspaceId))
+    await runDustbinAction(async () => {
+      const sessions = await service.sessions.list({ workspaceId })
+
+      for (const session of sessions) {
+        await service.dustbin.sessions.trash(session.id, {
+          trashedWithWorkspace: true,
+        })
+      }
+
+      await service.dustbin.workspaces.trash(workspaceId)
+    })
 
     return sendEmpty(204)
   })
@@ -210,15 +220,36 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
   app.post("/dustbin/workspaces/:workspaceId/restore", async (c) => {
     const workspaceId = c.req.param("workspaceId")
 
-    await runDustbinAction(() =>
-      service.dustbin.workspaces.restore(workspaceId),
-    )
+    await runDustbinAction(async () => {
+      await service.dustbin.workspaces.restore(workspaceId)
+
+      const sessions = await service.dustbin.sessions.list({ workspaceId })
+
+      for (const session of sessions) {
+        if (session.trashedWithWorkspace === true) {
+          await service.dustbin.sessions.restore(session.id)
+        }
+      }
+    })
 
     return sendEmpty(204)
   })
 
   app.delete("/dustbin/workspaces/:workspaceId", async (c) => {
-    await service.dustbin.workspaces.remove(c.req.param("workspaceId"))
+    const workspaceId = c.req.param("workspaceId")
+    const activeSessions = await service.sessions.list({ workspaceId })
+
+    for (const session of activeSessions) {
+      await service.sessions.remove(session.id)
+    }
+
+    const dustbinSessions = await service.dustbin.sessions.list({ workspaceId })
+
+    for (const session of dustbinSessions) {
+      await service.dustbin.sessions.remove(session.id)
+    }
+
+    await service.dustbin.workspaces.remove(workspaceId)
     return sendEmpty(204)
   })
 
