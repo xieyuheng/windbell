@@ -12,6 +12,8 @@ export type RangerState = {
   root: string
   currentDirectory: string
   entries: Array<FileSystemEntry>
+  selectedIndex: number
+  selectedEntry: FileSystemEntry | undefined
   loading: boolean
   error: string | undefined
 }
@@ -31,6 +33,8 @@ export function makeRangerState(workspaceId: S.WorkspaceId): RangerState {
     root: "",
     currentDirectory: "",
     entries: [],
+    selectedIndex: -1,
+    selectedEntry: undefined,
     loading: false,
     error: undefined,
   })
@@ -48,6 +52,8 @@ export async function loadRanger(state: RangerState): Promise<void> {
       state.root = ""
       state.currentDirectory = ""
       state.entries = []
+      state.selectedIndex = -1
+      state.selectedEntry = undefined
       state.error = `workspace not found: ${state.workspaceId}`
       return
     }
@@ -71,11 +77,22 @@ export async function loadDirectory(
   state.error = undefined
 
   try {
-    state.entries = await fileSystem.listEntries(path)
+    const entries = await fileSystem.listEntries(path)
+
+    state.entries = entries
     state.currentDirectory = path
+    state.selectedIndex = entries.length > 0 ? 0 : -1
+    state.selectedEntry = entries[0]
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
   } finally {
     state.loading = false
   }
+}
+
+export function selectEntry(state: RangerState, index: number): void {
+  if (index < 0 || index >= state.entries.length) return
+
+  state.selectedIndex = index
+  state.selectedEntry = state.entries[index]
 }

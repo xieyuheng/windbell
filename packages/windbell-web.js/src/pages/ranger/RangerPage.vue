@@ -5,7 +5,8 @@ import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
 import { rangerMessages } from "./Ranger.i18n"
 import RangerSidebar from "./components/RangerSidebar.vue"
-import { loadRanger, makeRangerState } from "./RangerState"
+import RangerView from "./components/RangerView.vue"
+import { loadRanger, makeRangerState, selectEntry } from "./RangerState"
 
 const route = useRoute()
 const workspaceId = computed(() => String(route.params.workspaceId ?? ""))
@@ -44,17 +45,25 @@ useHead(() => ({
       :root="state.root"
       :current-directory="state.currentDirectory"
       :entries="state.entries"
-      :selected-index="0"
+      :selected-index="state.selectedIndex"
+      @select="selectEntry(state, $event)"
     />
 
-    <section class="flex-1 bg-paper px-4 py-3">
-      <p v-if="state.loading" class="text-ink">
+    <section v-if="state.loading" class="flex flex-1 items-start px-4 py-3">
+      <p class="text-ink">
         {{ t("loading") }}
       </p>
+    </section>
 
-      <p v-else-if="state.error !== undefined" class="text-danger">
+    <section
+      v-else-if="state.error !== undefined"
+      class="flex flex-1 items-start px-4 py-3"
+    >
+      <p class="text-danger">
         {{ state.error }}
       </p>
     </section>
+
+    <RangerView v-else class="flex-1" :entry="state.selectedEntry" />
   </main>
 </template>

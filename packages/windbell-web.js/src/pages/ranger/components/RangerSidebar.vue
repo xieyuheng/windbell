@@ -9,6 +9,10 @@ const props = defineProps<{
   selectedIndex: number
 }>()
 
+const emit = defineEmits<{
+  select: [index: number]
+}>()
+
 const currentName = computed(() => {
   return pathName(props.currentDirectory || props.root)
 })
@@ -37,6 +41,7 @@ function pathName(value: string): string {
         :key="entry.path"
         class="w-full truncate px-3 py-1 text-ink"
         :class="{ 'bg-ink text-paper': index === selectedIndex }"
+        @click="emit('select', index)"
       >
         {{ entry.kind === "Directory" ? `${entry.name}/` : entry.name }}
       </li>
