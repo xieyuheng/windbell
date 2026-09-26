@@ -89,6 +89,10 @@ useHead(() => ({
       </div>
     </header>
 
+    <h2 class="text-base text-ink">
+      {{ t("deletedSessions") }}
+    </h2>
+
     <p v-if="state.loading" class="text-ink">
       {{ t("loading") }}
     </p>

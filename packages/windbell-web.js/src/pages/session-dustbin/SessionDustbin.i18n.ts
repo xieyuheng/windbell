@@ -2,6 +2,7 @@ export const sessionDustbinMessages = {
   "zh-CN": {
     title: "对话回收站",
     description: "当前工作区下已移入回收站的对话。",
+    deletedSessions: "已删除对话",
     loading: "加载中...",
     empty: "回收站为空。",
     restore: "恢复",
@@ -13,6 +14,7 @@ export const sessionDustbinMessages = {
   "en-US": {
     title: "Session Dustbin",
     description: "Sessions moved to the dustbin in this workspace.",
+    deletedSessions: "Deleted Sessions",
     loading: "Loading...",
     empty: "The dustbin is empty.",
     restore: "Restore",
