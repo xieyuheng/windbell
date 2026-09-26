@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { ArchiveRestore, Trash2 } from "@lucide/vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
 import { onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import BackButton from "../../components/buttons/BackButton.vue"
-import Card from "../../components/card/Card.vue"
+import DustbinWorkspaceCard from "./components/DustbinWorkspaceCard.vue"
 import { workspaceDustbinMessages } from "./WorkspaceDustbin.i18n"
 import {
   loadWorkspaceDustbin,
@@ -22,13 +21,6 @@ const { t } = useI18n({
 const state = makeWorkspaceDustbinState()
 const busyWorkspaceId = ref<string | undefined>(undefined)
 
-function formatDateTime(value: number): string {
-  const date = new Date(value)
-  const pad = (value: number): string => String(value).padStart(2, "0")
-
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
-}
-
 async function restore(workspace: S.DustbinWorkspace): Promise<void> {
   busyWorkspaceId.value = workspace.id
   state.error = undefined
@@ -43,8 +35,6 @@ async function restore(workspace: S.DustbinWorkspace): Promise<void> {
 }
 
 async function remove(workspace: S.DustbinWorkspace): Promise<void> {
-  if (!window.confirm(t("deleteConfirm"))) return
-
   busyWorkspaceId.value = workspace.id
   state.error = undefined
 
@@ -95,56 +85,12 @@ useHead(() => ({
       class="flex flex-1 flex-col gap-4"
     >
       <li v-for="workspace in state.workspaces" :key="workspace.id">
-        <Card as="article">
-          <template #header>
-            <h2 class="truncate text-base text-ink">
-              {{ workspace.name }}
-            </h2>
-
-            <div class="mt-2 flex items-center gap-2">
-              <button
-                class="inline-flex items-center gap-1 rounded px-1 py-1 text-sm transition-colors hover:bg-paper/60 hover:text-ink disabled:opacity-50"
-                type="button"
-                :disabled="busyWorkspaceId === workspace.id"
-                @click="restore(workspace)"
-              >
-                <ArchiveRestore
-                  :size="16"
-                  :stroke-width="1.5"
-                  aria-hidden="true"
-                />
-                <span>{{ t("restore") }}</span>
-              </button>
-
-              <button
-                class="inline-flex items-center gap-1 rounded px-1 py-1 text-sm transition-colors hover:bg-paper/60 hover:text-danger disabled:opacity-50"
-                type="button"
-                :disabled="busyWorkspaceId === workspace.id"
-                @click="remove(workspace)"
-              >
-                <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
-                <span>{{ t("remove") }}</span>
-              </button>
-            </div>
-          </template>
-
-          <div class="px-3 py-2">
-            <p class="truncate font-mono text-ink">
-              {{ workspace.root }}
-            </p>
-          </div>
-
-          <template #footer>
-            <div class="flex flex-col gap-1 text-sm">
-              <p class="truncate">
-                {{ t("deletedAt") }} {{ formatDateTime(workspace.deletedAt) }}
-              </p>
-              <p class="truncate">
-                {{ t("createdAt") }} {{ formatDateTime(workspace.createdAt) }}
-              </p>
-            </div>
-          </template>
-        </Card>
+        <DustbinWorkspaceCard
+          :workspace="workspace"
+          :busy="busyWorkspaceId === workspace.id"
+          @restore="restore(workspace)"
+          @remove="remove(workspace)"
+        />
       </li>
     </ol>
 

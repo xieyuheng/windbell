@@ -5,7 +5,7 @@ import { computed, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
 import BackButton from "../../components/buttons/BackButton.vue"
-import DustbinSessionsCard from "./components/DustbinSessionsCard.vue"
+import DustbinSessionCard from "./components/DustbinSessionCard.vue"
 import { sessionDustbinMessages } from "./SessionDustbin.i18n"
 import {
   loadSessionDustbin,
@@ -106,7 +106,7 @@ useHead(() => ({
       class="flex flex-1 flex-col gap-4"
     >
       <li v-for="session in state.sessions" :key="session.id">
-        <DustbinSessionsCard
+        <DustbinSessionCard
           :session="session"
           :busy="busySessionId === session.id"
           @restore="restore(session)"
