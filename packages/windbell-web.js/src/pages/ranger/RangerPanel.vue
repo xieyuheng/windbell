@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { rangerMessages } from "./Ranger.i18n"
 import { readStoredSidebarRatio } from "./RangerLayout"
@@ -26,25 +26,18 @@ const { t } = useI18n({
 
 const state = makeRangerState(props.workspaceId)
 const sidebarRatio = ref(readStoredSidebarRatio())
+const panel = ref<HTMLElement | null>(null)
+
+function focusPanel(): void {
+  panel.value?.focus({ preventScroll: true })
+}
 
 function handleSelect(index: number): void {
   state.focus = "sidebar"
   selectEntry(state, index)
 }
 
-function isTextInput(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false
-
-  return (
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    target.isContentEditable
-  )
-}
-
 async function handleKeydown(event: KeyboardEvent): Promise<void> {
-  if (event.defaultPrevented || isTextInput(event.target)) return
-
   switch (event.key) {
     case "ArrowUp": {
       if (state.focus !== "sidebar") return
@@ -88,16 +81,15 @@ async function handleKeydown(event: KeyboardEvent): Promise<void> {
 }
 
 function onKeydown(event: KeyboardEvent): void {
+  if (event.defaultPrevented) return
+  if (event.target !== event.currentTarget) return
+
   void handleKeydown(event)
 }
 
 onMounted(async () => {
-  window.addEventListener("keydown", onKeydown)
+  focusPanel()
   await loadRanger(state)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener("keydown", onKeydown)
 })
 
 watch(
@@ -110,7 +102,13 @@ watch(
 </script>
 
 <template>
-  <main class="flex h-screen w-full overflow-hidden">
+  <main
+    ref="panel"
+    class="flex h-screen w-full overflow-hidden outline-none"
+    tabindex="0"
+    @pointerdown="focusPanel"
+    @keydown="onKeydown"
+  >
     <RangerSidebar
       class="shrink-0"
       :style="{ width: `${sidebarRatio * 100}%` }"
