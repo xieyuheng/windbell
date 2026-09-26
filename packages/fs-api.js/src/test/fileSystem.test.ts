@@ -3,6 +3,7 @@ import fs from "node:fs/promises"
 import Os from "node:os"
 import Path from "node:path"
 import { test } from "node:test"
+import type { FileSystemWatchEvent } from "../index.ts"
 import { makeFileSystemClient, startFileSystemServer } from "../index.ts"
 import { makeFileSystemRouter } from "../router/index.ts"
 
@@ -89,6 +90,56 @@ test("POST /watch streams file changes", async (t) => {
 
   assert.match(text, /event: change/)
   assert.match(text, /"filename":"a\.txt"/)
+})
+
+test("fileSystem client watch", async (t) => {
+  const root = await fs.mkdtemp(
+    Path.join(Os.tmpdir(), "windbell-watch-client-"),
+  )
+
+  const { server, url } = await startFileSystemServer({
+    host: "127.0.0.1",
+    port: 0,
+    basePath: "/fs",
+    corsOrigin: undefined,
+  })
+
+  const client = makeFileSystemClient({ baseUrl: url })
+  const events: Array<FileSystemWatchEvent> = []
+  const errors: Array<Error> = []
+  const stop = client.watch(
+    root,
+    (event) => events.push(event),
+    (error) => errors.push(error),
+  )
+
+  t.after(async () => {
+    stop()
+
+    await new Promise<void>((resolve, reject) => {
+      server.close((error) => (error ? reject(error) : resolve()))
+    })
+
+    await fs.rm(root, { recursive: true, force: true })
+  })
+
+  await waitFor(() =>
+    events.some((event) => event.type === "ready" && event.path === root),
+  )
+
+  const textFile = Path.join(root, "a.txt")
+  await fs.writeFile(textFile, "hello")
+
+  await waitFor(() =>
+    events.some(
+      (event) =>
+        event.type === "change" &&
+        event.path === textFile &&
+        event.filename === "a.txt",
+    ),
+  )
+
+  assert.deepEqual(errors, [])
 })
 
 test("fileSystem client and server", async (t) => {
@@ -179,3 +230,16 @@ test("fileSystem client and server", async (t) => {
   await client.delete(Path.join(root, "notes"))
   assert.equal(await client.exists(Path.join(root, "notes")), false)
 })
+
+async function waitFor(
+  predicate: () => boolean,
+  timeoutMs = 3_000,
+): Promise<void> {
+  const deadline = Date.now() + timeoutMs
+
+  while (!predicate() && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 20))
+  }
+
+  assert.equal(predicate(), true)
+}
