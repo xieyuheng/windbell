@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { FileSystemEntry } from "@xieyuheng/fs-api.js/client"
-import { computed } from "vue"
+import type { Component } from "vue"
+import { ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { rangerMessages } from "../Ranger.i18n"
 import { resolveEntryView } from "../views/registry"
@@ -14,16 +15,45 @@ const { t } = useI18n({
   useScope: "local",
 })
 
-const view = computed(() => {
-  if (props.entry === undefined) return undefined
+const view = ref<Component | undefined>(undefined)
+const loading = ref(false)
 
-  return resolveEntryView(props.entry)
-})
+let requestId = 0
+
+watch(
+  () => props.entry,
+  async (entry) => {
+    const currentRequestId = ++requestId
+
+    loading.value = false
+    view.value = undefined
+
+    if (entry === undefined) return
+
+    loading.value = true
+
+    try {
+      const nextView = await resolveEntryView(entry)
+      if (currentRequestId !== requestId) return
+
+      view.value = nextView
+    } finally {
+      if (currentRequestId === requestId) {
+        loading.value = false
+      }
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
   <section class="flex h-full min-h-0 flex-col overflow-hidden bg-paper">
-    <component v-if="view !== undefined" :is="view" :entry="entry" />
+    <div v-if="loading" class="px-4 py-3 text-ink">
+      {{ t("loading") }}
+    </div>
+
+    <component v-else-if="view !== undefined" :is="view" :entry="entry" />
 
     <div v-else class="flex flex-1 items-center justify-center px-4 text-ink">
       {{ t("empty") }}

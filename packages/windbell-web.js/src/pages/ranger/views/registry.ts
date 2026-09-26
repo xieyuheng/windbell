@@ -1,8 +1,15 @@
-import type { FileSystemEntry } from "@xieyuheng/fs-api.js/client"
+import {
+  makeFileSystemClient,
+  type FileSystemEntry,
+} from "@xieyuheng/fs-api.js/client"
 import type { Component } from "vue"
 import DirectoryView from "./DirectoryView.vue"
 import TextView from "./TextView.vue"
 import UnknownView from "./UnknownView.vue"
+
+const fileSystem = makeFileSystemClient({
+  baseUrl: "/api/fs",
+})
 
 const textExtensions = new Set([
   "bash",
@@ -63,9 +70,33 @@ function extensionOf(name: string): string {
   return name.slice(index + 1).toLowerCase()
 }
 
-export function resolveEntryView(entry: FileSystemEntry): Component {
+function resolveKnownEntryView(entry: FileSystemEntry): Component | undefined {
   if (entry.kind === "Directory") return DirectoryView
   if (textExtensions.has(extensionOf(entry.name))) return TextView
 
-  return UnknownView
+  return undefined
+}
+
+export async function resolveEntryView(
+  entry: FileSystemEntry,
+): Promise<Component> {
+  const knownView = resolveKnownEntryView(entry)
+  if (knownView !== undefined) return knownView
+
+  try {
+    const info = await fileSystem.inspectFile(entry.path)
+
+    switch (info.kind) {
+      case "Text":
+        return TextView
+      case "Image":
+      case "Pdf":
+      case "Archive":
+      case "Binary":
+      case "Unknown":
+        return UnknownView
+    }
+  } catch {
+    return UnknownView
+  }
 }
