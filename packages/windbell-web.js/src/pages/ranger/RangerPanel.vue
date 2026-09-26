@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
+import { makeDividerState } from "../../components/divider/DividerState"
+import ResizeDivider from "../../components/divider/ResizeDivider.vue"
 import { rangerMessages } from "./Ranger.i18n"
-import { readStoredSidebarRatio } from "./RangerLayout"
-import RangerDivider from "./components/RangerDivider.vue"
 import RangerSidebar from "./components/RangerSidebar.vue"
 import RangerView from "./components/RangerView.vue"
 import {
@@ -26,7 +26,12 @@ const { t } = useI18n({
 })
 
 const state = makeRangerState(props.workspaceId)
-const sidebarRatio = ref(readStoredSidebarRatio())
+const sidebarDivider = makeDividerState({
+  defaultRatio: 0.25,
+  minRatio: 0.15,
+  maxRatio: 0.5,
+  storageKey: "windbell.ranger.sidebarRatio",
+})
 const panel = ref<HTMLElement | null>(null)
 
 let stopWatch: (() => void) | undefined
@@ -133,7 +138,7 @@ onBeforeUnmount(() => {
   >
     <RangerSidebar
       class="shrink-0"
-      :style="{ width: `${sidebarRatio * 100}%` }"
+      :style="{ width: `${sidebarDivider.ratio * 100}%` }"
       :root="state.root"
       :current-directory="state.currentDirectory"
       :entries="state.entries"
@@ -142,7 +147,7 @@ onBeforeUnmount(() => {
       @select="handleSelect($event)"
     />
 
-    <RangerDivider v-model:ratio="sidebarRatio" />
+    <ResizeDivider :state="sidebarDivider" />
 
     <section
       v-if="state.loading"
