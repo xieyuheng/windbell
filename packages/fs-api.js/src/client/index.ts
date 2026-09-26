@@ -1,2 +1,6 @@
 export * from "./FileSystemClient.ts"
-export type { FileSystemEntry } from "../service/fileSystem.ts"
+export type {
+  FileSystemEntry,
+  FileTypeKind,
+  InspectFileResult,
+} from "../service/fileSystem.ts"
