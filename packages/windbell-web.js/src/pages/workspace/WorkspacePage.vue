@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Plus, Trash2 } from "@lucide/vue"
+import { FolderTree, Plus, Trash2 } from "@lucide/vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
 import { computed, onMounted, watch } from "vue"
@@ -100,6 +100,17 @@ useHead(() => ({
           <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("newSession") }}</span>
         </button>
+
+        <RouterLink
+          class="inline-flex items-center gap-2 rounded border-2 border-line px-2 py-1.5 text-ink transition-colors hover:bg-line"
+          :to="{
+            name: 'ranger',
+            params: { workspaceId },
+          }"
+        >
+          <FolderTree :size="16" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("ranger") }}</span>
+        </RouterLink>
 
         <RouterLink
           class="inline-flex items-center gap-2 rounded border-2 border-line px-2 py-1.5 text-ink transition-colors hover:bg-line"

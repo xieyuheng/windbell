@@ -5,7 +5,7 @@ import SessionDustbinPage from "./session-dustbin/SessionDustbinPage.vue"
 import WorkspaceDustbinPage from "./workspace-dustbin/WorkspaceDustbinPage.vue"
 import SessionPage from "./session/SessionPage.vue"
 import SettingsPage from "./settings/SettingsPage.vue"
-import TreePage from "./tree/TreePage.vue"
+import RangerPage from "./ranger/RangerPage.vue"
 import WorkspacePage from "./workspace/WorkspacePage.vue"
 
 export const routes: Array<RouteRecordRaw> = [
@@ -56,9 +56,9 @@ export const routes: Array<RouteRecordRaw> = [
     component: SessionPage,
   },
   {
-    path: "/workspaces/:workspaceId/tree",
-    name: "tree",
-    component: TreePage,
+    path: "/workspaces/:workspaceId/ranger",
+    name: "ranger",
+    component: RangerPage,
   },
   {
     path: "/settings",
