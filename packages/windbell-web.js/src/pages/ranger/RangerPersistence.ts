@@ -1,0 +1,57 @@
+export type StoredRangerLocation = {
+  currentDirectory: string
+  selectedPath: string | null
+}
+
+export function rangerLocationStorageKey(workspaceId: string): string {
+  return `windbell.ranger.location.${workspaceId}`
+}
+
+export function readStoredRangerLocation(
+  workspaceId: string,
+): StoredRangerLocation | undefined {
+  try {
+    const raw = localStorage.getItem(rangerLocationStorageKey(workspaceId))
+    if (raw === null) return undefined
+
+    const value: unknown = JSON.parse(raw)
+    if (value === null || typeof value !== "object") return undefined
+
+    const record = value as Record<string, unknown>
+    const currentDirectory = record.currentDirectory
+    const selectedPath = record.selectedPath
+
+    if (typeof currentDirectory !== "string" || currentDirectory === "") {
+      return undefined
+    }
+
+    if (
+      selectedPath !== undefined &&
+      selectedPath !== null &&
+      typeof selectedPath !== "string"
+    ) {
+      return undefined
+    }
+
+    return {
+      currentDirectory,
+      selectedPath: selectedPath ?? null,
+    }
+  } catch {
+    return undefined
+  }
+}
+
+export function writeStoredRangerLocation(
+  workspaceId: string,
+  location: StoredRangerLocation,
+): void {
+  try {
+    localStorage.setItem(
+      rangerLocationStorageKey(workspaceId),
+      JSON.stringify(location),
+    )
+  } catch {
+    // ignore storage errors
+  }
+}

@@ -6,6 +6,10 @@ import { makeSemiosisClient } from "@xieyuheng/semiosis-api.js/client"
 import type * as S from "@xieyuheng/semiosis.js"
 import { reactive } from "vue"
 import { isSamePath, parentPath } from "./RangerPath"
+import {
+  readStoredRangerLocation,
+  writeStoredRangerLocation,
+} from "./RangerPersistence"
 
 export type RangerFocus = "sidebar" | "view"
 
@@ -45,6 +49,13 @@ export function makeRangerState(workspaceId: S.WorkspaceId): RangerState {
   })
 }
 
+function persistLocation(state: RangerState): void {
+  writeStoredRangerLocation(state.workspaceId, {
+    currentDirectory: state.currentDirectory,
+    selectedPath: state.selectedEntry?.path ?? null,
+  })
+}
+
 export async function loadRanger(state: RangerState): Promise<void> {
   state.loading = true
   state.error = undefined
@@ -66,6 +77,20 @@ export async function loadRanger(state: RangerState): Promise<void> {
     state.workspace = workspace
     state.root = workspace.root
 
+    const storedLocation = readStoredRangerLocation(state.workspaceId)
+
+    if (storedLocation !== undefined) {
+      const restored = await loadDirectory(
+        state,
+        storedLocation.currentDirectory,
+        {
+          selectPath: storedLocation.selectedPath ?? undefined,
+        },
+      )
+
+      if (restored) return
+    }
+
     await loadDirectory(state, workspace.root)
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
@@ -82,7 +107,7 @@ export async function loadDirectory(
   state: RangerState,
   path: string,
   options: LoadDirectoryOptions = {},
-): Promise<void> {
+): Promise<boolean> {
   state.loading = true
   state.error = undefined
 
@@ -100,8 +125,12 @@ export async function loadDirectory(
 
     state.selectedIndex = entries.length > 0 ? index : -1
     state.selectedEntry = entries[index]
+
+    persistLocation(state)
+    return true
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
+    return false
   } finally {
     state.loading = false
   }
@@ -112,6 +141,8 @@ export function selectEntry(state: RangerState, index: number): void {
 
   state.selectedIndex = index
   state.selectedEntry = state.entries[index]
+
+  persistLocation(state)
 }
 
 export function moveSelection(state: RangerState, delta: number): void {
