@@ -18,13 +18,13 @@ const { t } = useI18n({
 <template>
   <div class="flex min-w-0 items-center gap-2">
     <span
-      class="shrink-0 rounded px-1.5 py-0.5 text-xs text-ink"
+      class="shrink-0 rounded px-1 py-px text-ink"
       :style="{ backgroundColor: signCardConfig[sign.kind].color }"
     >
       {{ t(signCardConfig[sign.kind].labelKey) }}
     </span>
 
-    <span class="truncate text-sm text-ink-muted">
+    <span class="truncate">
       {{ signBody(sign) }}
     </span>
   </div>
