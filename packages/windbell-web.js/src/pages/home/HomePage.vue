@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { Plus, Trash2 } from "@lucide/vue"
+import { Plus, Settings, Trash2 } from "@lucide/vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
 import { onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import MediumButton from "../../components/buttons/MediumButton.vue"
-import SettingsButton from "../../components/buttons/SettingsButton.vue"
 import Card from "../../components/card/Card.vue"
 import WorkspaceCard from "./components/WorkspaceCard.vue"
 import { homeMessages } from "./Home.i18n"
@@ -89,7 +88,10 @@ useHead(() => ({
       </h1>
 
       <div class="flex flex-wrap items-center gap-2">
-        <SettingsButton />
+        <MediumButton :to="{ name: 'settings' }">
+          <Settings :size="16" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("app.settings") }}</span>
+        </MediumButton>
 
         <MediumButton :to="{ name: 'workspace-dustbin' }">
           <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
