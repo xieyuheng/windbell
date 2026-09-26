@@ -104,8 +104,42 @@ test("semiosis client and server", async (t) => {
   assert.equal(indexes.length, 1)
   assert.equal(indexes[0]?.id, session.id)
 
+  await client.sessions.moveToDustbin(session.id)
+  assert.equal(await client.sessions.get(session.id), undefined)
+  assert.equal(
+    (await client.sessions.list({ workspaceId: workspace.id })).length,
+    0,
+  )
+
+  const dustbinSessions = await client.dustbin.sessions.list({
+    workspaceId: workspace.id,
+  })
+  assert.equal(dustbinSessions.length, 1)
+  assert.equal(dustbinSessions[0]?.id, session.id)
+  assert.equal(typeof dustbinSessions[0]?.deletedAt, "number")
+
+  await client.dustbin.sessions.restore(session.id)
+  assert.ok((await client.sessions.get(session.id)) !== undefined)
+  assert.equal(
+    (await client.dustbin.sessions.list({ workspaceId: workspace.id })).length,
+    0,
+  )
+
+  await client.dustbin.sessions.move(session.id)
+  await client.dustbin.sessions.remove(session.id)
+  assert.equal(await client.sessions.get(session.id), undefined)
+  assert.equal(
+    (await client.dustbin.sessions.list({ workspaceId: workspace.id })).length,
+    0,
+  )
+
   await client.sessions.remove(session.id)
   assert.equal(await client.sessions.get(session.id), undefined)
+
+  await assert.rejects(
+    () => client.dustbin.sessions.restore("missing-session"),
+    /session not found in dustbin/,
+  )
 
   await client.workspaces.remove(workspace.id)
   assert.equal(await client.workspaces.get(workspace.id), undefined)

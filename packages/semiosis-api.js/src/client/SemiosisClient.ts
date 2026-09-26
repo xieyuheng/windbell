@@ -17,6 +17,19 @@ export type ListSessionsOptions = {
   workspaceId: S.WorkspaceId | undefined
 }
 
+export type ListDustbinSessionsOptions = {
+  workspaceId: S.WorkspaceId | undefined
+}
+
+export type DustbinSessionsClient = {
+  list(
+    options: ListDustbinSessionsOptions,
+  ): Promise<Array<S.DustbinSessionIndex>>
+  move(sessionId: S.SessionId): Promise<void>
+  restore(sessionId: S.SessionId): Promise<void>
+  remove(sessionId: S.SessionId): Promise<void>
+}
+
 export type InterpretOptions = {
   model: {
     qualifiedName: string
@@ -61,7 +74,12 @@ export type SemiosisClient = {
       id: S.SessionId,
       options: InterpretOptions,
     ): AsyncGenerator<S.Sign>
+    moveToDustbin(id: S.SessionId): Promise<void>
     remove(id: S.SessionId): Promise<void>
+  }
+
+  dustbin: {
+    sessions: DustbinSessionsClient
   }
 }
 
@@ -159,12 +177,57 @@ export function makeSemiosisClient(
         }
       },
 
+      moveToDustbin: async (id) => {
+        await call(config.baseUrl, "POST", "/dustbin/sessions", {
+          sessionId: id,
+        })
+      },
+
       remove: async (id) => {
         await call(
           config.baseUrl,
           "DELETE",
           `/sessions/${encodeURIComponent(id)}`,
         )
+      },
+    },
+
+    dustbin: {
+      sessions: {
+        list: (options) => {
+          const query = new URLSearchParams()
+          if (options.workspaceId !== undefined) {
+            query.set("workspaceId", options.workspaceId)
+          }
+
+          return call(
+            config.baseUrl,
+            "GET",
+            withQuery("/dustbin/sessions", query),
+          )
+        },
+
+        move: async (id) => {
+          await call(config.baseUrl, "POST", "/dustbin/sessions", {
+            sessionId: id,
+          })
+        },
+
+        restore: async (id) => {
+          await call(
+            config.baseUrl,
+            "POST",
+            `/dustbin/sessions/${encodeURIComponent(id)}/restore`,
+          )
+        },
+
+        remove: async (id) => {
+          await call(
+            config.baseUrl,
+            "DELETE",
+            `/dustbin/sessions/${encodeURIComponent(id)}`,
+          )
+        },
       },
     },
   }

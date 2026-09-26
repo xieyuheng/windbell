@@ -1,4 +1,8 @@
 import Path from "node:path"
+import {
+  makeDustbinSessionStore,
+  type DustbinSessionStore,
+} from "./DustbinSessionStore.ts"
 import { makeModelStore, type ModelStore } from "./ModelStore.ts"
 import { makeSettingsStore, type SettingsStore } from "./SettingsStore.ts"
 import { makeProviderStore, type ProviderStore } from "./ProviderStore.ts"
@@ -16,6 +20,9 @@ export type Database = {
   settings: SettingsStore
   workspaces: WorkspaceStore
   sessions: SessionStore
+  dustbin: {
+    sessions: DustbinSessionStore
+  }
 }
 
 export function makeDatabase(options: DatabaseOptions): Database {
@@ -38,5 +45,11 @@ export function makeDatabase(options: DatabaseOptions): Database {
     sessions: makeSessionStore({
       root: Path.join(root, "sessions"),
     }),
+    dustbin: {
+      sessions: makeDustbinSessionStore({
+        sessionsRoot: Path.join(root, "sessions"),
+        dustbinSessionsRoot: Path.join(root, "dustbin", "sessions"),
+      }),
+    },
   }
 }

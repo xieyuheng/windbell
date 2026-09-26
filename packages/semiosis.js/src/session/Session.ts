@@ -13,3 +13,7 @@ export type Session = {
 }
 
 export type SessionIndex = Omit<Session, "context">
+
+export type DustbinSessionIndex = SessionIndex & {
+  deletedAt: number
+}

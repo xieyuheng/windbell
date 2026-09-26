@@ -140,6 +140,34 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     return sendEmpty(204)
   })
 
+  app.get("/dustbin/sessions", async (c) => {
+    const workspaceId = c.req.query("workspaceId")
+
+    return sendJson(200, await service.dustbin.sessions.list({ workspaceId }))
+  })
+
+  app.post("/dustbin/sessions", async (c) => {
+    const body = readRecord(await readJsonBody(c))
+    const sessionId = readString(body, "sessionId")
+
+    await runDustbinAction(() => service.dustbin.sessions.move(sessionId))
+
+    return sendEmpty(204)
+  })
+
+  app.post("/dustbin/sessions/:sessionId/restore", async (c) => {
+    const sessionId = c.req.param("sessionId")
+
+    await runDustbinAction(() => service.dustbin.sessions.restore(sessionId))
+
+    return sendEmpty(204)
+  })
+
+  app.delete("/dustbin/sessions/:sessionId", async (c) => {
+    await service.dustbin.sessions.remove(c.req.param("sessionId"))
+    return sendEmpty(204)
+  })
+
   app.post("/sessions/:sessionId/interpret", async (c) => {
     const sessionId = c.req.param("sessionId")
     const body = readRecord(await readJsonBody(c))
@@ -216,6 +244,19 @@ function makeDefaultInitialSigns(workspace: S.Workspace): Array<S.Sign> {
     ...toolRouter.toolSigns,
     S.PersonaSign("You are a helpful software engineer assistant."),
   ]
+}
+
+async function runDustbinAction(action: () => Promise<void>): Promise<void> {
+  try {
+    await action()
+  } catch (error) {
+    if (error instanceof S.DustbinSessionError) {
+      const status = error.code === "not-found" ? 404 : 409
+      throw new HTTPException(status, { message: error.message })
+    }
+
+    throw error
+  }
 }
 
 async function readJsonBody(c: Context): Promise<unknown> {

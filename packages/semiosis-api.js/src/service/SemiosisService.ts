@@ -7,6 +7,9 @@ export type SemiosisServiceOptions = {
 export type SemiosisService = {
   workspaces: S.Database["workspaces"]
   sessions: S.Database["sessions"]
+  dustbin: {
+    sessions: S.Database["dustbin"]["sessions"]
+  }
 }
 
 export function makeSemiosisService(
@@ -15,5 +18,8 @@ export function makeSemiosisService(
   return {
     workspaces: options.database.workspaces,
     sessions: options.database.sessions,
+    dustbin: {
+      sessions: options.database.dustbin.sessions,
+    },
   }
 }

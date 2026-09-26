@@ -1,12 +1,3 @@
-# semiosis-api.js
-
-[semiosis-api.js]
-
-在删除 session 的 api 之外，
-我想要设计把 session 放入回收站：
-- dustbin/sessions
-的 API。
-
 # windbell-web.js
 
 [windbell-web.js] 改善 workspace-list 使用体验
