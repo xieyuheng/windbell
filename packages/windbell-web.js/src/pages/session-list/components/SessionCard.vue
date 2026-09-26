@@ -86,27 +86,27 @@ function requestDelete(): void {
   <Card as="article">
     <template #header>
       <RouterLink class="block min-w-0" :to="sessionRoute">
-        <h2 class="truncate text-base text-ink">
+        <h2 class="truncate text-lg">
           {{ session.title }}
         </h2>
       </RouterLink>
 
-      <div class="mt-2 flex items-center gap-1">
+      <div class="mt-2 flex items-center gap-2">
         <button
-          class="inline-flex items-center gap-1 rounded px-1.5 py-1 text-xs text-ink-muted transition-colors hover:bg-paper/60 hover:text-ink"
+          class="inline-flex items-center gap-1 rounded px-1 py-1 text-sm transition-colors hover:bg-paper/60 hover:text-ink"
           type="button"
           @click="requestEditTitle"
         >
-          <Pencil :size="14" :stroke-width="1.5" aria-hidden="true" />
+          <Pencil :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("editTitle") }}</span>
         </button>
 
         <button
-          class="inline-flex items-center gap-1 rounded px-1.5 py-1 text-xs text-ink-muted transition-colors hover:bg-paper/60 hover:text-danger"
+          class="inline-flex items-center gap-1 rounded px-1 py-1 text-sm transition-colors hover:bg-paper/60 hover:text-danger"
           type="button"
           @click="requestDelete"
         >
-          <Trash2 :size="14" :stroke-width="1.5" aria-hidden="true" />
+          <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("delete") }}</span>
         </button>
       </div>
@@ -125,7 +125,7 @@ function requestDelete(): void {
     </RouterLink>
 
     <template #footer>
-      <div class="flex flex-col gap-1 text-sm text-ink-muted">
+      <div class="flex flex-col gap-1 text-sm">
         <p class="truncate">
           {{ t("updatedAt") }} {{ formatDateTime(session.updatedAt) }}
         </p>
