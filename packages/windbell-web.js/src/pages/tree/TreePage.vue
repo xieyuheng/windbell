@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
+import { computed } from "vue"
 import { useI18n } from "vue-i18n"
-import { treeMessages } from "./Tree.i18n"
+import { useRoute } from "vue-router"
 import BackButton from "../../components/buttons/BackButton.vue"
+import { treeMessages } from "./Tree.i18n"
+
+const route = useRoute()
+const workspaceId = computed(() => String(route.params.workspaceId ?? ""))
 
 const { t } = useI18n({
   messages: treeMessages,
@@ -28,7 +33,12 @@ useHead(() => ({
       </h1>
 
       <div class="flex flex-wrap items-center gap-2">
-        <BackButton />
+        <BackButton
+          :to="{
+            name: 'workspace',
+            params: { workspaceId },
+          }"
+        />
       </div>
     </header>
   </main>

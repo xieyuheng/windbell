@@ -4,6 +4,7 @@ import { reactive } from "vue"
 
 export type SessionState = {
   sessionId: S.SessionId
+  workspaceId: S.WorkspaceId
   title: string
   context: Array<S.Sign>
   loading: boolean
@@ -18,6 +19,7 @@ const semiosis = makeSemiosisClient({
 export function makeSessionState(sessionId: S.SessionId): SessionState {
   return reactive<SessionState>({
     sessionId,
+    workspaceId: "",
     title: "",
     context: [],
     loading: false,
@@ -38,12 +40,14 @@ export async function loadSessionState(
     const session = await semiosis.sessions.get(sessionId)
 
     if (session === undefined) {
+      state.workspaceId = ""
       state.title = ""
       state.context = []
       state.error = `session not found: ${sessionId}`
       return
     }
 
+    state.workspaceId = session.workspaceId
     state.title = session.title
     state.context = session.context
   } catch (error) {

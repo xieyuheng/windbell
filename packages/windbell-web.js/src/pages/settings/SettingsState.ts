@@ -1,6 +1,5 @@
 import { makeSemiosisClient } from "@xieyuheng/semiosis-api.js/client"
 import { reactive } from "vue"
-import type { Router } from "vue-router"
 
 export type SettingsState = {
   models: Array<{ qualifiedName: string }>
@@ -8,28 +7,19 @@ export type SettingsState = {
   loading: boolean
   saving: boolean
   error: string | undefined
-  goBack(): void
 }
 
 const semiosis = makeSemiosisClient({
   baseUrl: "/api/semiosis",
 })
 
-export function makeSettingsState(router: Router): SettingsState {
+export function makeSettingsState(): SettingsState {
   return reactive<SettingsState>({
     models: [],
     defaultModelQualifiedName: null,
     loading: false,
     saving: false,
     error: undefined,
-
-    goBack() {
-      if (window.history.length > 1) {
-        router.back()
-      } else {
-        router.push({ name: "dashboard" })
-      }
-    },
   })
 }
 

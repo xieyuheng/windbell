@@ -80,7 +80,12 @@ useHead(() => ({
       </h1>
 
       <div class="flex flex-wrap items-center gap-2">
-        <BackButton />
+        <BackButton
+          :to="{
+            name: 'workspace',
+            params: { workspaceId },
+          }"
+        />
       </div>
     </header>
 

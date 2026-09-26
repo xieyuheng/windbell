@@ -26,7 +26,7 @@ useHead(() => ({
       <h1 class="text-xl text-ink">404</h1>
 
       <div class="flex flex-wrap items-center gap-2">
-        <BackButton />
+        <BackButton :to="{ name: 'dashboard' }" />
       </div>
     </header>
   </main>

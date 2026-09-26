@@ -31,11 +31,17 @@ const title = computed(() => state.title || t("notFound"))
 let bottomObserver: IntersectionObserver | undefined
 
 function goBack(): void {
-  if (window.history.length > 1) {
-    router.back()
-  } else {
-    router.push({ name: "dashboard" })
+  if (state.workspaceId === "") {
+    void router.push({ name: "dashboard" })
+    return
   }
+
+  void router.push({
+    name: "workspace",
+    params: {
+      workspaceId: state.workspaceId,
+    },
+  })
 }
 
 async function send(): Promise<void> {

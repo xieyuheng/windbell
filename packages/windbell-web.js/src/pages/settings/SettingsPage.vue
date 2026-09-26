@@ -2,7 +2,6 @@
 import { useHead } from "@unhead/vue"
 import { onMounted } from "vue"
 import { useI18n } from "vue-i18n"
-import { useRouter } from "vue-router"
 import Card from "../../components/card/Card.vue"
 import BackButton from "../../components/buttons/BackButton.vue"
 import { useFont, type Font } from "../../app/font"
@@ -19,10 +18,9 @@ const { locale, t } = useI18n({
   messages: settingsMessages,
   useScope: "local",
 })
-const router = useRouter()
 const theme = useTheme()
 const font = useFont()
-const state = makeSettingsState(router)
+const state = makeSettingsState()
 
 const themeOptions: Array<{ value: ThemeMode; labelKey: string }> = [
   { value: "system", labelKey: "themeSystem" },
@@ -52,7 +50,7 @@ useHead(() => ({
       </h1>
 
       <div class="flex flex-wrap items-center gap-2">
-        <BackButton />
+        <BackButton :to="{ name: 'dashboard' }" />
       </div>
     </header>
 
