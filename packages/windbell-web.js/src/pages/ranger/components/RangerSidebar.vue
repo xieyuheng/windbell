@@ -7,6 +7,7 @@ const props = defineProps<{
   currentDirectory: string
   entries: Array<FileSystemEntry>
   selectedIndex: number
+  focus: "sidebar" | "view"
 }>()
 
 const emit = defineEmits<{
@@ -51,8 +52,14 @@ function pathName(value: string): string {
       <li
         v-for="(entry, index) in entries"
         :key="entry.path"
-        class="w-full truncate px-3 py-1 text-ink"
-        :class="{ 'bg-ink text-paper': index === selectedIndex }"
+        class="w-full truncate px-3 py-1"
+        :class="[
+          index === selectedIndex
+            ? focus === 'sidebar'
+              ? 'bg-ink text-paper'
+              : 'bg-ink/15 text-ink'
+            : 'text-ink',
+        ]"
         @click="emit('select', index)"
       >
         {{ entry.kind === "Directory" ? `${entry.name}/` : entry.name }}

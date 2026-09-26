@@ -122,6 +122,7 @@ useHead(() => ({
       :current-directory="state.currentDirectory"
       :entries="state.entries"
       :selected-index="state.selectedIndex"
+      :focus="state.focus"
       @select="handleSelect($event)"
     />
 
