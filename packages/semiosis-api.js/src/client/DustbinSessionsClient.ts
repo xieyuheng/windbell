@@ -10,7 +10,7 @@ export type DustbinSessionsClient = {
   list(
     options: ListDustbinSessionsOptions,
   ): Promise<Array<S.DustbinSessionIndex>>
-  move(sessionId: S.SessionId): Promise<void>
+  trash(sessionId: S.SessionId): Promise<void>
   restore(sessionId: S.SessionId): Promise<void>
   remove(sessionId: S.SessionId): Promise<void>
 }
@@ -28,7 +28,7 @@ export function makeDustbinSessionsClient(
       return call(config.baseUrl, "GET", withQuery("/dustbin/sessions", query))
     },
 
-    move: async (id) => {
+    trash: async (id) => {
       await call(config.baseUrl, "POST", "/dustbin/sessions", {
         sessionId: id,
       })

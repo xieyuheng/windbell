@@ -150,7 +150,7 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const body = readRecord(await readJsonBody(c))
     const sessionId = readString(body, "sessionId")
 
-    await runDustbinAction(() => service.dustbin.sessions.move(sessionId))
+    await runDustbinAction(() => service.dustbin.sessions.trash(sessionId))
 
     return sendEmpty(204)
   })

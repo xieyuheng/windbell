@@ -25,7 +25,7 @@ export type ListDustbinSessionOptions = {
 }
 
 export type DustbinSessionStore = {
-  move(sessionId: SessionId): Promise<void>
+  trash(sessionId: SessionId): Promise<void>
   list(options: ListDustbinSessionOptions): Promise<Array<DustbinSessionIndex>>
   restore(sessionId: SessionId): Promise<void>
   remove(sessionId: SessionId): Promise<void>
@@ -98,7 +98,7 @@ export function makeDustbinSessionStore(
   }
 
   return {
-    async move(sessionId) {
+    async trash(sessionId) {
       assertId(sessionId)
 
       const index = await readSessionIndex(sessionId)

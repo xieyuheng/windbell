@@ -125,7 +125,7 @@ test("semiosis client and server", async (t) => {
     0,
   )
 
-  await client.dustbin.sessions.move(session.id)
+  await client.dustbin.sessions.trash(session.id)
   await client.dustbin.sessions.remove(session.id)
   assert.equal(await client.sessions.get(session.id), undefined)
   assert.equal(
