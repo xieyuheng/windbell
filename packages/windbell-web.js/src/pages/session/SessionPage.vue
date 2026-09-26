@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ArrowLeft, FolderTree } from "@lucide/vue"
 import { useHead } from "@unhead/vue"
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute, useRouter } from "vue-router"
 import SignCard from "../../components/sign/SignCard.vue"
 import SessionComposer from "./components/SessionComposer.vue"
+import SessionToolbar from "./components/SessionToolbar.vue"
 import RangerPanel from "../ranger/RangerPanel.vue"
 import { sessionMessages } from "./Session.i18n"
 import {
@@ -150,31 +150,12 @@ useHead(() => ({
       <div
         class="relative mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col overflow-hidden"
       >
-        <button
-          type="button"
-          class="pointer-events-auto absolute left-2 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-line/60 bg-paper/60 text-ink-muted backdrop-blur transition-colors hover:text-ink"
-          :style="{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }"
-          @click="goBack()"
-        >
-          <ArrowLeft :size="18" :stroke-width="1.5" aria-hidden="true" />
-          <span class="sr-only">{{ t("app.back") }}</span>
-        </button>
-
-        <button
-          type="button"
-          class="pointer-events-auto absolute right-2 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-line/60 bg-paper/60 text-ink-muted backdrop-blur transition-colors hover:text-ink disabled:pointer-events-none disabled:opacity-50"
-          :class="rangerOpen ? 'border-ink/40 bg-interactive/60 text-ink' : ''"
-          :style="{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }"
-          :aria-pressed="rangerOpen"
-          :disabled="state.workspaceId === ''"
-          :title="rangerOpen ? t('closeRanger') : t('openRanger')"
-          @click="rangerOpen = !rangerOpen"
-        >
-          <FolderTree :size="18" :stroke-width="1.5" aria-hidden="true" />
-          <span class="sr-only">
-            {{ rangerOpen ? t("closeRanger") : t("openRanger") }}
-          </span>
-        </button>
+        <SessionToolbar
+          :state="state"
+          :ranger-open="rangerOpen"
+          @back="goBack"
+          @toggle-ranger="rangerOpen = !rangerOpen"
+        />
 
         <div
           ref="scroller"
