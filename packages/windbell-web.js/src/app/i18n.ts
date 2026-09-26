@@ -10,14 +10,12 @@ export const supportedLocales: Array<{ value: Locale; label: string }> = [
 const messages = {
   "zh-CN": {
     app: {
-      name: "风铃",
       back: "返回",
       settings: "设置",
     },
   },
   "en-US": {
     app: {
-      name: "Windbell",
       back: "Back",
       settings: "Settings",
     },

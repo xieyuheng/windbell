@@ -1,7 +1,6 @@
 export const settingsMessages = {
   "zh-CN": {
     title: "设置",
-    back: "返回",
     defaultModel: "默认模型",
     noModels: "database 中还没有可用模型。",
     loading: "加载中...",
@@ -16,7 +15,6 @@ export const settingsMessages = {
   },
   "en-US": {
     title: "Settings",
-    back: "Back",
     defaultModel: "Default model",
     noModels: "No models available in database.",
     loading: "Loading...",
