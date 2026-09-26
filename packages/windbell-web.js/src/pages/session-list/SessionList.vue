@@ -3,9 +3,10 @@ import { Plus } from "@lucide/vue"
 import { useHead } from "@unhead/vue"
 import { computed, onMounted, watch } from "vue"
 import { useI18n } from "vue-i18n"
-import { RouterLink, useRoute, useRouter } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import BaseCard from "../../components/BaseCard.vue"
 import BackButton from "../../components/BackButton.vue"
+import SessionCard from "./components/SessionCard.vue"
 import { sessionListMessages } from "./SessionList.i18n"
 import {
   loadSessionList,
@@ -16,7 +17,7 @@ import {
 const route = useRoute()
 const router = useRouter()
 
-const { locale, t } = useI18n({
+const { t } = useI18n({
   messages: sessionListMessages,
   useScope: "local",
 })
@@ -38,13 +39,6 @@ async function createSession(): Promise<void> {
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
   }
-}
-
-function formatUpdatedAt(value: number): string {
-  return new Intl.DateTimeFormat(locale.value, {
-    month: "short",
-    day: "numeric",
-  }).format(value)
 }
 
 onMounted(async () => {
@@ -111,28 +105,7 @@ useHead(() => ({
       class="flex flex-1 flex-col gap-4"
     >
       <li v-for="session in state.sessions" :key="session.id">
-        <BaseCard
-          :as="RouterLink"
-          class="transition-colors hover:border-ink-muted"
-          :to="{
-            name: 'session',
-            params: {
-              sessionId: session.id,
-            },
-          }"
-        >
-          <template #header>
-            <h2 class="truncate text-base text-ink">
-              {{ session.title }}
-            </h2>
-          </template>
-
-          <div class="px-3 py-2">
-            <p class="truncate text-ink">
-              {{ formatUpdatedAt(session.updatedAt) }}
-            </p>
-          </div>
-        </BaseCard>
+        <SessionCard :session="session" />
       </li>
     </ol>
 

@@ -5,7 +5,7 @@ import { reactive } from "vue"
 export type SessionListState = {
   workspaceId: S.WorkspaceId
   workspace: S.Workspace | undefined
-  sessions: Array<S.SessionIndex>
+  sessions: Array<S.Session>
   loading: boolean
   error: string | undefined
 }
@@ -39,7 +39,11 @@ export async function loadSessionList(state: SessionListState): Promise<void> {
     ])
 
     state.workspace = workspace
-    state.sessions = sessions
+    state.sessions = (
+      await Promise.all(
+        sessions.map((session) => semiosis.sessions.get(session.id)),
+      )
+    ).filter((session): session is S.Session => session !== undefined)
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
   } finally {
