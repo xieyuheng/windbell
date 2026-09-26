@@ -2,6 +2,7 @@
 import { FolderTree, Plus, Trash2 } from "@lucide/vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
+import PageLayout from "../../components/layout/PageLayout.vue"
 import { computed, onMounted, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute, useRouter } from "vue-router"
@@ -84,7 +85,7 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-5 py-6">
+  <PageLayout>
     <header class="flex flex-col gap-3">
       <div class="flex min-w-0 flex-col gap-1">
         <h1 class="text-xl text-ink">
@@ -161,5 +162,5 @@ useHead(() => ({
     <div v-else class="flex flex-1 items-center justify-center text-ink">
       {{ t("empty") }}
     </div>
-  </main>
+  </PageLayout>
 </template>

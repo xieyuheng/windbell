@@ -2,6 +2,7 @@
 import { Plus, Settings, Trash2 } from "@lucide/vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
+import PageLayout from "../../components/layout/PageLayout.vue"
 import { onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import MediumButton from "../../components/buttons/MediumButton.vue"
@@ -81,7 +82,7 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-5 py-6">
+  <PageLayout>
     <header class="flex flex-col gap-3">
       <h1 class="text-xl text-ink">
         {{ t("title") }}
@@ -158,5 +159,5 @@ useHead(() => ({
         />
       </li>
     </ul>
-  </main>
+  </PageLayout>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
+import PageLayout from "../../components/layout/PageLayout.vue"
 import { useI18n } from "vue-i18n"
 import { notFoundPageMessages } from "./NotFoundPage.i18n"
 import BackButton from "../../components/buttons/BackButton.vue"
@@ -21,7 +22,7 @@ useHead(() => ({
 </script>
 
 <template>
-  <main class="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-5 py-6">
+  <PageLayout>
     <header class="flex flex-col gap-3">
       <h1 class="text-xl text-ink">404</h1>
 
@@ -29,5 +30,5 @@ useHead(() => ({
         <BackButton :to="{ name: 'home' }" />
       </div>
     </header>
-  </main>
+  </PageLayout>
 </template>
