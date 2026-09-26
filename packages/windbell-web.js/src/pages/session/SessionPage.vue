@@ -1,16 +1,36 @@
 <script setup lang="ts">
-import { ArrowLeft, ArrowUp, Square } from "@lucide/vue"
+import { ArrowLeft, FolderTree } from "@lucide/vue"
 import { useHead } from "@unhead/vue"
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute, useRouter } from "vue-router"
 import SignCard from "../../components/sign/SignCard.vue"
+import SessionComposer from "./components/SessionComposer.vue"
+import RangerPanel from "../ranger/RangerPanel.vue"
 import { sessionMessages } from "./Session.i18n"
 import {
   interpretSession,
   loadSessionState,
   makeSessionState,
 } from "./SessionState"
+
+const rangerOpenStorageKey = "windbell.session.rangerOpen"
+
+function readStoredRangerOpen(): boolean {
+  try {
+    return localStorage.getItem(rangerOpenStorageKey) === "true"
+  } catch {
+    return false
+  }
+}
+
+function writeStoredRangerOpen(value: boolean): void {
+  try {
+    localStorage.setItem(rangerOpenStorageKey, String(value))
+  } catch {
+    // ignore storage errors
+  }
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -26,6 +46,7 @@ const state = makeSessionState(sessionId.value)
 const scroller = ref<HTMLElement | null>(null)
 const bottomAnchor = ref<HTMLElement | null>(null)
 const bottomAnchorVisible = ref(true)
+const rangerOpen = ref(readStoredRangerOpen())
 const title = computed(() => state.title || t("notFound"))
 
 let bottomObserver: IntersectionObserver | undefined
@@ -56,13 +77,17 @@ async function send(): Promise<void> {
 async function scrollToBottom(): Promise<void> {
   await nextTick()
 
-  const element = scroller.value
-  if (element !== null && element.scrollHeight > element.clientHeight) {
-    element.scrollTop = element.scrollHeight
-    return
-  }
+  // Wait for a layout pass so sign cards have finished reflowing before
+  // measuring scrollHeight. This matters especially when the window width
+  // changes and text wraps to a different number of lines.
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => resolve())
+  })
 
-  window.scrollTo({ top: document.documentElement.scrollHeight })
+  const element = scroller.value
+  if (element === null) return
+
+  element.scrollTop = element.scrollHeight
 }
 
 function scheduleAutoScroll(): void {
@@ -98,6 +123,10 @@ watch(
   },
 )
 
+watch(rangerOpen, (value) => {
+  writeStoredRangerOpen(value)
+})
+
 onBeforeUnmount(() => {
   bottomObserver?.disconnect()
 })
@@ -114,84 +143,81 @@ useHead(() => ({
 </script>
 
 <template>
-  <main
-    class="relative mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col overflow-hidden"
-  >
-    <div
-      class="shrink-0"
-      :style="{ height: 'calc(env(safe-area-inset-top, 0px) + 4rem)' }"
-    />
-
-    <div
-      class="pointer-events-none fixed inset-x-0 z-50 mx-auto max-w-4xl px-2"
-      :style="{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }"
+  <main class="flex h-screen w-full overflow-hidden">
+    <section
+      class="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
     >
-      <button
-        type="button"
-        class="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-line/60 bg-paper/70 text-ink-muted backdrop-blur transition-colors hover:text-ink"
-        @click="goBack()"
+      <div
+        class="relative mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col overflow-hidden"
       >
-        <ArrowLeft :size="18" :stroke-width="1.5" aria-hidden="true" />
-        <span class="sr-only">{{ t("app.back") }}</span>
-      </button>
-    </div>
-
-    <div ref="scroller" class="flex-1 overflow-y-auto px-4 pt-6 pb-19">
-      <div class="flex w-full flex-col gap-6">
-        <h1 class="text-xl text-ink">
-          {{ title }}
-        </h1>
-
-        <p v-if="state.loading" class="text-ink">
-          {{ t("loading") }}
-        </p>
-
-        <p v-else-if="state.error !== undefined" class="text-danger">
-          {{ state.error }}
-        </p>
-
-        <ol v-else class="flex flex-col gap-4">
-          <SignCard
-            v-for="(sign, index) in state.context"
-            :key="index"
-            :sign="sign"
-          />
-        </ol>
-      </div>
-
-      <div ref="bottomAnchor" class="h-px w-full" />
-    </div>
-
-    <div
-      class="pointer-events-none fixed inset-x-0 bottom-[env(safe-area-inset-bottom,0px)] z-10 mx-auto max-w-4xl px-2 py-4"
-    >
-      <form
-        class="pointer-events-auto flex w-full items-center gap-2 rounded-full border border-line/60 bg-paper/60 backdrop-blur transition-colors"
-        @submit.prevent="send"
-      >
-        <input
-          v-model="input"
-          class="min-w-0 flex-1 bg-transparent px-4 py-2 text-ink outline-none placeholder:text-ink-muted"
-          :placeholder="t('inputPlaceholder')"
-          type="text"
-        />
         <button
-          class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-interactive/60 text-ink transition-transform duration-150 hover:scale-110 disabled:pointer-events-none disabled:opacity-50"
-          type="submit"
-          :disabled="state.interpreting"
-          :aria-label="state.interpreting ? t('sending') : t('send')"
-          :title="state.interpreting ? t('sending') : t('send')"
+          type="button"
+          class="pointer-events-auto absolute left-2 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-line/60 bg-paper/60 text-ink-muted backdrop-blur transition-colors hover:text-ink"
+          :style="{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }"
+          @click="goBack()"
         >
-          <Square
-            v-if="state.interpreting"
-            :size="12"
-            class="fill-current"
-            aria-hidden="true"
-          />
-
-          <ArrowUp v-else :size="18" :stroke-width="1.5" aria-hidden="true" />
+          <ArrowLeft :size="18" :stroke-width="1.5" aria-hidden="true" />
+          <span class="sr-only">{{ t("app.back") }}</span>
         </button>
-      </form>
+
+        <button
+          type="button"
+          class="pointer-events-auto absolute right-2 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-line/60 bg-paper/60 text-ink-muted backdrop-blur transition-colors hover:text-ink disabled:pointer-events-none disabled:opacity-50"
+          :class="rangerOpen ? 'border-ink/40 bg-interactive/60 text-ink' : ''"
+          :style="{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }"
+          :aria-pressed="rangerOpen"
+          :disabled="state.workspaceId === ''"
+          :title="rangerOpen ? t('closeRanger') : t('openRanger')"
+          @click="rangerOpen = !rangerOpen"
+        >
+          <FolderTree :size="18" :stroke-width="1.5" aria-hidden="true" />
+          <span class="sr-only">
+            {{ rangerOpen ? t("closeRanger") : t("openRanger") }}
+          </span>
+        </button>
+
+        <div
+          ref="scroller"
+          class="min-h-0 flex-1 overflow-y-auto px-4 pt-19 pb-19"
+        >
+          <div class="flex w-full flex-col gap-6">
+            <h1 class="text-xl text-ink">
+              {{ title }}
+            </h1>
+
+            <p v-if="state.loading" class="text-ink">
+              {{ t("loading") }}
+            </p>
+
+            <p v-else-if="state.error !== undefined" class="text-danger">
+              {{ state.error }}
+            </p>
+
+            <ol v-else class="flex flex-col gap-4">
+              <SignCard
+                v-for="(sign, index) in state.context"
+                :key="index"
+                :sign="sign"
+              />
+            </ol>
+          </div>
+
+          <div ref="bottomAnchor" class="h-px w-full" />
+        </div>
+
+        <SessionComposer
+          v-model="input"
+          :interpreting="state.interpreting"
+          @send="send"
+        />
+      </div>
+    </section>
+
+    <div
+      v-if="rangerOpen && state.workspaceId !== ''"
+      class="h-screen w-[48vw] max-w-[720px] shrink-0 border-l border-line"
+    >
+      <RangerPanel :workspace-id="state.workspaceId" />
     </div>
   </main>
 </template>

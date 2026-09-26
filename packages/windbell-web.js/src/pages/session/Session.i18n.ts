@@ -6,6 +6,8 @@ export const sessionMessages = {
     inputPlaceholder: "输入内容...",
     send: "发送",
     sending: "发送中...",
+    openRanger: "打开文件浏览器",
+    closeRanger: "关闭文件浏览器",
   },
   "en-US": {
     description: "An interpretation process made of signs.",
@@ -14,5 +16,7 @@ export const sessionMessages = {
     inputPlaceholder: "Type a message...",
     send: "Send",
     sending: "Sending...",
+    openRanger: "Open file browser",
+    closeRanger: "Close file browser",
   },
 }
