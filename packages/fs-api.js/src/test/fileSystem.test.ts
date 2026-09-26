@@ -217,6 +217,20 @@ test("fileSystem client and server", async (t) => {
     textFile,
   ])
 
+  const notesLink = Path.join(root, "notes-link")
+  await fs.symlink(Path.join(root, "notes"), notesLink, "dir")
+  assert.equal(await client.isDirectory(notesLink), true)
+
+  const entriesWithLink = await client.listEntries(root)
+  assert.deepEqual(
+    entriesWithLink.find((entry) => entry.name === "notes-link"),
+    {
+      name: "notes-link",
+      path: notesLink,
+      kind: "Directory",
+    },
+  )
+
   const renamedFile = Path.join(root, "renamed.md")
   await client.rename(textFile, renamedFile)
   assert.equal(await client.exists(textFile), false)

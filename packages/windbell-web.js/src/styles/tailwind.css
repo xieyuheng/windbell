@@ -95,42 +95,42 @@ body {
   color: var(--color-ink);
 }
 
-.session-scroller {
+.thin-scrollbar {
   scrollbar-gutter: stable;
 }
 
 @supports not selector(::-webkit-scrollbar) {
-  .session-scroller {
+  .thin-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) transparent;
   }
 }
 
 @supports selector(::-webkit-scrollbar) {
-  .session-scroller::-webkit-scrollbar {
+  .thin-scrollbar::-webkit-scrollbar {
     width: 10px;
   }
 
-  .session-scroller::-webkit-scrollbar-track {
+  .thin-scrollbar::-webkit-scrollbar-track {
     background: transparent;
   }
 
-  .session-scroller::-webkit-scrollbar-thumb {
+  .thin-scrollbar::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-thumb);
     border: 2px solid transparent;
     border-radius: 999px;
     background-clip: padding-box;
   }
 
-  .session-scroller::-webkit-scrollbar-thumb:hover {
+  .thin-scrollbar::-webkit-scrollbar-thumb:hover {
     background-color: var(--scrollbar-thumb-hover);
   }
 
-  .session-scroller::-webkit-scrollbar-button {
+  .thin-scrollbar::-webkit-scrollbar-button {
     display: none;
   }
 
-  .session-scroller::-webkit-scrollbar-corner {
+  .thin-scrollbar::-webkit-scrollbar-corner {
     background: transparent;
   }
 }

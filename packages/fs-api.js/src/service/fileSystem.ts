@@ -69,13 +69,37 @@ export async function listEntries(
 ): Promise<Array<FileSystemEntry>> {
   const entries = await fs.readdir(path, { withFileTypes: true })
 
-  return entries
-    .sort((left, right) => left.name.localeCompare(right.name))
-    .map((entry) => ({
-      name: entry.name,
-      path: Path.join(path, entry.name),
-      kind: entry.isDirectory() ? "Directory" : "File",
-    }))
+  return await Promise.all(
+    entries
+      .sort((left, right) => left.name.localeCompare(right.name))
+      .map(async (entry): Promise<FileSystemEntry> => {
+        const entryPath = Path.join(path, entry.name)
+
+        if (entry.isSymbolicLink()) {
+          try {
+            const stat = await fs.stat(entryPath)
+
+            return {
+              name: entry.name,
+              path: entryPath,
+              kind: stat.isDirectory() ? "Directory" : "File",
+            }
+          } catch {
+            return {
+              name: entry.name,
+              path: entryPath,
+              kind: "File",
+            }
+          }
+        }
+
+        return {
+          name: entry.name,
+          path: entryPath,
+          kind: entry.isDirectory() ? "Directory" : "File",
+        }
+      }),
+  )
 }
 
 export async function inspectFile(path: string): Promise<InspectFileResult> {
