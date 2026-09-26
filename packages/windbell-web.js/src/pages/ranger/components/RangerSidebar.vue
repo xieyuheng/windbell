@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FileSystemEntry } from "@xieyuheng/fs-api.js/client"
-import { computed } from "vue"
+import { computed, nextTick, ref, watch } from "vue"
 
 const props = defineProps<{
   root: string
@@ -12,6 +12,18 @@ const props = defineProps<{
 const emit = defineEmits<{
   select: [index: number]
 }>()
+
+const list = ref<HTMLOListElement | null>(null)
+
+watch(
+  () => props.selectedIndex,
+  async (index) => {
+    await nextTick()
+
+    const item = list.value?.children[index] as HTMLElement | undefined
+    item?.scrollIntoView({ block: "nearest" })
+  },
+)
 
 const currentName = computed(() => {
   return pathName(props.currentDirectory || props.root)
@@ -35,7 +47,7 @@ function pathName(value: string): string {
       </p>
     </header>
 
-    <ol class="min-h-0 flex-1 overflow-y-auto border-t border-line">
+    <ol ref="list" class="min-h-0 flex-1 overflow-y-auto border-t border-line">
       <li
         v-for="(entry, index) in entries"
         :key="entry.path"
