@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ArchiveRestore, Trash2 } from "@lucide/vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
 import { onMounted, ref } from "vue"
@@ -95,39 +96,48 @@ useHead(() => ({
             <h2 class="truncate text-base text-ink">
               {{ workspace.name }}
             </h2>
-          </template>
 
-          <div class="flex flex-col gap-1 px-3 py-2">
-            <p class="truncate font-mono text-ink">
-              {{ workspace.root }}
-            </p>
-            <p class="truncate text-sm">
-              {{ t("deletedAt") }} {{ formatDateTime(workspace.deletedAt) }}
-            </p>
-            <p class="truncate text-sm">
-              {{ t("createdAt") }} {{ formatDateTime(workspace.createdAt) }}
-            </p>
-          </div>
-
-          <template #footer>
-            <div class="flex items-center gap-2">
+            <div class="mt-2 flex items-center gap-2">
               <button
-                class="inline-flex items-center gap-1 rounded px-1.5 py-1 text-sm text-ink-muted transition-colors hover:bg-paper/60 hover:text-ink disabled:opacity-50"
+                class="inline-flex items-center gap-1 rounded px-1 py-1 text-sm transition-colors hover:bg-paper/60 hover:text-ink disabled:opacity-50"
                 type="button"
                 :disabled="busyWorkspaceId === workspace.id"
                 @click="restore(workspace)"
               >
-                {{ t("restore") }}
+                <ArchiveRestore
+                  :size="16"
+                  :stroke-width="1.5"
+                  aria-hidden="true"
+                />
+                <span>{{ t("restore") }}</span>
               </button>
 
               <button
-                class="inline-flex items-center gap-1 rounded px-1.5 py-1 text-sm text-ink-muted transition-colors hover:bg-paper/60 hover:text-danger disabled:opacity-50"
+                class="inline-flex items-center gap-1 rounded px-1 py-1 text-sm transition-colors hover:bg-paper/60 hover:text-danger disabled:opacity-50"
                 type="button"
                 :disabled="busyWorkspaceId === workspace.id"
                 @click="remove(workspace)"
               >
-                {{ t("remove") }}
+                <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
+                <span>{{ t("remove") }}</span>
               </button>
+            </div>
+          </template>
+
+          <div class="px-3 py-2">
+            <p class="truncate font-mono text-ink">
+              {{ workspace.root }}
+            </p>
+          </div>
+
+          <template #footer>
+            <div class="flex flex-col gap-1 text-sm">
+              <p class="truncate">
+                {{ t("deletedAt") }} {{ formatDateTime(workspace.deletedAt) }}
+              </p>
+              <p class="truncate">
+                {{ t("createdAt") }} {{ formatDateTime(workspace.createdAt) }}
+              </p>
             </div>
           </template>
         </Card>
