@@ -69,7 +69,10 @@ defineExpose({ scrollToBottom })
 </script>
 
 <template>
-  <div ref="scroller" class="min-h-0 flex-1 overflow-y-auto px-4 pt-19 pb-19">
+  <div
+    ref="scroller"
+    class="session-scroller min-h-0 flex-1 overflow-y-auto px-4 pt-19 pb-19"
+  >
     <div class="flex w-full flex-col gap-6">
       <h1 class="text-xl text-ink">
         {{ title }}
