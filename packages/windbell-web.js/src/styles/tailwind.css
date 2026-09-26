@@ -8,6 +8,10 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme inline {
+  --font-mono: var(--font-mono-family);
+}
+
 @theme {
   --color-paper: #fafaf9;
   --color-paper-deep: #e2e2e0;
@@ -60,11 +64,13 @@
 }
 
 :root {
-  --font-app: "Unifont", system-ui, sans-serif;
+  --font-app: "Unifont", sans-serif;
+  --font-mono-family: "Unifont", monospace;
 }
 
 html[data-font="system"] {
-  --font-app: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-app: system-ui, sans-serif;
+  --font-mono-family: monospace;
 }
 
 body {
