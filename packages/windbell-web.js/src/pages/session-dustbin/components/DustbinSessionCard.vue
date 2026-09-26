@@ -4,6 +4,7 @@ import type * as S from "@xieyuheng/semiosis.js"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import Card from "../../../components/card/Card.vue"
+import SmallButton from "../../../components/buttons/SmallButton.vue"
 import SignLine from "../../../components/sign/SignLine.vue"
 import { sessionDustbinMessages } from "../SessionDustbin.i18n"
 import type { SessionDustbinListItem } from "../SessionDustbinState"
@@ -59,25 +60,20 @@ function requestRemove(): void {
       </h2>
 
       <div class="mt-2 flex items-center gap-2">
-        <button
-          class="inline-flex items-center gap-1 rounded px-1 py-1 text-sm transition-colors hover:bg-paper/60 hover:text-ink disabled:opacity-50"
-          type="button"
-          :disabled="busy"
-          @click="emit('restore')"
-        >
+        <SmallButton type="button" :disabled="busy" @click="emit('restore')">
           <ArchiveRestore :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("restore") }}</span>
-        </button>
+        </SmallButton>
 
-        <button
-          class="inline-flex items-center gap-1 rounded px-1 py-1 text-sm transition-colors hover:bg-paper/60 hover:text-danger disabled:opacity-50"
+        <SmallButton
           type="button"
+          tone="danger"
           :disabled="busy"
           @click="requestRemove"
         >
           <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("remove") }}</span>
-        </button>
+        </SmallButton>
       </div>
     </template>
 

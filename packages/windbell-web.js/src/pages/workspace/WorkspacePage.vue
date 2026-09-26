@@ -4,8 +4,9 @@ import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
 import { computed, onMounted, watch } from "vue"
 import { useI18n } from "vue-i18n"
-import { RouterLink, useRoute, useRouter } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import BackButton from "../../components/buttons/BackButton.vue"
+import MediumButton from "../../components/buttons/MediumButton.vue"
 import SessionCard from "./components/SessionCard.vue"
 import { workspaceMessages } from "./Workspace.i18n"
 import {
@@ -102,17 +103,7 @@ useHead(() => ({
       <div class="flex flex-wrap items-center gap-2">
         <BackButton :to="{ name: 'home' }" />
 
-        <button
-          class="inline-flex items-center gap-2 rounded border-2 border-line px-2 py-1.5 text-ink transition-colors hover:bg-line"
-          type="button"
-          @click="createSession"
-        >
-          <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
-          <span>{{ t("newSession") }}</span>
-        </button>
-
-        <RouterLink
-          class="inline-flex items-center gap-2 rounded border-2 border-line px-2 py-1.5 text-ink transition-colors hover:bg-line"
+        <MediumButton
           :to="{
             name: 'ranger',
             params: { workspaceId },
@@ -120,10 +111,9 @@ useHead(() => ({
         >
           <FolderTree :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("ranger") }}</span>
-        </RouterLink>
+        </MediumButton>
 
-        <RouterLink
-          class="inline-flex items-center gap-2 rounded border-2 border-line px-2 py-1.5 text-ink transition-colors hover:bg-line"
+        <MediumButton
           :to="{
             name: 'session-dustbin',
             params: { workspaceId },
@@ -131,13 +121,20 @@ useHead(() => ({
         >
           <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("sessionDustbin") }}</span>
-        </RouterLink>
+        </MediumButton>
       </div>
     </header>
 
-    <h2 class="text-base text-ink">
-      {{ t("sessions") }}
-    </h2>
+    <div class="flex flex-col gap-2">
+      <h2 class="text-base text-ink">
+        {{ t("sessions") }}
+      </h2>
+
+      <MediumButton class="self-start" type="button" @click="createSession">
+        <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
+        <span>{{ t("newSession") }}</span>
+      </MediumButton>
+    </div>
 
     <p v-if="state.loading" class="text-ink">
       {{ t("loading") }}

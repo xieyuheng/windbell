@@ -2,6 +2,7 @@
 import { useHead } from "@unhead/vue"
 import { computed, onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
+import MediumButton from "../../components/buttons/MediumButton.vue"
 import Card from "../../components/card/Card.vue"
 import BackButton from "../../components/buttons/BackButton.vue"
 import { useFont, type Font } from "../../app/font"
@@ -303,22 +304,21 @@ useHead(() => ({
             </details>
 
             <div class="flex flex-wrap items-center gap-2 px-2">
-              <button
+              <MediumButton
                 v-if="hasSessionStorage"
                 type="button"
-                class="inline-flex items-center justify-center rounded border border-line px-3 py-2 text-ink transition-colors hover:bg-line"
                 @click="clearSessionStorage"
               >
                 {{ t("clearSessionData") }}
-              </button>
+              </MediumButton>
 
-              <button
+              <MediumButton
                 type="button"
-                class="inline-flex items-center justify-center rounded border border-danger/60 px-3 py-2 text-danger transition-colors hover:bg-danger/10"
+                tone="danger"
                 @click="clearAllStorage"
               >
                 {{ t("clearAllWindbellData") }}
-              </button>
+              </MediumButton>
             </div>
           </template>
         </div>

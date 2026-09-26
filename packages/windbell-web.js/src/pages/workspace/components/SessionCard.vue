@@ -5,6 +5,7 @@ import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
 import Card from "../../../components/card/Card.vue"
+import SmallButton from "../../../components/buttons/SmallButton.vue"
 import SignLine from "../../../components/sign/SignLine.vue"
 
 const props = withDefaults(
@@ -93,23 +94,15 @@ function requestTrash(): void {
       </RouterLink>
 
       <div class="mt-2 flex items-center gap-2">
-        <button
-          class="inline-flex items-center gap-1 rounded px-1 py-1 text-sm transition-colors hover:bg-paper/60 hover:text-ink"
-          type="button"
-          @click="requestEditTitle"
-        >
+        <SmallButton type="button" @click="requestEditTitle">
           <Pencil :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("editTitle") }}</span>
-        </button>
+        </SmallButton>
 
-        <button
-          class="inline-flex items-center gap-1 rounded px-1 py-1 text-sm transition-colors hover:bg-paper/60 hover:text-danger"
-          type="button"
-          @click="requestTrash"
-        >
+        <SmallButton type="button" tone="danger" @click="requestTrash">
           <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("trash") }}</span>
-        </button>
+        </SmallButton>
       </div>
     </template>
 
