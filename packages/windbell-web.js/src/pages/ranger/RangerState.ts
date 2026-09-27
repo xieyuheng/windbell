@@ -2,8 +2,6 @@ import {
   makeFileSystemClient,
   type FileSystemEntry,
 } from "@xieyuheng/fs-api.js/client"
-import { makeSemiosisClient } from "@xieyuheng/semiosis-api.js/client"
-import type * as S from "@xieyuheng/semiosis.js"
 import { reactive } from "vue"
 import { isSamePath, parentPath } from "./RangerPath"
 import {
@@ -14,10 +12,8 @@ import {
 export type RangerFocus = "sidebar" | "view"
 
 export type RangerState = {
-  workspaceId: S.WorkspaceId
-  locationStorageKey: string
-  workspace: S.Workspace | undefined
   root: string
+  locationStorageKey: string
   currentDirectory: string
   entries: Array<FileSystemEntry>
   selectedIndex: number
@@ -27,23 +23,17 @@ export type RangerState = {
   error: string | undefined
 }
 
-const semiosis = makeSemiosisClient({
-  baseUrl: "/api/semiosis",
-})
-
 const fileSystem = makeFileSystemClient({
   baseUrl: "/api/fs",
 })
 
 export function makeRangerState(
-  workspaceId: S.WorkspaceId,
+  root: string,
   locationStorageKey: string,
 ): RangerState {
   return reactive<RangerState>({
-    workspaceId,
+    root,
     locationStorageKey,
-    workspace: undefined,
-    root: "",
     currentDirectory: "",
     entries: [],
     selectedIndex: -1,
@@ -64,30 +54,17 @@ function persistLocation(state: RangerState): void {
 export async function loadRanger(state: RangerState): Promise<void> {
   state.loading = true
   state.error = undefined
-  state.workspace = undefined
-  state.root = ""
   state.currentDirectory = ""
   state.entries = []
   state.selectedIndex = -1
   state.selectedEntry = undefined
 
+  if (state.root === "") {
+    state.loading = false
+    return
+  }
+
   try {
-    const workspace = await semiosis.workspaces.get(state.workspaceId)
-
-    if (workspace === undefined) {
-      state.workspace = undefined
-      state.root = ""
-      state.currentDirectory = ""
-      state.entries = []
-      state.selectedIndex = -1
-      state.selectedEntry = undefined
-      state.error = `workspace not found: ${state.workspaceId}`
-      return
-    }
-
-    state.workspace = workspace
-    state.root = workspace.root
-
     const storedLocation = readStoredRangerLocation(state.locationStorageKey)
 
     if (storedLocation !== undefined) {
@@ -102,7 +79,7 @@ export async function loadRanger(state: RangerState): Promise<void> {
       if (restored) return
     }
 
-    await loadDirectory(state, workspace.root)
+    await loadDirectory(state, state.root)
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
   } finally {

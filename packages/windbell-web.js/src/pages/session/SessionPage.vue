@@ -8,7 +8,7 @@ import ResizeDivider from "../../components/divider/ResizeDivider.vue"
 import SessionComposer from "./components/SessionComposer.vue"
 import SessionSignList from "./components/SessionSignList.vue"
 import SessionToolbar from "./components/SessionToolbar.vue"
-import RangerPanel from "../ranger/RangerPanel.vue"
+import Ranger from "../ranger/Ranger.vue"
 import { sessionMessages } from "./Session.i18n"
 import {
   interpretSession,
@@ -76,7 +76,7 @@ const locationStorageKey = computed(() =>
 const signList = ref<InstanceType<typeof SessionSignList> | null>(null)
 const title = computed(() => state.title || t("notFound"))
 const rangerPaneVisible = computed(
-  () => rangerOpen.value && state.workspaceId !== "" && !state.loading,
+  () => rangerOpen.value && state.workspaceRoot !== "" && !state.loading,
 )
 const sessionPaneWidth = computed(() =>
   rangerPaneVisible.value ? `${sessionDivider.value.ratio * 100}%` : "100%",
@@ -168,8 +168,8 @@ useHead(() => ({
       v-if="rangerPaneVisible"
       class="h-screen min-w-0 flex-1 overflow-hidden"
     >
-      <RangerPanel
-        :workspace-id="state.workspaceId"
+      <Ranger
+        :root="state.workspaceRoot"
         :location-storage-key="locationStorageKey"
       />
     </div>

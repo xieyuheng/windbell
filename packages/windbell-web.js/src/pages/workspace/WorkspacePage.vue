@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FolderTree, Plus, Trash2 } from "@lucide/vue"
+import { Plus, Trash2 } from "@lucide/vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
@@ -103,16 +103,6 @@ useHead(() => ({
 
       <div class="flex flex-wrap items-center gap-2">
         <BackButton :to="{ name: 'home' }" />
-
-        <MediumButton
-          :to="{
-            name: 'ranger',
-            params: { workspaceId },
-          }"
-        >
-          <FolderTree :size="16" :stroke-width="1.5" aria-hidden="true" />
-          <span>{{ t("ranger") }}</span>
-        </MediumButton>
 
         <MediumButton
           :to="{

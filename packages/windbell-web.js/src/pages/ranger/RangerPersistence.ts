@@ -3,10 +3,6 @@ export type StoredRangerLocation = {
   selectedPath: string | null
 }
 
-export function rangerLocationStorageKey(workspaceId: string): string {
-  return `windbell.ranger.location.${workspaceId}`
-}
-
 export function readStoredRangerLocation(
   storageKey: string,
 ): StoredRangerLocation | undefined {

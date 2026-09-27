@@ -5,6 +5,7 @@ import { reactive } from "vue"
 export type SessionState = {
   sessionId: S.SessionId
   workspaceId: S.WorkspaceId
+  workspaceRoot: string
   title: string
   context: Array<S.Sign>
   loading: boolean
@@ -20,6 +21,7 @@ export function makeSessionState(sessionId: S.SessionId): SessionState {
   return reactive<SessionState>({
     sessionId,
     workspaceId: "",
+    workspaceRoot: "",
     title: "",
     context: [],
     loading: false,
@@ -33,6 +35,8 @@ export async function loadSessionState(
   sessionId: S.SessionId,
 ): Promise<void> {
   state.sessionId = sessionId
+  state.workspaceId = ""
+  state.workspaceRoot = ""
   state.loading = true
   state.error = undefined
 
@@ -40,7 +44,6 @@ export async function loadSessionState(
     const session = await semiosis.sessions.get(sessionId)
 
     if (session === undefined) {
-      state.workspaceId = ""
       state.title = ""
       state.context = []
       state.error = `session not found: ${sessionId}`
@@ -50,6 +53,15 @@ export async function loadSessionState(
     state.workspaceId = session.workspaceId
     state.title = session.title
     state.context = session.context
+
+    const workspace = await semiosis.workspaces.get(session.workspaceId)
+
+    if (workspace === undefined) {
+      state.error = `workspace not found: ${session.workspaceId}`
+      return
+    }
+
+    state.workspaceRoot = workspace.root
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
   } finally {
