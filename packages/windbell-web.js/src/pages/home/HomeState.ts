@@ -4,6 +4,7 @@ import { reactive } from "vue"
 
 export type HomeState = {
   workspaces: Array<S.Workspace>
+  sessionsByWorkspaceId: Record<S.WorkspaceId, Array<S.SessionIndex>>
   loading: boolean
   error: string | undefined
 }
@@ -15,9 +16,30 @@ const semiosis = makeSemiosisClient({
 export function makeHomeState(): HomeState {
   return reactive<HomeState>({
     workspaces: [],
+    sessionsByWorkspaceId: {},
     loading: false,
     error: undefined,
   })
+}
+
+function sortWorkspacesByUpdatedAt(workspaces: Array<S.Workspace>): void {
+  workspaces.sort(
+    (a, b) => b.updatedAt - a.updatedAt || b.createdAt - a.createdAt,
+  )
+}
+
+function groupSessionsByWorkspace(
+  sessions: Array<S.SessionIndex>,
+): Record<S.WorkspaceId, Array<S.SessionIndex>> {
+  const grouped: Record<S.WorkspaceId, Array<S.SessionIndex>> = {}
+
+  for (const session of sessions) {
+    const workspaceSessions = grouped[session.workspaceId] ?? []
+    workspaceSessions.push(session)
+    grouped[session.workspaceId] = workspaceSessions
+  }
+
+  return grouped
 }
 
 export async function loadHomeState(state: HomeState): Promise<void> {
@@ -25,7 +47,14 @@ export async function loadHomeState(state: HomeState): Promise<void> {
   state.error = undefined
 
   try {
-    state.workspaces = await semiosis.workspaces.list()
+    const [workspaces, sessions] = await Promise.all([
+      semiosis.workspaces.list(),
+      semiosis.sessions.list({ workspaceId: undefined }),
+    ])
+
+    sortWorkspacesByUpdatedAt(workspaces)
+    state.workspaces = workspaces
+    state.sessionsByWorkspaceId = groupSessionsByWorkspace(sessions)
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
   } finally {
@@ -49,6 +78,9 @@ export async function ensureWorkspace(
     state.workspaces[index] = workspace
   }
 
+  state.sessionsByWorkspaceId[workspace.id] ??= []
+  sortWorkspacesByUpdatedAt(state.workspaces)
+
   return workspace
 }
 
@@ -60,6 +92,7 @@ export async function trashWorkspace(
   state.workspaces = state.workspaces.filter(
     (workspace) => workspace.id !== workspaceId,
   )
+  delete state.sessionsByWorkspaceId[workspaceId]
 }
 
 export async function updateWorkspaceTitle(
@@ -82,4 +115,5 @@ export async function updateWorkspaceTitle(
 
   await semiosis.workspaces.put(workspace)
   state.workspaces[index] = workspace
+  sortWorkspacesByUpdatedAt(state.workspaces)
 }

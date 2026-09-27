@@ -92,7 +92,9 @@ export function makeWorkspaceStore(
         }
       }
 
-      workspaces.sort((a, b) => a.createdAt - b.createdAt)
+      workspaces.sort(
+        (a, b) => b.updatedAt - a.updatedAt || b.createdAt - a.createdAt,
+      )
       return workspaces
     },
 

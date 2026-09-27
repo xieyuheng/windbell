@@ -22,6 +22,7 @@ import {
 
 export type SessionStoreOptions = {
   root: string
+  onSessionUpdated?: (session: SessionIndex) => Promise<void> | void
 }
 
 export type MakeSessionOptions = {
@@ -44,6 +45,7 @@ export type SessionStore = {
 
 export function makeSessionStore(options: SessionStoreOptions): SessionStore {
   const root = Path.resolve(options.root)
+  const onSessionUpdated = options.onSessionUpdated
 
   const sessionDir = (id: SessionId): string => {
     return Path.join(root, id)
@@ -185,6 +187,8 @@ export function makeSessionStore(options: SessionStoreOptions): SessionStore {
           serializeSign(sign),
         )
       }
+
+      await onSessionUpdated?.(index)
     },
 
     async appendSign(id, sign) {
@@ -207,6 +211,7 @@ export function makeSessionStore(options: SessionStoreOptions): SessionStore {
       }
 
       await writeJsonFile(indexPath(id), updatedIndex)
+      await onSessionUpdated?.(updatedIndex)
     },
 
     async remove(id) {

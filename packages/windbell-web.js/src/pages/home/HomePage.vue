@@ -23,6 +23,7 @@ const { t } = useI18n({
 })
 
 const state = makeHomeState()
+const sessionPreviewLimit = 3
 const createDialogOpen = ref(false)
 const creating = ref(false)
 const createError = ref<string | undefined>(undefined)
@@ -132,6 +133,8 @@ useHead(() => ({
       <li v-for="workspace in state.workspaces" :key="workspace.id">
         <WorkspaceCard
           :workspace="workspace"
+          :sessions="state.sessionsByWorkspaceId[workspace.id] ?? []"
+          :preview-limit="sessionPreviewLimit"
           @trash="handleTrashWorkspace(workspace)"
           @update-title="handleUpdateWorkspaceTitle(workspace, $event)"
         />

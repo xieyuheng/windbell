@@ -82,6 +82,8 @@ test("semiosis client and server", async (t) => {
   assert.ok(session.context.length > 0)
   assert.equal(session.context[0]?.kind, "ToolSign")
 
+  await new Promise((resolve) => setTimeout(resolve, 10))
+
   const signs: Array<S.Sign> = []
 
   for await (const sign of client.sessions.interpret(session.id, {
@@ -97,6 +99,9 @@ test("semiosis client and server", async (t) => {
 
   const gotSession = await client.sessions.get(session.id)
   assert.ok((gotSession?.context.length ?? 0) > 1)
+
+  const updatedWorkspace = await client.workspaces.get(workspace.id)
+  assert.equal(updatedWorkspace?.updatedAt, gotSession?.updatedAt)
 
   const indexes = await client.sessions.list({
     workspaceId: workspace.id,

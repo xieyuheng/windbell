@@ -20,6 +20,7 @@ const { t } = useI18n({
 })
 
 const state = makeWorkspaceDustbinState()
+const sessionPreviewLimit = 3
 const busyWorkspaceId = ref<string | undefined>(undefined)
 
 async function restore(workspace: S.DustbinWorkspace): Promise<void> {
@@ -88,7 +89,9 @@ useHead(() => ({
       <li v-for="workspace in state.workspaces" :key="workspace.id">
         <DustbinWorkspaceCard
           :workspace="workspace"
+          :sessions="state.sessionsByWorkspaceId[workspace.id] ?? []"
           :busy="busyWorkspaceId === workspace.id"
+          :preview-limit="sessionPreviewLimit"
           @restore="restore(workspace)"
           @remove="remove(workspace)"
         />

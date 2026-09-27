@@ -32,6 +32,24 @@ export type Database = {
 
 export function makeDatabase(options: DatabaseOptions): Database {
   const root = options.root
+  const workspaces = makeWorkspaceStore({
+    root: Path.join(root, "workspaces"),
+  })
+  const sessions = makeSessionStore({
+    root: Path.join(root, "sessions"),
+    async onSessionUpdated(session) {
+      const workspace = await workspaces.get(session.workspaceId)
+      if (workspace === undefined) return
+
+      const updatedAt = Math.max(workspace.updatedAt, session.updatedAt)
+      if (updatedAt === workspace.updatedAt) return
+
+      await workspaces.put({
+        ...workspace,
+        updatedAt,
+      })
+    },
+  })
 
   return {
     root,
@@ -44,12 +62,8 @@ export function makeDatabase(options: DatabaseOptions): Database {
     settings: makeSettingsStore({
       root,
     }),
-    workspaces: makeWorkspaceStore({
-      root: Path.join(root, "workspaces"),
-    }),
-    sessions: makeSessionStore({
-      root: Path.join(root, "sessions"),
-    }),
+    workspaces,
+    sessions,
     dustbin: {
       sessions: makeDustbinSessionStore({
         sessionsRoot: Path.join(root, "sessions"),
