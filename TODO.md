@@ -1,6 +1,9 @@
 # windbell-web.js
 
-模仿 telegram 给对话设置纹样背景。
+我想要模仿 telegram 给对话设页面以及其他页面置纹样背景。
+
+尤其是中国风格的纹样。
+关于这个需求，你有什么想法？
 
 # windbell-web.js
 
