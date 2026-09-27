@@ -32,11 +32,9 @@ const workspaceId = computed(() => String(route.params.workspaceId ?? ""))
 const state = makeWorkspaceState(workspaceId.value)
 const title = computed(() => state.workspace?.name ?? t("title"))
 const creatingSession = ref(false)
-const createSessionError = ref<string | undefined>(undefined)
 
 async function createSession(content: string): Promise<void> {
   creatingSession.value = true
-  createSessionError.value = undefined
 
   try {
     const session = await makeSession(state, t("untitled"))
@@ -54,9 +52,6 @@ async function createSession(content: string): Promise<void> {
         sessionId: session.id,
       },
     })
-  } catch (error) {
-    createSessionError.value =
-      error instanceof Error ? error.message : String(error)
   } finally {
     creatingSession.value = false
   }
@@ -133,11 +128,7 @@ useHead(() => ({
       </div>
     </header>
 
-    <SessionStartComposer
-      :creating="creatingSession"
-      :error="createSessionError"
-      @create="createSession"
-    />
+    <SessionStartComposer :creating="creatingSession" @create="createSession" />
 
     <div class="flex flex-col gap-2">
       <h2 class="text-base text-ink">
