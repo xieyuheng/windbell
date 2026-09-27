@@ -28,6 +28,7 @@ export type SessionsClient = {
   make(options: MakeSessionOptions): Promise<S.Session>
   get(id: S.SessionId): Promise<S.Session | undefined>
   put(session: S.Session): Promise<void>
+  generateTitle(id: S.SessionId): Promise<string>
   interpret(id: S.SessionId, options: InterpretOptions): AsyncGenerator<S.Sign>
   remove(id: S.SessionId): Promise<void>
 }
@@ -61,6 +62,16 @@ export function makeSessionsClient(
         `/sessions/${encodeURIComponent(session.id)}`,
         session,
       )
+    },
+
+    generateTitle: async (id) => {
+      const result = await call<{ title: string }>(
+        config.baseUrl,
+        "POST",
+        `/sessions/${encodeURIComponent(id)}/title`,
+      )
+
+      return result.title
     },
 
     async *interpret(id, options) {

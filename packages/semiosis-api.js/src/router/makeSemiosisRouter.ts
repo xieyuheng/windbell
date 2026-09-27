@@ -135,6 +135,37 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     return sendEmpty(204)
   })
 
+  app.post("/sessions/:sessionId/title", async (c) => {
+    const sessionId = c.req.param("sessionId")
+    const session = await service.sessions.get(sessionId)
+
+    if (session === undefined) {
+      throw new HTTPException(404, { message: "session not found" })
+    }
+
+    const settings = await options.database.settings.get()
+    const defaultModel = settings?.defaultModel
+
+    if (defaultModel === undefined || defaultModel === null) {
+      throw new HTTPException(400, {
+        message: "default model is not configured",
+      })
+    }
+
+    const model = await S.makeModel(defaultModel.qualifiedName, {
+      database: options.database,
+    })
+
+    const title = await S.generateTitle({
+      model,
+      context: session.context,
+    })
+
+    await service.sessions.updateTitle(sessionId, title)
+
+    return sendJson(200, { title })
+  })
+
   app.delete("/sessions/:sessionId", async (c) => {
     await service.sessions.remove(c.req.param("sessionId"))
     return sendEmpty(204)
