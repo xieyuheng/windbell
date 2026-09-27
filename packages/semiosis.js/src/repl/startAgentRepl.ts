@@ -3,14 +3,20 @@ import process from "node:process"
 import { errorReport } from "@xieyuheng/std.js/error"
 import { agentInterpret, type Agent } from "../agent/index.ts"
 import type { Database } from "../database/index.ts"
-import { formatSign, formatSignTag } from "../format/index.ts"
+import { formatSign, formatWithBackground } from "../format/index.ts"
 import type { Model } from "../model/index.ts"
 import {
   generateTitle,
   makeAgentFromSession,
   type Session,
 } from "../session/index.ts"
-import { PersonaSign, UserSign, type Sign } from "../sign/index.ts"
+import {
+  ErrorSign,
+  PersonaSign,
+  UserSign,
+  isUserSign,
+  type Sign,
+} from "../sign/index.ts"
 import { makeDefaultToolRouter } from "../tools/index.ts"
 import type { Workspace } from "../workspace/Workspace.ts"
 
@@ -132,8 +138,8 @@ async function readFirstInput(): Promise<string | undefined> {
       const input = line.trim()
       if (input === "") continue
 
-      if (input === "/info") {
-        console.log("/info is not available before a session is created.")
+      if (input === "/info" || input === "/title") {
+        console.log(`${input} is not available before a session is created.`)
         continue
       }
 
@@ -154,7 +160,7 @@ async function runAgentRepl(
     process.stdout.isTTY === true &&
     process.env.NO_COLOR === undefined &&
     process.env.TERM !== "dumb"
-  const userPrompt = `${formatSignTag("UserSign", "user", { color: useColor })}\n\n`
+  const userPrompt = "> "
 
   const messages: Array<string> = []
   const buffer: Array<string> = []
@@ -199,6 +205,8 @@ async function runAgentRepl(
     readline.prompt()
   }
 
+  let hasGeneratedInitialTitle = false
+
   async function updateTitleFromContext(): Promise<string> {
     const title = await generateTitle({
       model: agent.model,
@@ -209,6 +217,34 @@ async function runAgentRepl(
     return title
   }
 
+  function printError(error: unknown): void {
+    console.log(formatSign(ErrorSign(errorReport(error)), { color: useColor }))
+  }
+
+  async function printGeneratedTitle(): Promise<void> {
+    try {
+      const title = await updateTitleFromContext()
+      const titleTag = useColor
+        ? formatWithBackground("[title]", 240)
+        : "[title]"
+
+      console.log(`${titleTag}\n\n${title}\n`)
+    } catch (error) {
+      printError(error)
+    }
+  }
+
+  async function maybeGenerateInitialTitle(): Promise<void> {
+    if (hasGeneratedInitialTitle) return
+
+    const context = await agent.getContext()
+    const userSignCount = context.filter(isUserSign).length
+    if (userSignCount !== 1) return
+
+    hasGeneratedInitialTitle = true
+    await printGeneratedTitle()
+  }
+
   async function interpretUserInput(input: string): Promise<void> {
     try {
       console.log()
@@ -216,8 +252,10 @@ async function runAgentRepl(
         console.log(formatSign(sign, { color: useColor }))
       }
     } catch (error) {
-      console.log(errorReport(error))
+      printError(error)
     }
+
+    await maybeGenerateInitialTitle()
   }
 
   readline.on("line", (line) => {
@@ -270,6 +308,12 @@ async function runAgentRepl(
     const input = message.trim()
 
     if (input === "/exit") break
+
+    if (input === "/title") {
+      await printGeneratedTitle()
+      renderPrompt()
+      continue
+    }
 
     if (input === "/info") {
       await options.onInfo?.()

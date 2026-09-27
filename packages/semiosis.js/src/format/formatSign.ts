@@ -20,6 +20,10 @@ const signTagBackgroundByKind = {
 const signTagForeground = "\x1b[38;5;255m"
 const signTagReset = "\x1b[0m"
 
+export function formatWithBackground(text: string, background: number): string {
+  return `\x1b[48;5;${background}m${signTagForeground}${text}${signTagReset}`
+}
+
 export function formatSignTag(
   kind: Sign["kind"],
   text: string,
@@ -28,8 +32,7 @@ export function formatSignTag(
   const tag = `[${text}]`
   if (options.color !== true) return tag
 
-  const background = signTagBackgroundByKind[kind]
-  return `\x1b[48;5;${background}m${signTagForeground}${tag}${signTagReset}`
+  return formatWithBackground(tag, signTagBackgroundByKind[kind])
 }
 
 export function formatSign(
