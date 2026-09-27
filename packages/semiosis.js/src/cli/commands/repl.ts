@@ -83,6 +83,10 @@ export function makeReplHandler(options: ReplCommandOptions) {
 
     return startAgentRepl(agent, {
       showContext: sessionId !== undefined,
+      async onTitleChange(title) {
+        await options.database.sessions.updateTitle(session.id, title)
+        session.title = title
+      },
     })
   }
 }

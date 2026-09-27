@@ -3,10 +3,12 @@ import process from "node:process"
 import { errorReport } from "@xieyuheng/std.js/error"
 import { agentInterpret, type Agent } from "../agent/index.ts"
 import { formatSign, formatSignTag } from "../format/index.ts"
+import { generateTitle } from "../session/index.ts"
 import { UserSign } from "../sign/index.ts"
 
 export type StartAgentReplOptions = {
   showContext: boolean
+  onTitleChange?: (title: string) => Promise<void> | void
 }
 
 function isNewlineKey(key: Readline.Key | undefined): boolean {
@@ -75,6 +77,16 @@ export async function startAgentRepl(
 
     readline.setPrompt(userPrompt)
     readline.prompt()
+  }
+
+  async function updateTitleFromContext(): Promise<string> {
+    const title = await generateTitle({
+      model: agent.model,
+      context: await agent.getContext(),
+    })
+
+    await options.onTitleChange?.(title)
+    return title
   }
 
   readline.on("line", (line) => {
