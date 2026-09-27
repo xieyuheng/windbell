@@ -79,9 +79,11 @@ function requestTrash(): void {
         </h2>
       </RouterLink>
 
-      <p class="mt-1 truncate font-mono text-sm" :title="workspace.root">
-        {{ workspace.root }}
-      </p>
+      <RouterLink class="block min-w-0" :to="sessionListRoute">
+        <p class="mt-1 truncate font-mono text-sm" :title="workspace.root">
+          {{ workspace.root }}
+        </p>
+      </RouterLink>
 
       <div class="mt-2 flex items-center gap-2">
         <SmallButton type="button" @click="requestEditTitle">
