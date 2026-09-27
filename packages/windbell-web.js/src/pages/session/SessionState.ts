@@ -72,7 +72,7 @@ export async function loadSessionState(
 export async function interpretSession(
   state: SessionState,
   content: string,
-): Promise<void> {
+): Promise<boolean> {
   state.interpreting = true
   state.error = undefined
 
@@ -98,9 +98,26 @@ export async function interpretSession(
     })) {
       state.context.push(sign)
     }
+
+    return true
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
+    return false
   } finally {
     state.interpreting = false
+  }
+}
+
+export async function generateSessionTitle(state: SessionState): Promise<void> {
+  try {
+    const title = (
+      await semiosis.sessions.generateTitle(state.sessionId)
+    ).trim()
+
+    if (title !== "") {
+      state.title = title
+    }
+  } catch {
+    // Title generation is best-effort and should not block the conversation.
   }
 }

@@ -1,13 +1,5 @@
 # windbell-web.js
 
-判断最后一个是否是 UserSign 不太稳定。
-可否给 SessionPage 增加参数，
-在转跳的时候，带有 url query 参数，
-告诉 SessionPage 需要继续对话
-（对话启动之后就消除 url query 参数）？
-
-# windbell-web.js
-
 模仿 telegram 给对话设置纹样背景。
 
 # windbell-web.js

@@ -11,10 +11,12 @@ import SessionToolbar from "./components/SessionToolbar.vue"
 import Ranger from "../../components/ranger/Ranger.vue"
 import { sessionMessages } from "./Session.i18n"
 import {
+  generateSessionTitle,
   interpretSession,
   loadSessionState,
   makeSessionState,
 } from "./SessionState"
+import { receiveSessionMessages, type SessionMessage } from "./SessionInbox"
 
 function sessionRangerOpenStorageKey(sessionId: string): string {
   return `windbell.session.${sessionId}.rangerOpen`
@@ -105,9 +107,39 @@ async function send(): Promise<void> {
   await interpretSession(state, content)
 }
 
-onMounted(async () => {
-  await loadSessionState(state, sessionId.value)
+async function handleSessionMessage(message: SessionMessage): Promise<void> {
+  switch (message.kind) {
+    case "PendingInterpret": {
+      const ok = await interpretSession(state, message.content)
+
+      if (ok && message.generateTitle) {
+        await generateSessionTitle(state)
+      }
+
+      return
+    }
+  }
+}
+
+async function receiveInbox(value: string): Promise<void> {
+  const messages = receiveSessionMessages(value)
+
+  for (const message of messages) {
+    await handleSessionMessage(message)
+  }
+}
+
+async function loadSession(value: string): Promise<void> {
+  await loadSessionState(state, value)
+
+  if (state.error !== undefined) return
+
+  await receiveInbox(value)
   await signList.value?.scrollToBottom()
+}
+
+onMounted(async () => {
+  await loadSession(sessionId.value)
 })
 
 watch(sessionId, async (value) => {
@@ -117,8 +149,7 @@ watch(sessionId, async (value) => {
     storageKey: sessionWidthRatioStorageKey(value),
   })
 
-  await loadSessionState(state, value)
-  await signList.value?.scrollToBottom()
+  await loadSession(value)
 })
 
 watch(rangerOpen, (value) => {

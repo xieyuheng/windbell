@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { Plus, Trash2 } from "@lucide/vue"
+import { Trash2 } from "@lucide/vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
-import { computed, onMounted, watch } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute, useRouter } from "vue-router"
 import BackButton from "../../components/buttons/BackButton.vue"
 import MediumButton from "../../components/buttons/MediumButton.vue"
+import { sendSessionMessage } from "../session/SessionInbox"
 import SessionCard from "./components/SessionCard.vue"
+import SessionStartComposer from "./components/SessionStartComposer.vue"
 import { workspaceMessages } from "./Workspace.i18n"
 import {
   loadWorkspaceState,
@@ -29,10 +31,22 @@ const { t } = useI18n({
 const workspaceId = computed(() => String(route.params.workspaceId ?? ""))
 const state = makeWorkspaceState(workspaceId.value)
 const title = computed(() => state.workspace?.name ?? t("title"))
+const creatingSession = ref(false)
+const createSessionError = ref<string | undefined>(undefined)
 
-async function createSession(): Promise<void> {
+async function createSession(content: string): Promise<void> {
+  creatingSession.value = true
+  createSessionError.value = undefined
+
   try {
     const session = await makeSession(state, t("untitled"))
+
+    sendSessionMessage({
+      kind: "PendingInterpret",
+      sessionId: session.id,
+      content,
+      generateTitle: true,
+    })
 
     await router.push({
       name: "session",
@@ -41,7 +55,10 @@ async function createSession(): Promise<void> {
       },
     })
   } catch (error) {
-    state.error = error instanceof Error ? error.message : String(error)
+    createSessionError.value =
+      error instanceof Error ? error.message : String(error)
+  } finally {
+    creatingSession.value = false
   }
 }
 
@@ -116,15 +133,16 @@ useHead(() => ({
       </div>
     </header>
 
+    <SessionStartComposer
+      :creating="creatingSession"
+      :error="createSessionError"
+      @create="createSession"
+    />
+
     <div class="flex flex-col gap-2">
       <h2 class="text-base text-ink">
         {{ t("sessions") }}
       </h2>
-
-      <MediumButton class="self-start" type="button" @click="createSession">
-        <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
-        <span>{{ t("newSession") }}</span>
-      </MediumButton>
     </div>
 
     <p v-if="state.loading" class="text-ink">

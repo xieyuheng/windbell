@@ -8,6 +8,9 @@ export const workspaceMessages = {
     untitled: "未命名",
     loading: "加载中...",
     sessionDustbin: "对话回收站",
+    newSessionPlaceholder: "输入消息，开始一个新对话...",
+    startSession: "开始对话",
+    startingSession: "正在开始...",
   },
   "en-US": {
     title: "Sessions",
@@ -18,5 +21,8 @@ export const workspaceMessages = {
     untitled: "Untitled",
     loading: "Loading...",
     sessionDustbin: "Session Dustbin",
+    newSessionPlaceholder: "Type a message to start a new session...",
+    startSession: "Start session",
+    startingSession: "Starting...",
   },
 }
