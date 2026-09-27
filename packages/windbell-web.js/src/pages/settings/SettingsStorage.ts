@@ -44,7 +44,8 @@ function classifyStorageKey(key: string): StorageGroup {
   if (
     key === "windbell.theme" ||
     key === "windbell.font" ||
-    key === "windbell.locale"
+    key === "windbell.locale" ||
+    key === "windbell.wallpaper"
   ) {
     return "app"
   }
