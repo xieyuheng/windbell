@@ -145,20 +145,29 @@ useHead(() => ({
       <div
         class="relative mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col overflow-hidden"
       >
-        <SessionToolbar
-          :state="state"
-          :ranger-open="rangerOpen"
-          @back="goBack"
-          @toggle-ranger="rangerOpen = !rangerOpen"
-        />
+        <div
+          class="pointer-events-none absolute inset-x-0 z-50"
+          :style="{ top: 'calc(env(safe-area-inset-top, 0px) + 0.5rem)' }"
+        >
+          <SessionToolbar
+            :state="state"
+            :ranger-open="rangerOpen"
+            @back="goBack"
+            @toggle-ranger="rangerOpen = !rangerOpen"
+          />
+        </div>
 
         <SessionSignList ref="signList" :state="state" />
 
-        <SessionComposer
-          v-model="input"
-          :interpreting="state.interpreting"
-          @send="send"
-        />
+        <div
+          class="pointer-events-none absolute inset-x-0 bottom-[env(safe-area-inset-bottom,0px)] z-10 px-2 py-4"
+        >
+          <SessionComposer
+            v-model="input"
+            :interpreting="state.interpreting"
+            @send="send"
+          />
+        </div>
       </div>
     </section>
 

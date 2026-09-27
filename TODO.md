@@ -1,5 +1,9 @@
 # windbell-web.js
 
+模仿 telegram 给对话设置纹样背景。
+
+# windbell-web.js
+
 [windbell-web.js] markdown file -- 对文件的预览，包括文学式编程支持
 
 [windbell-web.js] 支持 markdown 的极简 IDE
