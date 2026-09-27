@@ -128,13 +128,13 @@ useHead(() => ({
       </div>
     </header>
 
-    <SessionStartComposer :creating="creatingSession" @create="createSession" />
-
     <div class="flex flex-col gap-2">
       <h2 class="text-base text-ink">
         {{ t("sessions") }}
       </h2>
     </div>
+
+    <SessionStartComposer :creating="creatingSession" @create="createSession" />
 
     <p v-if="state.loading" class="text-ink">
       {{ t("loading") }}
