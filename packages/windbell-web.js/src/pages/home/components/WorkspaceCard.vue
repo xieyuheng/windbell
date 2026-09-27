@@ -81,13 +81,13 @@ function requestTrash(): void {
   <Card as="article">
     <template #header>
       <RouterLink class="block min-w-0" :to="sessionListRoute">
-        <h2 class="truncate text-base text-ink">
+        <h2 class="truncate text-lg">
           {{ workspace.name }}
         </h2>
       </RouterLink>
 
       <p
-        class="mt-1 truncate font-mono text-sm text-ink"
+        class="mt-1 truncate font-mono text-sm"
         :title="workspace.root"
       >
         {{ workspace.root }}
@@ -106,32 +106,19 @@ function requestTrash(): void {
       </div>
     </template>
 
-    <div class="flex flex-col gap-2 px-3 py-2">
-      <RouterLink class="block min-w-0" :to="sessionListRoute">
-        <div
-          class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-sm"
-        >
-          <span>{{ t("sessionCount", { count: sessions.length }) }}</span>
-          <span
-            v-if="latestUpdatedAt !== undefined"
-            class="truncate text-ink/70"
-          >
-            {{ t("lastActiveAt", { time: latestUpdatedAt }) }}
-          </span>
-        </div>
-      </RouterLink>
-
+    <div class="flex flex-col px-3 py-2">
       <ul v-if="previewSessions.length > 0" class="flex flex-col gap-1">
-        <li v-for="session in previewSessions" :key="session.id">
+        <li v-for="session in previewSessions" :key="session.id"
+            class="flex min-w-0 items-baseline justify-between">
           <RouterLink
-            class="flex min-w-0 items-baseline justify-between gap-3 rounded px-1 py-0.5 text-sm hover:bg-ink/5"
+            class="hover:underline"
             :to="{ name: 'session', params: { sessionId: session.id } }"
           >
             <span class="truncate">{{ session.title }}</span>
+          </RouterLink>
             <span class="shrink-0 text-xs text-ink/60">
               {{ formatDateTime(session.updatedAt) }}
             </span>
-          </RouterLink>
         </li>
       </ul>
 
@@ -142,6 +129,9 @@ function requestTrash(): void {
 
     <template #footer>
       <div class="flex flex-col gap-1 text-sm">
+        <p class="truncate">
+          {{ t("sessionCount") }} {{ sessions.length }}
+        </p>
         <p class="truncate">
           {{ t("updatedAt") }} {{ formatDateTime(workspace.updatedAt) }}
         </p>
