@@ -17,7 +17,6 @@ import {
   ensureWorkspace,
   getOrMakeSession,
   makeAgentForCli,
-  makeInitialSigns,
   makeModelFromOptions,
 } from "../shared.ts"
 
@@ -61,7 +60,7 @@ export function makeBatchHandler(options: BatchCommandOptions) {
       }),
     )
 
-    const initialSigns: Array<Sign> = makeInitialSigns(toolRouter, personaSign)
+    const initialSigns: Array<Sign> = [...toolRouter.toolSigns, personaSign]
 
     const session = await getOrMakeSession({
       database: options.database,

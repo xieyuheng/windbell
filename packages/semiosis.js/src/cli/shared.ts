@@ -32,13 +32,6 @@ export async function ensureWorkspace(options: {
   })
 }
 
-export function makeInitialSigns(
-  toolRouter: ToolRouter,
-  personaSign: Sign,
-): Array<Sign> {
-  return [...toolRouter.toolSigns, personaSign]
-}
-
 export async function getOrMakeSession(options: {
   database: Database
   sessionId?: string
