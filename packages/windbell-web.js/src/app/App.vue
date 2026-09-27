@@ -2,7 +2,6 @@
 import { useHead } from "@unhead/vue"
 import { useI18n } from "vue-i18n"
 import { RouterView } from "vue-router"
-import WallpaperLayer from "../components/wallpaper/WallpaperLayer.vue"
 import { useTheme } from "./theme"
 
 const { locale } = useI18n()
@@ -23,9 +22,8 @@ useHead(() => ({
 
 <template>
   <div
-    class="relative isolate flex min-h-screen flex-col pb-[env(safe-area-inset-bottom,0px)] text-ink transition-colors"
+    class="flex min-h-screen flex-col bg-paper pb-[env(safe-area-inset-bottom,0px)] text-ink transition-colors"
   >
-    <WallpaperLayer />
     <RouterView />
   </div>
 </template>

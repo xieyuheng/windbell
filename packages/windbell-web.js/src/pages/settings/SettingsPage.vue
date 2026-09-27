@@ -8,10 +8,7 @@ import Card from "../../components/card/Card.vue"
 import BackButton from "../../components/buttons/BackButton.vue"
 import { useFont, type Font } from "../../app/font"
 import { setLocale, supportedLocales } from "../../app/i18n"
-import { patternOptions } from "../../app/patterns"
-import type { PatternDefinition } from "../../app/patternTypes"
 import { useTheme, type ThemeMode } from "../../app/theme"
-import { useWallpaper } from "../../app/wallpaper"
 import { settingsMessages } from "./Settings.i18n"
 import {
   loadSettings,
@@ -31,7 +28,6 @@ const { locale, t } = useI18n({
 })
 const theme = useTheme()
 const font = useFont()
-const wallpaper = useWallpaper()
 const state = makeSettingsState()
 const storageEntries = ref(readWindbellStorage())
 const storageGroupLabelKeys: Record<StorageGroup, string> = {
@@ -101,19 +97,6 @@ const fontOptions: Array<{ value: Font; labelKey: string }> = [
   { value: "unifont", labelKey: "fontUnifont" },
   { value: "system", labelKey: "fontSystem" },
 ]
-
-function patternSwatchStyle(
-  pattern: PatternDefinition,
-): Record<string, string> {
-  if (pattern.url === "") {
-    return { "--swatch-opacity": "0" }
-  }
-
-  return {
-    "--swatch-image": `url("${pattern.url}")`,
-    "--swatch-tile": `${Math.max(12, pattern.tile / 3)}px`,
-  }
-}
 
 onMounted(async () => {
   await loadSettings(state)
@@ -212,51 +195,6 @@ useHead(() => ({
             />
             <span>{{ t(item.labelKey) }}</span>
           </label>
-        </div>
-      </Card>
-
-      <Card as="section">
-        <template #header>
-          <h2 class="text-ink">
-            {{ t("wallpaper") }}
-          </h2>
-        </template>
-
-        <div class="flex flex-col gap-3 p-2">
-          <p class="px-2 text-sm text-ink-muted">
-            {{ t("wallpaperDescription") }}
-          </p>
-
-          <div
-            class="grid grid-cols-[repeat(auto-fill,minmax(6rem,1fr))] gap-2 px-2"
-          >
-            <label
-              v-for="pattern in patternOptions"
-              :key="pattern.id"
-              class="flex cursor-pointer flex-col gap-2 rounded border p-2 transition-colors"
-              :class="
-                wallpaper.patternId === pattern.id
-                  ? 'border-ink/60 bg-paper-deep'
-                  : 'border-line/60 hover:bg-paper-deep'
-              "
-            >
-              <span
-                class="pattern-swatch h-16 w-full rounded"
-                :style="patternSwatchStyle(pattern)"
-              />
-
-              <span class="flex items-center gap-2 text-sm text-ink">
-                <input
-                  class="accent-ink"
-                  type="radio"
-                  name="wallpaper"
-                  :checked="wallpaper.patternId === pattern.id"
-                  @change="wallpaper.setPattern(pattern.id)"
-                />
-                {{ pattern.label[locale] ?? pattern.id }}
-              </span>
-            </label>
-          </div>
         </div>
       </Card>
 
