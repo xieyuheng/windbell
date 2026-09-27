@@ -6,6 +6,7 @@ import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
 import Card from "../../../components/card/Card.vue"
 import SmallButton from "../../../components/buttons/SmallButton.vue"
+import { formatDateTime } from "../../../utils/datetime"
 import SignLine from "../../../components/sign/SignLine.vue"
 
 const props = withDefaults(
@@ -59,13 +60,6 @@ const previewSigns = computed(() => {
 
   return signs.slice(Math.max(0, signs.length - limit))
 })
-
-function formatDateTime(value: number): string {
-  const date = new Date(value)
-  const pad = (value: number): string => String(value).padStart(2, "0")
-
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
-}
 
 function requestEditTitle(): void {
   const title = window.prompt(t("editTitlePrompt"), props.session.title)

@@ -12,7 +12,6 @@ export const workspaceDustbinMessages = {
     sessionCount: "回收站中对话：",
     noSessions: "该工作区下没有对话。",
     restoreHint: "恢复工作区时，随工作区删除的对话会一起恢复。",
-    justNow: "刚刚",
   },
   "en-US": {
     title: "Workspace Dustbin",
@@ -28,6 +27,5 @@ export const workspaceDustbinMessages = {
     noSessions: "No sessions in this workspace.",
     restoreHint:
       "Sessions deleted with the workspace will be restored together.",
-    justNow: "Just now",
   },
 }

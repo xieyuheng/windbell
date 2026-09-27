@@ -6,6 +6,7 @@ import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
 import Card from "../../../components/card/Card.vue"
 import SmallButton from "../../../components/buttons/SmallButton.vue"
+import { formatDateTime, formatRelativeTime } from "../../../utils/datetime"
 import { homeMessages } from "../Home.i18n"
 
 const props = withDefaults(
@@ -46,78 +47,10 @@ const previewSessions = computed(() =>
   sortedSessions.value.slice(0, Math.max(0, props.previewLimit)),
 )
 
-function formatDateTime(value: number): string {
-  const date = new Date(value)
-  const pad = (value: number): string => String(value).padStart(2, "0")
-
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
-}
-
-const relativeTimeFormatters = new Map<string, Intl.RelativeTimeFormat>()
-
-function getRelativeTimeFormatter(locale: string): Intl.RelativeTimeFormat {
-  const existing = relativeTimeFormatters.get(locale)
-  if (existing !== undefined) return existing
-
-  const formatter = new Intl.RelativeTimeFormat(locale, {
-    numeric: "auto",
-  })
-  relativeTimeFormatters.set(locale, formatter)
-  return formatter
-}
-
-type RelativeTimeUnit = "minute" | "hour" | "day" | "week" | "month" | "year"
-
-function formatRelativeUnit(
-  formatter: Intl.RelativeTimeFormat,
-  locale: string,
-  value: number,
-  unit: RelativeTimeUnit,
-): string {
-  const text = formatter.format(value, unit)
-  if (!locale.startsWith("zh")) return text
-
-  return text.replace(/(\d)(?=[\u4e00-\u9fff])/g, "$1 ")
-}
-
-function formatRelativeTime(value: number, locale: string): string {
-  const seconds = Math.max(0, Math.floor((Date.now() - value) / 1000))
-
-  if (seconds < 60) return t("justNow")
-
-  const formatter = getRelativeTimeFormatter(locale)
-
-  const minutes = Math.floor(seconds / 60)
-  if (minutes < 60) {
-    return formatRelativeUnit(formatter, locale, -minutes, "minute")
-  }
-
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) {
-    return formatRelativeUnit(formatter, locale, -hours, "hour")
-  }
-
-  const days = Math.floor(hours / 24)
-  if (days < 7) {
-    return formatRelativeUnit(formatter, locale, -days, "day")
-  }
-
-  if (days < 30) {
-    const weeks = Math.max(1, Math.floor(days / 7))
-    return formatRelativeUnit(formatter, locale, -weeks, "week")
-  }
-
-  const months = Math.floor(days / 30)
-  if (months < 12) {
-    return formatRelativeUnit(formatter, locale, -months, "month")
-  }
-
-  const years = Math.max(1, Math.floor(months / 12))
-  return formatRelativeUnit(formatter, locale, -years, "year")
-}
-
 function formatSessionRelativeTime(value: number): string {
-  return formatRelativeTime(value, locale.value)
+  return formatRelativeTime(value, {
+    locale: locale.value,
+  })
 }
 
 function requestEditTitle(): void {
