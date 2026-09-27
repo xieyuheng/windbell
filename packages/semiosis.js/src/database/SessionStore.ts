@@ -40,6 +40,7 @@ export type SessionStore = {
   list(options: ListSessionOptions): Promise<Array<SessionIndex>>
   put(session: Session): Promise<void>
   appendSign(id: SessionId, sign: Sign): Promise<void>
+  updateTitle(id: SessionId, title: string): Promise<void>
   remove(id: SessionId): Promise<void>
 }
 
@@ -207,6 +208,22 @@ export function makeSessionStore(options: SessionStoreOptions): SessionStore {
 
       const updatedIndex: SessionIndex = {
         ...index,
+        updatedAt: Date.now(),
+      }
+
+      await writeJsonFile(indexPath(id), updatedIndex)
+      await onSessionUpdated?.(updatedIndex)
+    },
+
+    async updateTitle(id, title) {
+      const index = await readIndex(id)
+      if (index === undefined) {
+        throw new Error(`[SessionStore] session not found: ${id}`)
+      }
+
+      const updatedIndex: SessionIndex = {
+        ...index,
+        title,
         updatedAt: Date.now(),
       }
 
