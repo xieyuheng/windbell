@@ -3,8 +3,8 @@ import type { FileSystemEntry } from "@xieyuheng/fs-api.js/client"
 import type { Component } from "vue"
 import { ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
-import { rangerMessages } from "../Ranger.i18n"
-import { resolveEntryView } from "../views/registry"
+import { rangerMessages } from "./Ranger.i18n"
+import { resolveEntryView } from "./views/registry"
 
 const props = defineProps<{
   entry: FileSystemEntry | undefined

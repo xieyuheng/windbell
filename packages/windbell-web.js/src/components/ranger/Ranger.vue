@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
-import { makeDividerState } from "../../components/divider/DividerState"
-import ResizeDivider from "../../components/divider/ResizeDivider.vue"
+import { makeDividerState } from "../divider/DividerState"
+import ResizeDivider from "../divider/ResizeDivider.vue"
 import { rangerMessages } from "./Ranger.i18n"
-import RangerSidebar from "./components/RangerSidebar.vue"
-import RangerView from "./components/RangerView.vue"
+import RangerSidebar from "./RangerSidebar.vue"
+import RangerView from "./RangerView.vue"
 import {
   goParent,
   loadRanger,

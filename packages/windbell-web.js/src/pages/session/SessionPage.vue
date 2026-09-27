@@ -8,7 +8,7 @@ import ResizeDivider from "../../components/divider/ResizeDivider.vue"
 import SessionComposer from "./components/SessionComposer.vue"
 import SessionSignList from "./components/SessionSignList.vue"
 import SessionToolbar from "./components/SessionToolbar.vue"
-import Ranger from "../ranger/Ranger.vue"
+import Ranger from "../../components/ranger/Ranger.vue"
 import { sessionMessages } from "./Session.i18n"
 import {
   interpretSession,
