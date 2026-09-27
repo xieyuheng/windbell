@@ -30,10 +30,6 @@ function submit(): void {
 
 <template>
   <form class="flex w-full flex-col gap-2" @submit.prevent="submit">
-    <p v-if="props.error !== undefined" class="text-sm text-danger">
-      {{ props.error }}
-    </p>
-
     <div
       class="flex items-center gap-2 rounded-full border border-line/60 bg-paper/60 p-1.5 backdrop-blur transition-colors"
     >
@@ -55,5 +51,9 @@ function submit(): void {
         <ArrowUp :size="18" :stroke-width="1.5" aria-hidden="true" />
       </button>
     </div>
+
+    <p v-if="props.error !== undefined" class="text-sm text-danger">
+      {{ props.error }}
+    </p>
   </form>
 </template>

@@ -36,7 +36,7 @@ function submit(): void {
   >
     <input
       v-model="input"
-      class="min-w-0 flex-1 bg-transparent px-4 py-2 text-ink outline-none placeholder:text-ink-muted"
+      class="min-w-0 flex-1 bg-transparent px-3 py-2 text-ink outline-none placeholder:text-ink-muted"
       :placeholder="t('inputPlaceholder')"
       type="text"
     />
