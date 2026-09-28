@@ -59,9 +59,9 @@ const { t } = useI18n({
 })
 
 const sessionDividerOptions = {
-  defaultRatio: 0.6,
-  minRatio: 0.4,
-  maxRatio: 0.8,
+  defaultRatio: 0.5,
+  minRatio: 0.25,
+  maxRatio: 0.60,
 }
 
 const state = makeSessionState(sessionId.value)
