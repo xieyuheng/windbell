@@ -1,9 +1,6 @@
 import type { RouteRecordRaw } from "vue-router"
 import HomePage from "./home/HomePage.vue"
-import MarkdownPage from "./markdown/MarkdownPage.vue"
 import MarkdownRenderPage from "./markdown/MarkdownRenderPage.vue"
-import MarkdownTreePage from "./markdown/MarkdownTreePage.vue"
-import MarkdownUploadPage from "./markdown/MarkdownUploadPage.vue"
 import NotFoundPage from "./errors/NotFoundPage.vue"
 import SessionDustbinPage from "./session-dustbin/SessionDustbinPage.vue"
 import WorkspaceDustbinPage from "./workspace-dustbin/WorkspaceDustbinPage.vue"
@@ -65,28 +62,8 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/markdown",
-    component: MarkdownPage,
-    children: [
-      {
-        path: "",
-        redirect: { name: "markdown-upload" },
-      },
-      {
-        path: "upload",
-        name: "markdown-upload",
-        component: MarkdownUploadPage,
-      },
-      {
-        path: "render",
-        name: "markdown-render",
-        component: MarkdownRenderPage,
-      },
-      {
-        path: "tree",
-        name: "markdown-tree",
-        component: MarkdownTreePage,
-      },
-    ],
+    name: "markdown",
+    component: MarkdownRenderPage,
   },
   {
     path: "/:pathMatch(.*)*",

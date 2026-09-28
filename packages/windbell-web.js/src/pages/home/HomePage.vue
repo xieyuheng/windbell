@@ -1,14 +1,19 @@
 <script setup lang="ts">
-import { Plus, Settings, Trash2 } from "@lucide/vue"
+import { FileText, Plus, Settings, Trash2 } from "@lucide/vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
 import { onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
+import { useRouter } from "vue-router"
 import MediumButton from "../../components/buttons/MediumButton.vue"
 import WorkspaceCard from "./components/WorkspaceCard.vue"
 import WorkspaceCreateDialog from "./components/WorkspaceCreateDialog.vue"
 import { homeMessages } from "./Home.i18n"
+import {
+  encodeMarkdownSource,
+  markdownSourceQueryKey,
+} from "../markdown/markdownSource"
 import {
   ensureWorkspace,
   loadHomeState,
@@ -21,11 +26,37 @@ const { t } = useI18n({
   messages: homeMessages,
   useScope: "local",
 })
+const router = useRouter()
 
 const state = makeHomeState()
 const createDialogOpen = ref(false)
 const creating = ref(false)
 const createError = ref<string | undefined>(undefined)
+const markdownInput = ref<HTMLInputElement>()
+
+function openMarkdownFilePicker(): void {
+  markdownInput.value?.click()
+}
+
+async function handleMarkdownFileChange(event: Event): Promise<void> {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (file === undefined) return
+
+  try {
+    const source = await file.text()
+    await router.push({
+      name: "markdown",
+      query: {
+        [markdownSourceQueryKey]: encodeMarkdownSource(source),
+      },
+    })
+  } catch (caught) {
+    state.error = caught instanceof Error ? caught.message : String(caught)
+  } finally {
+    input.value = ""
+  }
+}
 
 onMounted(async () => {
   await loadHomeState(state)
@@ -106,8 +137,21 @@ useHead(() => ({
           <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("workspaceDustbin") }}</span>
         </MediumButton>
+
+        <MediumButton type="button" @click="openMarkdownFilePicker">
+          <FileText :size="16" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("markdownPreview") }}</span>
+        </MediumButton>
       </div>
     </header>
+
+    <input
+      ref="markdownInput"
+      class="hidden"
+      type="file"
+      accept=".md,.markdown,.txt,text/markdown"
+      @change="handleMarkdownFileChange"
+    />
 
     <div class="flex flex-col gap-2">
       <h2 class="text-base text-ink">
