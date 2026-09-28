@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { LinkReference } from "mdast"
 import { computed } from "vue"
+import MarkdownNode from "../MarkdownNode.vue"
 import type { MarkdownState } from "../markdownState"
 import { safeUrl } from "../markdownUrl"
 
@@ -24,7 +25,19 @@ const href = computed(() => safeUrl(definition.value?.url))
     target="_blank"
     rel="noopener noreferrer"
   >
-    <slot />
+    <MarkdownNode
+      v-for="(child, index) in node.children"
+      :key="index"
+      :node="child"
+      :state="state"
+    />
   </a>
-  <span v-else><slot /></span>
+  <span v-else>
+    <MarkdownNode
+      v-for="(child, index) in node.children"
+      :key="index"
+      :node="child"
+      :state="state"
+    />
+  </span>
 </template>

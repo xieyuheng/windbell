@@ -12,20 +12,8 @@ const props = defineProps<{
 }>()
 
 const component = computed(() => resolveMarkdownNodeComponent(props.node))
-
-const childNodes = computed<Array<MarkdownNodeType>>(() => {
-  if (!("children" in props.node)) return []
-  return props.node.children as Array<MarkdownNodeType>
-})
 </script>
 
 <template>
-  <component :is="component" :node="node" :state="state">
-    <MarkdownNode
-      v-for="(child, index) in childNodes"
-      :key="index"
-      :node="child"
-      :state="state"
-    />
-  </component>
+  <component :is="component" :node="node" :state="state" />
 </template>

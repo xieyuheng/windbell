@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Delete } from "mdast"
+import MarkdownNode from "../MarkdownNode.vue"
 import type { MarkdownState } from "../markdownState"
 
 defineProps<{
@@ -9,5 +10,12 @@ defineProps<{
 </script>
 
 <template>
-  <del class="text-ink-muted"><slot /></del>
+  <del class="text-ink-muted">
+    <MarkdownNode
+      v-for="(child, index) in node.children"
+      :key="index"
+      :node="child"
+      :state="state"
+    />
+  </del>
 </template>

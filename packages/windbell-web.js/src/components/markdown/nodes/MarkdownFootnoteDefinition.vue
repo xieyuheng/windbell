@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { FootnoteDefinition } from "mdast"
 import { computed } from "vue"
+import MarkdownNode from "../MarkdownNode.vue"
 import type { MarkdownState } from "../markdownState"
 
 const props = defineProps<{
@@ -20,7 +21,14 @@ const number = computed(() =>
   >
     <div class="flex gap-2">
       <span class="shrink-0">{{ number ?? "?" }}.</span>
-      <div class="min-w-0 flex-1"><slot /></div>
+      <div class="min-w-0 flex-1">
+        <MarkdownNode
+          v-for="(child, index) in node.children"
+          :key="index"
+          :node="child"
+          :state="state"
+        />
+      </div>
     </div>
   </section>
 </template>

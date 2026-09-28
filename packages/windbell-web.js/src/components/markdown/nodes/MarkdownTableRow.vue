@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TableRow } from "mdast"
+import MarkdownNode from "../MarkdownNode.vue"
 import type { MarkdownState } from "../markdownState"
 
 defineProps<{
@@ -10,6 +11,11 @@ defineProps<{
 
 <template>
   <tr class="border-b border-line">
-    <slot />
+    <MarkdownNode
+      v-for="(child, index) in node.children"
+      :key="index"
+      :node="child"
+      :state="state"
+    />
   </tr>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Heading } from "mdast"
 import { computed } from "vue"
+import MarkdownNode from "../MarkdownNode.vue"
 import type { MarkdownState } from "../markdownState"
 
 const props = defineProps<{
@@ -33,6 +34,11 @@ const prefix = computed(() =>
     <span class="text-ink-muted" aria-hidden="true">
       {{ prefix }}{{ " " }}
     </span>
-    <slot />
+    <MarkdownNode
+      v-for="(child, index) in node.children"
+      :key="index"
+      :node="child"
+      :state="state"
+    />
   </component>
 </template>

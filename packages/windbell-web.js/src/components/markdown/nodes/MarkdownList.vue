@@ -2,6 +2,7 @@
 import type { List } from "mdast"
 import { computed } from "vue"
 import type { MarkdownState } from "../markdownState"
+import MarkdownListItem from "./MarkdownListItem.vue"
 
 const props = defineProps<{
   node: List
@@ -12,18 +13,27 @@ const tag = computed(() => (props.node.ordered ? "ol" : "ul"))
 const start = computed(() =>
   props.node.ordered ? (props.node.start ?? undefined) : undefined,
 )
-const markerClass = computed(() =>
-  props.node.ordered ? "list-decimal" : "list-disc",
-)
+
+function markerFor(index: number): string {
+  if (!props.node.ordered) return "* "
+
+  const start = props.node.start ?? 1
+  return `${start + index}. `
+}
 </script>
 
 <template>
   <component
     :is="tag"
     :start="start"
-    class="my-3 space-y-1 pl-6 marker:text-ink-muted"
-    :class="markerClass"
+    class="markdown-list list-none space-y-1 pl-0"
   >
-    <slot />
+    <MarkdownListItem
+      v-for="(item, index) in node.children"
+      :key="index"
+      :node="item"
+      :state="state"
+      :marker="markerFor(index)"
+    />
   </component>
 </template>
