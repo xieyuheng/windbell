@@ -18,6 +18,10 @@ const sizeClass = computed(() => {
   if (props.node.depth === 2) return "text-lg"
   return undefined
 })
+
+const prefix = computed(() =>
+  "#".repeat(Math.min(Math.max(props.node.depth, 1), 6)),
+)
 </script>
 
 <template>
@@ -26,6 +30,9 @@ const sizeClass = computed(() => {
     class="mb-3 mt-6 font-semibold first:mt-0"
     :class="sizeClass"
   >
+    <span class="text-ink-muted" aria-hidden="true">
+      {{ prefix }}{{ " " }}
+    </span>
     <slot />
   </component>
 </template>

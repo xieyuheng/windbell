@@ -85,9 +85,9 @@ const frontmatter = computed<FrontmatterData | undefined>(() => {
 <template>
   <header
     v-if="frontmatter !== undefined"
-    class="my-4 flex flex-col gap-2 border-b border-line pb-4"
+    class="flex flex-col gap-2"
   >
-    <div v-if="frontmatter.title" class="text-xl font-semibold text-ink">
+    <div v-if="frontmatter.title" class="text-2xl font-semibold text-ink">
       {{ frontmatter.title }}
     </div>
 
