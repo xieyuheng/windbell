@@ -10,7 +10,7 @@ defineProps<{
 
 <template>
   <div class="my-4 overflow-x-auto thin-scrollbar">
-    <table class="w-full border-collapse text-left text-sm">
+    <table class="w-full border-collapse text-left">
       <slot />
     </table>
   </div>

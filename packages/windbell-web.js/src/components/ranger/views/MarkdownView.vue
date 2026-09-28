@@ -38,7 +38,7 @@ watch(mode, (value) => {
 
       <pre
         v-else
-        class="m-0 font-mono text-sm whitespace-pre-wrap break-words text-ink"
+        class="m-0 font-mono whitespace-pre-wrap break-words text-ink"
         >{{ text }}</pre>
     </div>
   </div>

@@ -14,20 +14,9 @@ const tag = computed(() => {
 })
 
 const sizeClass = computed(() => {
-  switch (props.node.depth) {
-    case 1:
-      return "text-2xl"
-    case 2:
-      return "text-xl"
-    case 3:
-      return "text-lg"
-    case 4:
-      return "text-base"
-    case 5:
-      return "text-sm"
-    default:
-      return "text-xs"
-  }
+  if (props.node.depth === 1) return "text-xl"
+  if (props.node.depth === 2) return "text-lg"
+  return undefined
 })
 </script>
 

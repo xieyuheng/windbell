@@ -10,6 +10,6 @@ defineProps<{
 
 <template>
   <pre
-    class="my-4 overflow-x-auto rounded bg-paper-deep p-3 text-sm thin-scrollbar"
+    class="my-4 overflow-x-auto rounded bg-paper-deep p-3 thin-scrollbar"
   ><code class="font-mono">{{ node.value }}</code></pre>
 </template>
