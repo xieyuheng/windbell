@@ -98,7 +98,5 @@ const frontmatter = computed<FrontmatterData | undefined>(() => {
     </div>
   </header>
 
-  <pre v-else class="whitespace-pre-wrap font-mono">{{
-    node.value
-  }}</pre>
+  <pre v-else class="whitespace-pre-wrap font-mono">{{ node.value }}</pre>
 </template>
