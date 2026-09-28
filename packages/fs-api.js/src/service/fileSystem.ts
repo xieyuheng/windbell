@@ -40,6 +40,15 @@ export async function read(path: string): Promise<string> {
   return await fs.readFile(path, "utf8")
 }
 
+export async function readBytes(
+  path: string,
+): Promise<Uint8Array<ArrayBuffer>> {
+  const buffer = await fs.readFile(path)
+  const bytes = new Uint8Array(buffer.byteLength)
+  bytes.set(buffer)
+  return bytes
+}
+
 export async function write(path: string, text: string): Promise<void> {
   await fs.writeFile(path, text, "utf8")
 }

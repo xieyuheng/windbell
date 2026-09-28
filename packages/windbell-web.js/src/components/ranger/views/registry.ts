@@ -3,10 +3,8 @@ import {
   type FileSystemEntry,
 } from "@xieyuheng/fs-api.js/client"
 import type { Component } from "vue"
-import DirectoryView from "./DirectoryView.vue"
 import MarkdownView from "./MarkdownView.vue"
 import TextView from "./TextView.vue"
-import UnknownView from "./UnknownView.vue"
 
 const fileSystem = makeFileSystemClient({
   baseUrl: "/api/fs",
@@ -40,8 +38,6 @@ const textExtensions = new Set([
   "kt",
   "less",
   "log",
-  "markdown",
-  "md",
   "mjs",
   "mts",
   "php",
@@ -71,36 +67,21 @@ function extensionOf(name: string): string {
   return name.slice(index + 1).toLowerCase()
 }
 
-function resolveKnownEntryView(entry: FileSystemEntry): Component | undefined {
-  if (entry.kind === "Directory") return DirectoryView
+export async function resolveFileView(
+  entry: FileSystemEntry,
+): Promise<Component | undefined> {
+  if (entry.kind === "Directory") return undefined
 
   const extension = extensionOf(entry.name)
   if (extension === "md" || extension === "markdown") return MarkdownView
   if (textExtensions.has(extension)) return TextView
 
-  return undefined
-}
-
-export async function resolveEntryView(
-  entry: FileSystemEntry,
-): Promise<Component> {
-  const knownView = resolveKnownEntryView(entry)
-  if (knownView !== undefined) return knownView
-
   try {
     const info = await fileSystem.inspectFile(entry.path)
-
-    switch (info.kind) {
-      case "Text":
-        return TextView
-      case "Image":
-      case "Pdf":
-      case "Archive":
-      case "Binary":
-      case "Unknown":
-        return UnknownView
-    }
+    if (info.kind === "Text") return TextView
   } catch {
-    return UnknownView
+    return undefined
   }
+
+  return undefined
 }

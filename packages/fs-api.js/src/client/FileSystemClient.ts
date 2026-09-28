@@ -24,6 +24,7 @@ export type FileSystemClient = {
   isFile(path: string): Promise<boolean>
   isDirectory(path: string): Promise<boolean>
   read(path: string): Promise<string>
+  readBytes(path: string): Promise<Uint8Array>
   write(path: string, text: string): Promise<void>
   list(path: string): Promise<Array<string>>
   listEntries(path: string): Promise<Array<FileSystemEntry>>
@@ -55,6 +56,7 @@ export function makeFileSystemClient(
     isFile: (path) => call(config.baseUrl, "is-file", { path }),
     isDirectory: (path) => call(config.baseUrl, "is-directory", { path }),
     read: (path) => call(config.baseUrl, "read", { path }),
+    readBytes: (path) => readBytes(config.baseUrl, path),
     write: async (path, text) => {
       await call(config.baseUrl, "write", { path, text })
     },
@@ -83,6 +85,27 @@ export function makeFileSystemClient(
     watch: (path, onEvent, onError) =>
       watch(config.baseUrl, path, onEvent, onError),
   }
+}
+
+async function readBytes(baseUrl: string, path: string): Promise<Uint8Array> {
+  const response = await fetch(joinUrl(baseUrl, "read-bytes"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ path }),
+  })
+
+  if (!response.ok) {
+    const text = await response.text()
+    const value = text === "" ? null : parseJsonOrUndefined(text)
+
+    throw new Error(
+      `[FileSystemClient] read-bytes failed with HTTP ${response.status}: ${readErrorMessage(value, text)}`,
+    )
+  }
+
+  return new Uint8Array(await response.arrayBuffer())
 }
 
 async function call<T>(

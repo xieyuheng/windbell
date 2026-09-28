@@ -131,6 +131,19 @@ export function makeFileSystemRouter(): Hono {
     })
   })
 
+  app.post("/read-bytes", async (c) => {
+    const body = await readJsonBody(c)
+    const path = readPath(body)
+    const bytes = await service.readBytes(path)
+
+    return new Response(bytes, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/octet-stream",
+      },
+    })
+  })
+
   app.post("/:method", async (c) => {
     const method = c.req.param("method")
     const handler = handlers[method]

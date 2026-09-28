@@ -173,6 +173,10 @@ test("fileSystem client and server", async (t) => {
 
   await client.write(textFile, "# Hello")
   assert.equal(await client.read(textFile), "# Hello")
+  assert.deepEqual(
+    await client.readBytes(textFile),
+    new TextEncoder().encode("# Hello"),
+  )
 
   const emptyFile = Path.join(root, "empty.txt")
   await client.ensureFile(emptyFile)
