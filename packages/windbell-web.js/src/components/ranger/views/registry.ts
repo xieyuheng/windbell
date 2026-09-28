@@ -4,6 +4,7 @@ import {
 } from "@xieyuheng/fs-api.js/client"
 import type { Component } from "vue"
 import DirectoryView from "./DirectoryView.vue"
+import MarkdownView from "./MarkdownView.vue"
 import TextView from "./TextView.vue"
 import UnknownView from "./UnknownView.vue"
 
@@ -72,7 +73,10 @@ function extensionOf(name: string): string {
 
 function resolveKnownEntryView(entry: FileSystemEntry): Component | undefined {
   if (entry.kind === "Directory") return DirectoryView
-  if (textExtensions.has(extensionOf(entry.name))) return TextView
+
+  const extension = extensionOf(entry.name)
+  if (extension === "md" || extension === "markdown") return MarkdownView
+  if (textExtensions.has(extension)) return TextView
 
   return undefined
 }

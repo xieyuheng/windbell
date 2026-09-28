@@ -1,0 +1,26 @@
+<script setup lang="ts">
+import type { FootnoteReference } from "mdast"
+import { computed } from "vue"
+import type { MarkdownState } from "../markdownState"
+
+const props = defineProps<{
+  node: FootnoteReference
+  state: MarkdownState
+}>()
+
+const number = computed(() =>
+  props.state.footnoteNumbers.get(props.node.identifier),
+)
+</script>
+
+<template>
+  <sup>
+    <a
+      :id="`markdown-footnote-ref-${node.identifier}`"
+      :href="`#markdown-footnote-${node.identifier}`"
+      class="text-info no-underline"
+    >
+      {{ number ?? "?" }}
+    </a>
+  </sup>
+</template>

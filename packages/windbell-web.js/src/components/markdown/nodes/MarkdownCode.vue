@@ -1,0 +1,15 @@
+<script setup lang="ts">
+import type { Code } from "mdast"
+import type { MarkdownState } from "../markdownState"
+
+defineProps<{
+  node: Code
+  state: MarkdownState
+}>()
+</script>
+
+<template>
+  <pre
+    class="my-4 overflow-x-auto rounded bg-paper-deep p-3 text-sm thin-scrollbar"
+  ><code class="font-mono">{{ node.value }}</code></pre>
+</template>

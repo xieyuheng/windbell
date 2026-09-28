@@ -9,12 +9,18 @@
     "@xieyuheng/fs-api.js": "workspace:*",
     "@xieyuheng/semiosis-api.js": "workspace:*",
     "@xieyuheng/semiosis.js": "workspace:*",
+    "mdast-util-from-markdown": "2.0.3",
+    "mdast-util-frontmatter": "2.0.1",
+    "mdast-util-gfm": "3.1.0",
+    "micromark-extension-frontmatter": "2.0.0",
+    "micromark-extension-gfm": "3.0.0",
     "vue": "3.5.43",
     "vue-i18n": "11.4.12",
     "vue-router": "5.3.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.3.3",
+    "@types/mdast": "4.0.4",
     "@types/node": "26.6.3",
     "@vitejs/plugin-vue": "6.0.9",
     "prettier": "3.9.9",
