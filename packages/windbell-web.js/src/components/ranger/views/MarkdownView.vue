@@ -33,7 +33,7 @@ watch(mode, (value) => {
       @toggle="toggleMode"
     />
 
-    <div class="min-h-0 flex-1 overflow-auto px-4 py-3 pr-14 thin-scrollbar">
+    <div class="min-h-0 flex-1 overflow-auto px-4 py-3 thin-scrollbar">
       <Markdown v-if="mode === 'render'" :source="text" />
 
       <pre

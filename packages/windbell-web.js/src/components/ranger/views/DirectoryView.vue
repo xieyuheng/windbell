@@ -17,7 +17,7 @@ const { t } = useI18n({
   <div class="flex h-full min-h-0 flex-col overflow-hidden">
     <ol
       v-if="content.entries.length > 0"
-      class="min-h-0 flex-1 overflow-y-auto"
+      class="thin-scrollbar min-h-0 flex-1 overflow-y-auto"
     >
       <li
         v-for="child in content.entries"

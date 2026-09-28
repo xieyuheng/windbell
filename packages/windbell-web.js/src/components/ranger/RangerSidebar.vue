@@ -46,7 +46,10 @@ function pathName(value: string): string {
       </p>
     </header>
 
-    <ol ref="list" class="min-h-0 flex-1 overflow-y-auto border-t border-line">
+    <ol
+      ref="list"
+      class="thin-scrollbar min-h-0 flex-1 overflow-y-auto border-t border-line"
+    >
       <li
         v-for="(entry, index) in entries"
         :key="entry.path"
