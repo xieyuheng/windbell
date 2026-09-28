@@ -9,14 +9,12 @@
     "@xieyuheng/fs-api.js": "workspace:*",
     "@xieyuheng/semiosis-api.js": "workspace:*",
     "@xieyuheng/semiosis.js": "workspace:*",
-    "markdown-it": "15.0.2",
     "vue": "3.5.43",
     "vue-i18n": "11.4.12",
     "vue-router": "5.3.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.3.3",
-    "@types/markdown-it": "14.2.0",
     "@types/node": "26.6.3",
     "@vitejs/plugin-vue": "6.0.9",
     "prettier": "3.9.9",
