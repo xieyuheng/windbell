@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed } from "vue"
+import type { RangerFileContent } from "../RangerContent"
 
 const props = defineProps<{
-  content: Uint8Array
+  content: RangerFileContent
 }>()
 
-const text = computed(() => new TextDecoder().decode(props.content))
+const text = computed(() => new TextDecoder().decode(props.content.bytes))
 </script>
 
 <template>

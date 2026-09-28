@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n"
+import type { RangerEmptyContent } from "../RangerContent"
 import { rangerMessages } from "../Ranger.i18n"
+
+defineProps<{
+  content: RangerEmptyContent
+}>()
 
 const { t } = useI18n({
   messages: rangerMessages,

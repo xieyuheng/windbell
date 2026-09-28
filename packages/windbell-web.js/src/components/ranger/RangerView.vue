@@ -10,6 +10,12 @@ import DirectoryView from "./views/DirectoryView.vue"
 import UnknownView from "./views/UnknownView.vue"
 import { rangerMessages } from "./Ranger.i18n"
 import { resolveFileView } from "./views/registry"
+import type { RangerContent } from "./RangerContent"
+
+type DisplayedRangerView = {
+  component: Component
+  content: RangerContent
+}
 
 const props = defineProps<{
   entry: FileSystemEntry | undefined
@@ -24,46 +30,68 @@ const { t } = useI18n({
   useScope: "local",
 })
 
-const fileView = shallowRef<Component | undefined>(undefined)
-const fileContent = shallowRef<Uint8Array | undefined>(undefined)
-const fileLoading = ref(false)
-const fileError = ref<string | undefined>(undefined)
+const displayed = shallowRef<DisplayedRangerView | undefined>(undefined)
+const pending = ref(false)
+const error = ref<string | undefined>(undefined)
 
 let requestId = 0
+
+async function loadEntryView(
+  entry: FileSystemEntry,
+): Promise<DisplayedRangerView> {
+  if (entry.kind === "Directory") {
+    const entries = await fileSystem.listEntries(entry.path)
+
+    return {
+      component: DirectoryView,
+      content: { type: "directory", entries },
+    }
+  }
+
+  const view = await resolveFileView(entry)
+  if (view === undefined) {
+    return {
+      component: UnknownView,
+      content: { type: "none" },
+    }
+  }
+
+  const bytes = await fileSystem.readBytes(entry.path)
+
+  return {
+    component: view,
+    content: { type: "file", bytes },
+  }
+}
 
 watch(
   () => props.entry,
   async (entry) => {
     const currentRequestId = ++requestId
 
-    fileLoading.value = false
-    fileError.value = undefined
-    fileView.value = undefined
-    fileContent.value = undefined
+    error.value = undefined
+    pending.value = false
 
-    if (entry === undefined || entry.kind === "Directory") return
+    if (entry === undefined) {
+      displayed.value = undefined
+      return
+    }
 
-    fileLoading.value = true
+    pending.value = true
 
     try {
-      const view = await resolveFileView(entry)
+      const next = await loadEntryView(entry)
       if (currentRequestId !== requestId) return
 
-      if (view === undefined) return
-
-      const content = await fileSystem.readBytes(entry.path)
-      if (currentRequestId !== requestId) return
-
-      fileView.value = view
-      fileContent.value = content
+      displayed.value = next
     } catch (caught) {
       if (currentRequestId !== requestId) return
 
-      fileError.value =
-        caught instanceof Error ? caught.message : String(caught)
+      displayed.value = undefined
+      error.value = caught instanceof Error ? caught.message : String(caught)
     } finally {
       if (currentRequestId === requestId) {
-        fileLoading.value = false
+        pending.value = false
       }
     }
   },
@@ -72,26 +100,23 @@ watch(
 </script>
 
 <template>
-  <section class="flex h-full min-h-0 flex-col overflow-hidden bg-paper">
-    <DirectoryView v-if="entry?.kind === 'Directory'" :entry="entry" />
+  <section
+    class="relative flex h-full min-h-0 flex-col overflow-hidden bg-paper"
+  >
+    <p v-if="error !== undefined" class="px-4 py-3 text-danger">
+      {{ error }}
+    </p>
 
-    <template v-else-if="entry?.kind === 'File'">
-      <div v-if="fileLoading" class="px-4 py-3 text-ink">
-        {{ t("loading") }}
-      </div>
+    <component
+      v-else-if="displayed !== undefined"
+      :is="displayed.component"
+      :content="displayed.content"
+    />
 
-      <p v-else-if="fileError !== undefined" class="px-4 py-3 text-danger">
-        {{ fileError }}
-      </p>
-
-      <component
-        v-else-if="fileView !== undefined && fileContent !== undefined"
-        :is="fileView"
-        :content="fileContent"
-      />
-
-      <UnknownView v-else />
-    </template>
+    <div
+      v-else-if="pending"
+      class="pointer-events-none absolute right-3 top-3 z-10 h-4 w-4 animate-spin rounded-full border-2 border-line border-t-ink"
+    />
 
     <div v-else class="flex flex-1 items-center justify-center px-4 text-ink">
       {{ t("empty") }}

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue"
 import Markdown from "../../markdown/Markdown.vue"
+import type { RangerFileContent } from "../RangerContent"
 import MarkdownToolbar from "./MarkdownToolbar.vue"
 import {
   readStoredMarkdownViewMode,
@@ -9,10 +10,10 @@ import {
 } from "./MarkdownViewMode"
 
 const props = defineProps<{
-  content: Uint8Array
+  content: RangerFileContent
 }>()
 
-const text = computed(() => new TextDecoder().decode(props.content))
+const text = computed(() => new TextDecoder().decode(props.content.bytes))
 const mode = ref<MarkdownViewMode>(readStoredMarkdownViewMode())
 
 function toggleMode(): void {
