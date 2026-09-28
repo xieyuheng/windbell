@@ -7,6 +7,12 @@ import { ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import Markdown from "../../markdown/Markdown.vue"
 import { rangerMessages } from "../Ranger.i18n"
+import MarkdownToolbar from "./MarkdownToolbar.vue"
+import {
+  readStoredMarkdownViewMode,
+  writeStoredMarkdownViewMode,
+  type MarkdownViewMode,
+} from "./MarkdownViewMode"
 
 const props = defineProps<{
   entry: FileSystemEntry
@@ -24,8 +30,17 @@ const fileSystem = makeFileSystemClient({
 const loading = ref(false)
 const error = ref<string | undefined>(undefined)
 const content = ref("")
+const mode = ref<MarkdownViewMode>(readStoredMarkdownViewMode())
 
 let requestId = 0
+
+function toggleMode(): void {
+  mode.value = mode.value === "render" ? "source" : "render"
+}
+
+watch(mode, (value) => {
+  writeStoredMarkdownViewMode(value)
+})
 
 watch(
   () => props.entry,
@@ -58,7 +73,14 @@ watch(
 </script>
 
 <template>
-  <div class="flex h-full min-h-0 flex-col overflow-hidden">
+  <div class="relative flex h-full min-h-0 flex-col overflow-hidden">
+    <MarkdownToolbar
+      v-if="loading === false && error === undefined"
+      class="absolute right-3 top-3 z-10"
+      :mode="mode"
+      @toggle="toggleMode"
+    />
+
     <p v-if="loading" class="px-4 py-3 text-ink">
       {{ t("loading") }}
     </p>
@@ -67,8 +89,16 @@ watch(
       {{ error }}
     </p>
 
-    <div v-else class="min-h-0 flex-1 overflow-auto px-4 py-3 thin-scrollbar">
-      <Markdown :source="content" />
+    <div
+      v-else
+      class="min-h-0 flex-1 overflow-auto px-4 py-3 pr-14 thin-scrollbar"
+    >
+      <Markdown v-if="mode === 'render'" :source="content" />
+
+      <pre
+        v-else
+        class="m-0 font-mono text-sm whitespace-pre-wrap break-words text-ink"
+        >{{ content }}</pre>
     </div>
   </div>
 </template>
