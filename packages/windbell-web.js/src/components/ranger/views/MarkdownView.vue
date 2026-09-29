@@ -34,7 +34,7 @@ watch(mode, (value) => {
     />
 
     <div class="min-h-0 flex-1 overflow-auto px-4 py-3 thin-scrollbar">
-      <Markdown v-if="mode === 'render'" :source="text" />
+      <Markdown v-if="mode === 'render'" :text="text" />
 
       <pre
         v-else

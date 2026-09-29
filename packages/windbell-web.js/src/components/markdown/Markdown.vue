@@ -6,11 +6,10 @@ import { createMarkdownState } from "./markdownState"
 import { parseMarkdown } from "./parseMarkdown"
 
 const props = defineProps<{
-  source?: string
-  root?: Root
-}>()
+  text: string
+ }>()
 
-const root = computed(() => props.root ?? parseMarkdown(props.source ?? ""))
+const root = computed(() => parseMarkdown(props.text))
 const state = computed(() => createMarkdownState(root.value))
 </script>
 
