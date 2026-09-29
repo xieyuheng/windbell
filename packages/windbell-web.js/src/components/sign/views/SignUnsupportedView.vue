@@ -9,7 +9,7 @@ defineProps<{
 </script>
 
 <template>
-  <pre
-    class="thin-scrollbar overflow-x-auto whitespace-pre-wrap font-mono text-ink"
-    >{{ JSON.stringify(sign, null, 2) }}</pre>
+  <pre class="thin-scrollbar overflow-x-auto whitespace-pre-wrap font-mono">{{
+    JSON.stringify(sign, null, 2)
+  }}</pre>
 </template>

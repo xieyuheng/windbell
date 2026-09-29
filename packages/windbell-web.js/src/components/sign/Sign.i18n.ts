@@ -1,5 +1,7 @@
 export const signMessages = {
   "zh-CN": {
+    copyPath: "点击复制路径",
+    copyCommand: "点击复制命令",
     signKind: {
       user: "用户",
       reasoning: "思考",
@@ -12,6 +14,8 @@ export const signMessages = {
     },
   },
   "en-US": {
+    copyPath: "Click to copy path",
+    copyCommand: "Click to copy command",
     signKind: {
       user: "User",
       reasoning: "Reasoning",

@@ -18,8 +18,8 @@ const argumentsText = computed(() => JSON.stringify(props.args, null, 2) ?? "")
       {{ sign.name }}
     </div>
 
-    <div class="thin-scrollbar overflow-x-auto whitespace-pre font-mono">
-      {{ argumentsText }}
-    </div>
+    <pre class="thin-scrollbar overflow-x-auto whitespace-pre font-mono">{{
+      argumentsText
+    }}</pre>
   </div>
 </template>

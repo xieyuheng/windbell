@@ -3,6 +3,8 @@ import type * as S from "@xieyuheng/semiosis.js"
 import { bashToolParameters } from "@xieyuheng/semiosis.js/src/tools/bash/makeBashToolSign.ts"
 import { Ajv } from "ajv"
 import { computed } from "vue"
+import { useI18n } from "vue-i18n"
+import { signMessages } from "../../Sign.i18n.ts"
 import type { SignState } from "../../signState.ts"
 
 const props = defineProps<{
@@ -14,6 +16,11 @@ const props = defineProps<{
 type BashArguments = {
   command: string
 }
+
+const { t } = useI18n({
+  messages: signMessages,
+  useScope: "local",
+})
 
 const ajv = new Ajv({
   allErrors: true,
@@ -33,6 +40,25 @@ const bashArgs = computed<BashArguments>(() => {
 
   return props.args as BashArguments
 })
+
+async function copyText(text: string): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(text)
+  } catch {
+    // ignore clipboard errors
+  }
+}
+
+function copyPath(): void {
+  const workspaceRoot = props.state.workspaceRoot
+  if (workspaceRoot === undefined) return
+
+  void copyText(workspaceRoot)
+}
+
+function copyCommand(): void {
+  void copyText(bashArgs.value.command)
+}
 </script>
 
 <template>
@@ -41,12 +67,25 @@ const bashArgs = computed<BashArguments>(() => {
       {{ sign.name }}
     </div>
 
-    <div class="thin-scrollbar overflow-x-auto whitespace-pre font-mono">
+    <div class="font-mono break-words">
       <div v-if="state.workspaceRoot">
-        {{ `  ${state.workspaceRoot}` }}
+        <span class="select-none whitespace-pre" aria-hidden="true">{{
+          "  "
+        }}</span>
+        <span class="cursor-pointer" :title="t('copyPath')" @click="copyPath">{{
+          state.workspaceRoot
+        }}</span>
       </div>
 
-      <div>$ {{ bashArgs.command }}</div>
+      <div>
+        <span class="select-none" aria-hidden="true">$ </span>
+        <span
+          class="cursor-pointer"
+          :title="t('copyCommand')"
+          @click="copyCommand"
+          >{{ bashArgs.command }}</span
+        >
+      </div>
     </div>
   </div>
 </template>
