@@ -31,3 +31,5 @@ IDE 如何与 meta-lisp 结合？
 用 git 管理 ~/.windbell 文件夹
 
 - 自己尝试，先不要做成功能
+- 未来可以考虑做 git-api.js
+  - 本地部署 git 管理工具
