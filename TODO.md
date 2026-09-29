@@ -1,16 +1,26 @@
-# windbell-web.js
-
-配色可配置
-
 # semiosis.js
 
 review repl 代码
 repl 命令调用框架
+实现 /help 命令
+
 用 repl 命令，实现 provider 和 model 选择流程
 
 # windbell-web.js
 
 实现 provider 和 model 选择流程
+
+# meta-lisp
+
+IDE 如何与 meta-lisp 结合？
+
+- 初始化项目模板
+- 语法高亮
+- 按照惯例运行 scripts/ 中的脚本
+
+# windbell-web.js
+
+配色可配置
 
 # windbell-web.js
 
@@ -19,3 +29,5 @@ repl 命令调用框架
 # windbell database
 
 用 git 管理 ~/.windbell 文件夹
+
+- 自己尝试，先不要做成功能
