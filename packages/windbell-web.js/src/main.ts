@@ -2,8 +2,8 @@ import { createHead } from "@unhead/vue/client"
 import { createApp } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import App from "./app/App.vue"
-import { i18n } from "./app/i18n"
-import { routes } from "./pages/routes"
+import { i18n } from "./app/i18n.ts"
+import { routes } from "./pages/routes.ts"
 import "./styles/index.css"
 
 const router = createRouter({

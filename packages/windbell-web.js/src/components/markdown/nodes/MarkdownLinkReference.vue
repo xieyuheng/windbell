@@ -2,8 +2,8 @@
 import type { LinkReference } from "mdast"
 import { computed } from "vue"
 import MarkdownNode from "../MarkdownNode.vue"
-import type { MarkdownState } from "../markdownState"
-import { safeUrl } from "../markdownUrl"
+import type { MarkdownState } from "../markdownState.ts"
+import { safeUrl } from "../markdownUrl.ts"
 
 const props = defineProps<{
   node: LinkReference

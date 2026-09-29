@@ -2,8 +2,8 @@
 import type { Root } from "mdast"
 import { computed } from "vue"
 import MarkdownNode from "./MarkdownNode.vue"
-import { createMarkdownState } from "./markdownState"
-import { parseMarkdown } from "./parseMarkdown"
+import { createMarkdownState } from "./markdownState.ts"
+import { parseMarkdown } from "./parseMarkdown.ts"
 
 const props = defineProps<{
   text: string

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
-import { makeDividerState } from "../divider/DividerState"
+import { makeDividerState } from "../divider/DividerState.ts"
 import ResizeDivider from "../divider/ResizeDivider.vue"
-import { rangerMessages } from "./Ranger.i18n"
+import { rangerMessages } from "./Ranger.i18n.ts"
 import RangerSidebar from "./RangerSidebar.vue"
 import RangerView from "./RangerView.vue"
 import {
@@ -14,7 +14,7 @@ import {
   openSelectedEntry,
   selectEntry,
   watchRanger,
-} from "./RangerState"
+} from "./RangerState.ts"
 
 const props = defineProps<{
   root: string

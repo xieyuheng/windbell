@@ -6,7 +6,7 @@ import {
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import MediumButton from "../../../components/buttons/MediumButton.vue"
-import { homeMessages } from "../Home.i18n"
+import { homeMessages } from "../Home.i18n.ts"
 
 const props = defineProps<{
   creating: boolean

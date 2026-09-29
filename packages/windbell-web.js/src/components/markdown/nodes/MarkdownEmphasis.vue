@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Emphasis } from "mdast"
 import MarkdownNode from "../MarkdownNode.vue"
-import type { MarkdownState } from "../markdownState"
+import type { MarkdownState } from "../markdownState.ts"
 
 defineProps<{
   node: Emphasis

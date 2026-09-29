@@ -2,7 +2,7 @@
 import type { ListItem } from "mdast"
 import { computed } from "vue"
 import MarkdownNode from "../MarkdownNode.vue"
-import type { MarkdownState } from "../markdownState"
+import type { MarkdownState } from "../markdownState.ts"
 
 const props = defineProps<{
   node: ListItem

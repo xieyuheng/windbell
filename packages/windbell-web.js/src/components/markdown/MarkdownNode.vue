@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from "vue"
-import type { MarkdownState } from "./markdownState"
-import type { MarkdownNode as MarkdownNodeType } from "./markdownTypes"
-import { resolveMarkdownNodeComponent } from "./resolveMarkdownNodeComponent"
+import type { MarkdownState } from "./markdownState.ts"
+import type { MarkdownNode as MarkdownNodeType } from "./markdownTypes.ts"
+import { resolveMarkdownNodeComponent } from "./resolveMarkdownNodeComponent.ts"
 
 defineOptions({ name: "MarkdownNode" })
 

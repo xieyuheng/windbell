@@ -2,7 +2,7 @@
 import { useHead } from "@unhead/vue"
 import { useI18n } from "vue-i18n"
 import { RouterView } from "vue-router"
-import { useTheme } from "./theme"
+import { useTheme } from "./theme.ts"
 
 const { locale } = useI18n()
 const theme = useTheme()

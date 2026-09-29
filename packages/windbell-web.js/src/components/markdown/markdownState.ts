@@ -1,5 +1,5 @@
 import type { Definition, FootnoteDefinition, Root } from "mdast"
-import type { MarkdownNode } from "./markdownTypes"
+import type { MarkdownNode } from "./markdownTypes.ts"
 
 export interface MarkdownState {
   definitions: ReadonlyMap<string, Definition>

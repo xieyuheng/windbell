@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Image } from "mdast"
 import { computed } from "vue"
-import type { MarkdownState } from "../markdownState"
-import { safeUrl } from "../markdownUrl"
+import type { MarkdownState } from "../markdownState.ts"
+import { safeUrl } from "../markdownUrl.ts"
 
 const props = defineProps<{
   node: Image

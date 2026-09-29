@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { List } from "mdast"
 import { computed } from "vue"
-import type { MarkdownState } from "../markdownState"
+import type { MarkdownState } from "../markdownState.ts"
 import MarkdownListItem from "./MarkdownListItem.vue"
 
 const props = defineProps<{

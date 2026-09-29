@@ -8,17 +8,17 @@ import { useI18n } from "vue-i18n"
 import { useRoute, useRouter } from "vue-router"
 import BackButton from "../../components/buttons/BackButton.vue"
 import MediumButton from "../../components/buttons/MediumButton.vue"
-import { sendSessionMessage } from "../session/SessionInbox"
+import { sendSessionMessage } from "../session/SessionInbox.ts"
 import SessionCard from "./components/SessionCard.vue"
 import SessionStartComposer from "./components/SessionStartComposer.vue"
-import { workspaceMessages } from "./Workspace.i18n"
+import { workspaceMessages } from "./Workspace.i18n.ts"
 import {
   loadWorkspaceState,
   makeSession,
   makeWorkspaceState,
   trashSession,
   updateSessionTitle,
-} from "./WorkspaceState"
+} from "./WorkspaceState.ts"
 
 const route = useRoute()
 const router = useRouter()

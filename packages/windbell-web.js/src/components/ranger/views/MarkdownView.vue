@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue"
 import Markdown from "../../markdown/Markdown.vue"
-import type { RangerFileContent } from "../RangerContent"
+import type { RangerFileContent } from "../RangerContent.ts"
 import MarkdownToolbar from "./MarkdownToolbar.vue"
 import {
   readStoredMarkdownViewMode,
   writeStoredMarkdownViewMode,
   type MarkdownViewMode,
-} from "./MarkdownViewMode"
+} from "./MarkdownViewMode.ts"
 
 const props = defineProps<{
   content: RangerFileContent

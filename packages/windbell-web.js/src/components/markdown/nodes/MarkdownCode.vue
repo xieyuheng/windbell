@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Code } from "mdast"
-import type { MarkdownState } from "../markdownState"
+import type { MarkdownState } from "../markdownState.ts"
 
 defineProps<{
   node: Code

@@ -9,18 +9,18 @@ import { useRouter } from "vue-router"
 import MediumButton from "../../components/buttons/MediumButton.vue"
 import WorkspaceCard from "./components/WorkspaceCard.vue"
 import WorkspaceCreateDialog from "./components/WorkspaceCreateDialog.vue"
-import { homeMessages } from "./Home.i18n"
+import { homeMessages } from "./Home.i18n.ts"
 import {
   encodeMarkdownSource,
   markdownSourceQueryKey,
-} from "../markdown/markdownSource"
+} from "../markdown/markdownSource.ts"
 import {
   ensureWorkspace,
   loadHomeState,
   makeHomeState,
   trashWorkspace,
   updateWorkspaceTitle,
-} from "./HomeState"
+} from "./HomeState.ts"
 
 const { t } = useI18n({
   messages: homeMessages,

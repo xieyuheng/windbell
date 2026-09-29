@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { MarkdownState } from "../markdownState"
-import type { MarkdownNode } from "../markdownTypes"
+import type { MarkdownState } from "../markdownState.ts"
+import type { MarkdownNode } from "../markdownTypes.ts"
 
 defineProps<{
   node: MarkdownNode

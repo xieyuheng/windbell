@@ -3,20 +3,20 @@ import { useHead } from "@unhead/vue"
 import { computed, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute, useRouter } from "vue-router"
-import { makeDividerState } from "../../components/divider/DividerState"
+import { makeDividerState } from "../../components/divider/DividerState.ts"
 import ResizeDivider from "../../components/divider/ResizeDivider.vue"
 import SessionComposer from "./components/SessionComposer.vue"
 import SessionSignList from "./components/SessionSignList.vue"
 import SessionToolbar from "./components/SessionToolbar.vue"
 import Ranger from "../../components/ranger/Ranger.vue"
-import { sessionMessages } from "./Session.i18n"
+import { sessionMessages } from "./Session.i18n.ts"
 import {
   generateSessionTitle,
   interpretSession,
   loadSessionState,
   makeSessionState,
-} from "./SessionState"
-import { receiveSessionMessages, type SessionMessage } from "./SessionInbox"
+} from "./SessionState.ts"
+import { receiveSessionMessages, type SessionMessage } from "./SessionInbox.ts"
 
 function sessionRangerOpenStorageKey(sessionId: string): string {
   return `windbell.session.${sessionId}.rangerOpen`

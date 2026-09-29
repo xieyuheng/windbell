@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { InlineCode } from "mdast"
-import type { MarkdownState } from "../markdownState"
+import type { MarkdownState } from "../markdownState.ts"
 
 defineProps<{
   node: InlineCode

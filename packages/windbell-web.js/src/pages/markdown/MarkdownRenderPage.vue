@@ -5,7 +5,7 @@ import Markdown from "../../components/markdown/Markdown.vue"
 import {
   markdownSourceFromQuery,
   markdownSourceQueryKey,
-} from "./markdownSource"
+} from "./markdownSource.ts"
 
 const route = useRoute()
 

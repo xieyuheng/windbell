@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n"
-import { rangerMessages } from "../Ranger.i18n"
-import type { RangerDirectoryContent } from "../RangerContent"
+import { rangerMessages } from "../Ranger.i18n.ts"
+import type { RangerDirectoryContent } from "../RangerContent.ts"
 
 defineProps<{
   content: RangerDirectoryContent

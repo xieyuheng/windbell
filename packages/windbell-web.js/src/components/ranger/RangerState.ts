@@ -3,11 +3,11 @@ import {
   type FileSystemEntry,
 } from "@xieyuheng/fs-api.js/client"
 import { reactive } from "vue"
-import { isSamePath, parentPath } from "./RangerPath"
+import { isSamePath, parentPath } from "./RangerPath.ts"
 import {
   readStoredRangerLocation,
   writeStoredRangerLocation,
-} from "./RangerPersistence"
+} from "./RangerPersistence.ts"
 
 export type RangerFocus = "sidebar" | "view"
 

@@ -1,5 +1,5 @@
 import type { Component } from "vue"
-import type { MarkdownNode } from "./markdownTypes"
+import type { MarkdownNode } from "./markdownTypes.ts"
 import MarkdownBlockquote from "./nodes/MarkdownBlockquote.vue"
 import MarkdownBreak from "./nodes/MarkdownBreak.vue"
 import MarkdownCode from "./nodes/MarkdownCode.vue"

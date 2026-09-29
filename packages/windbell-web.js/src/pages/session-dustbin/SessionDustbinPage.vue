@@ -7,14 +7,14 @@ import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
 import BackButton from "../../components/buttons/BackButton.vue"
 import DustbinSessionCard from "./components/DustbinSessionCard.vue"
-import { sessionDustbinMessages } from "./SessionDustbin.i18n"
+import { sessionDustbinMessages } from "./SessionDustbin.i18n.ts"
 import {
   loadSessionDustbin,
   makeSessionDustbinState,
   removeSession,
   restoreSession,
   type SessionDustbinListItem,
-} from "./SessionDustbinState"
+} from "./SessionDustbinState.ts"
 
 const route = useRoute()
 

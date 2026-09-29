@@ -4,7 +4,7 @@ import {
   commitDividerRatio,
   setDividerRatio,
   type DividerState,
-} from "./DividerState"
+} from "./DividerState.ts"
 
 const props = defineProps<{
   state: DividerState

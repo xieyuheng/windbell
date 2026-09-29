@@ -6,21 +6,21 @@ import { useI18n } from "vue-i18n"
 import MediumButton from "../../components/buttons/MediumButton.vue"
 import Card from "../../components/card/Card.vue"
 import BackButton from "../../components/buttons/BackButton.vue"
-import { useFont, type Font } from "../../app/font"
-import { setLocale, supportedLocales } from "../../app/i18n"
-import { useTheme, type ThemeMode } from "../../app/theme"
-import { settingsMessages } from "./Settings.i18n"
+import { useFont, type Font } from "../../app/font.ts"
+import { setLocale, supportedLocales } from "../../app/i18n.ts"
+import { useTheme, type ThemeMode } from "../../app/theme.ts"
+import { settingsMessages } from "./Settings.i18n.ts"
 import {
   loadSettings,
   makeSettingsState,
   setDefaultModel,
-} from "./SettingsState"
+} from "./SettingsState.ts"
 import {
   clearStorageKeys,
   clearWindbellStorage,
   readWindbellStorage,
   type StorageGroup,
-} from "./SettingsStorage"
+} from "./SettingsStorage.ts"
 
 const { locale, t } = useI18n({
   messages: settingsMessages,

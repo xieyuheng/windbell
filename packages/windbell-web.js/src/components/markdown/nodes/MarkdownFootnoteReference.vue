@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FootnoteReference } from "mdast"
 import { computed } from "vue"
-import type { MarkdownState } from "../markdownState"
+import type { MarkdownState } from "../markdownState.ts"
 
 const props = defineProps<{
   node: FootnoteReference

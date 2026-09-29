@@ -2,8 +2,8 @@
 import { Code, Eye } from "@lucide/vue"
 import { useI18n } from "vue-i18n"
 import RoundButton from "../../buttons/RoundButton.vue"
-import { rangerMessages } from "../Ranger.i18n"
-import type { MarkdownViewMode } from "./MarkdownViewMode"
+import { rangerMessages } from "../Ranger.i18n.ts"
+import type { MarkdownViewMode } from "./MarkdownViewMode.ts"
 
 const props = defineProps<{
   mode: MarkdownViewMode

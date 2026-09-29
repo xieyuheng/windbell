@@ -8,9 +8,9 @@ import { ref, shallowRef, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import DirectoryView from "./views/DirectoryView.vue"
 import UnknownView from "./views/UnknownView.vue"
-import { rangerMessages } from "./Ranger.i18n"
-import { resolveFileView } from "./views/registry"
-import type { RangerContent } from "./RangerContent"
+import { rangerMessages } from "./Ranger.i18n.ts"
+import { resolveFileView } from "./views/registry.ts"
+import type { RangerContent } from "./RangerContent.ts"
 
 type DisplayedRangerView = {
   component: Component

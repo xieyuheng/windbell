@@ -1,2 +1,2 @@
-export * from "./formatDateTime"
-export * from "./formatRelativeTime"
+export * from "./formatDateTime.ts"
+export * from "./formatRelativeTime.ts"

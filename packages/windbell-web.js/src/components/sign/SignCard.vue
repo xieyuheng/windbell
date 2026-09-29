@@ -3,9 +3,9 @@ import type * as S from "@xieyuheng/semiosis.js"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import Card from "../card/Card.vue"
-import { signMessages } from "./Sign.i18n"
+import { signMessages } from "./Sign.i18n.ts"
 import SignView from "./SignView.vue"
-import { resolveSignView } from "./views/registry"
+import { resolveSignView } from "./views/registry.ts"
 
 const props = defineProps<{
   sign: S.Sign

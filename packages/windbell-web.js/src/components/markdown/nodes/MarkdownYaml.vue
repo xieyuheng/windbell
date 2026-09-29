@@ -2,7 +2,7 @@
 import type { Yaml } from "mdast"
 import { computed } from "vue"
 import * as YAML from "yaml"
-import type { MarkdownState } from "../markdownState"
+import type { MarkdownState } from "../markdownState.ts"
 
 interface FrontmatterData {
   title: string | undefined

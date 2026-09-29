@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type * as S from "@xieyuheng/semiosis.js"
 import { computed } from "vue"
-import { resolveSignView } from "./views/registry"
+import { resolveSignView } from "./views/registry.ts"
 
 const props = defineProps<{
   sign: S.Sign

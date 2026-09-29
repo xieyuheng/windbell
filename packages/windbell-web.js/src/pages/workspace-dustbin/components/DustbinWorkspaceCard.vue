@@ -5,8 +5,11 @@ import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import Card from "../../../components/card/Card.vue"
 import SmallButton from "../../../components/buttons/SmallButton.vue"
-import { formatDateTime, formatRelativeTime } from "../../../utils/datetime"
-import { workspaceDustbinMessages } from "../WorkspaceDustbin.i18n"
+import {
+  formatDateTime,
+  formatRelativeTime,
+} from "../../../utils/datetime/index.ts"
+import { workspaceDustbinMessages } from "../WorkspaceDustbin.i18n.ts"
 
 const props = withDefaults(
   defineProps<{
