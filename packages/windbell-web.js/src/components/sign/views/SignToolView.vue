@@ -20,8 +20,8 @@ const parametersText = computed(() =>
 
     <Markdown :text="sign.description" />
 
-    <div
-      class="thin-scrollbar overflow-x-auto whitespace-pre font-mono"
-    >{{ parametersText }}</div>
+    <div class="thin-scrollbar overflow-x-auto whitespace-pre font-mono">
+      {{ parametersText }}
+    </div>
   </div>
 </template>

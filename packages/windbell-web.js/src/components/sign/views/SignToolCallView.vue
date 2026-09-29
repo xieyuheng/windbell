@@ -21,8 +21,8 @@ const argumentsText = computed(() => {
       {{ sign.name }}
     </div>
 
-    <div
-      class="thin-scrollbar overflow-x-auto whitespace-pre font-mono"
-    >{{ argumentsText }}</div>
+    <div class="thin-scrollbar overflow-x-auto whitespace-pre font-mono">
+      {{ argumentsText }}
+    </div>
   </div>
 </template>
