@@ -9,7 +9,7 @@ type BashRunOptions = {
 }
 
 type BashRunResult = {
-  code: number | null
+  exitCode: number | null
   signal: NodeJS.Signals | null
   stdout: string
   stderr: string
@@ -94,7 +94,7 @@ function bashRun(
     child.on("close", (code, signal) => {
       clearTimeout(timer)
       resolve({
-        code,
+        exitCode: code,
         signal,
         stdout,
         stderr,
@@ -110,17 +110,21 @@ function formatBashRunResult(result: BashRunResult, timeoutMs: number): string {
   const lines: Array<string> = []
 
   if (result.timedOut) {
-    lines.push("exit_code: timeout")
-    lines.push(`timeout_ms: ${timeoutMs}`)
-  } else {
-    lines.push(`exit_code: ${result.code ?? result.signal ?? "unknown"}`)
+    lines.push(`[timeout ${timeoutMs}ms]`)
   }
 
-  lines.push("stdout:")
+  if (result.exitCode !== 0) {
+    lines.push(`[exit-code ${result.exitCode}]`)
+  }
+
+  if (result.signal) {
+    lines.push(`[signal ${result.signal}]`)
+  }
+
   lines.push(truncatedText(result.stdout, result.stdoutTruncated))
 
-  if (result.stderr !== "" || result.stderrTruncated) {
-    lines.push("stderr:")
+  if (result.stderr !== "") {
+    lines.push("[stderr]")
     lines.push(truncatedText(result.stderr, result.stderrTruncated))
   }
 

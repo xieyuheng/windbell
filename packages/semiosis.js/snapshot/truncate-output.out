@@ -44,8 +44,6 @@ bash
 
 [tool-output]
 
-exit_code: 0
-stdout:
 1234
 [output-truncated]
 

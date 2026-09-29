@@ -20,7 +20,9 @@ const props = withDefaults(
     :style="{ '--card-color': props.color }"
   >
     <div v-if="$slots.tag" class="flex">
-      <div class="flex py-0.5 border-3 border-[var(--card-color)] rounded-t-lg bg-[var(--card-color)] px-3">
+      <div
+        class="flex py-0.5 border-3 border-[var(--card-color)] rounded-t-lg bg-[var(--card-color)] px-3"
+      >
         <slot name="tag" />
       </div>
 

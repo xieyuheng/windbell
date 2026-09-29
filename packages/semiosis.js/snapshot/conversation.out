@@ -44,8 +44,6 @@ bash
 
 [tool-output]
 
-exit_code: 0
-stdout:
 # semiosis.js
 
 A minimal coding agent for DeepSeek API.
@@ -81,8 +79,6 @@ bash
 
 [tool-output]
 
-exit_code: 0
-stdout:
 #!/usr/bin/env -S node
 
 import process from "node:process"

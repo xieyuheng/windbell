@@ -50,10 +50,9 @@ bash
 
 [tool-output]
 
-exit_code: 3
-stdout:
+[exit-code 3]
 out
-stderr:
+[stderr]
 err
 
 [reasoning]

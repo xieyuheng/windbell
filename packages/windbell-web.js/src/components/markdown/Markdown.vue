@@ -7,7 +7,7 @@ import { parseMarkdown } from "./parseMarkdown"
 
 const props = defineProps<{
   text: string
- }>()
+}>()
 
 const root = computed(() => parseMarkdown(props.text))
 const state = computed(() => createMarkdownState(root.value))
