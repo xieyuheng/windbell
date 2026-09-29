@@ -10,7 +10,7 @@ export function signBody(sign: S.Sign): string {
     }
 
     case "ToolSign": {
-      return sign.name
+      return `${sign.name} ${sign.description}`
     }
 
     case "ToolCallSign": {
