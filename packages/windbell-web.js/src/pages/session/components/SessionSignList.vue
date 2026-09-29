@@ -91,6 +91,7 @@ defineExpose({ scrollToBottom })
           v-for="(sign, index) in props.state.context"
           :key="index"
           :sign="sign"
+          :workspace-root="props.state.workspaceRoot"
         />
       </ol>
     </div>

@@ -1,28 +1,19 @@
 <script setup lang="ts">
 import type * as S from "@xieyuheng/semiosis.js"
 import { computed } from "vue"
+import type { SignState } from "../signState.ts"
+import { parseToolCallArguments } from "./tool-calls/parseToolCallArguments.ts"
+import { resolveToolCallView } from "./tool-calls/registry.ts"
 
 const props = defineProps<{
   sign: S.ToolCallSign
+  state: SignState
 }>()
 
-const argumentsText = computed(() => {
-  try {
-    return JSON.stringify(JSON.parse(props.sign.arguments), null, 2) ?? ""
-  } catch {
-    return props.sign.arguments
-  }
-})
+const component = computed(() => resolveToolCallView(props.sign))
+const args = computed(() => parseToolCallArguments(props.sign))
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
-    <div class="font-mono font-bold">
-      {{ sign.name }}
-    </div>
-
-    <div class="thin-scrollbar overflow-x-auto whitespace-pre font-mono">
-      {{ argumentsText }}
-    </div>
-  </div>
+  <component :is="component" :sign="sign" :args="args" :state="state" />
 </template>

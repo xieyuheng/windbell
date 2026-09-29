@@ -179,6 +179,9 @@ importers:
       '@xieyuheng/semiosis.js':
         specifier: workspace:*
         version: link:../semiosis.js
+      ajv:
+        specifier: 8.20.0
+        version: 8.20.0
       mdast-util-from-markdown:
         specifier: 2.0.3
         version: 2.0.3

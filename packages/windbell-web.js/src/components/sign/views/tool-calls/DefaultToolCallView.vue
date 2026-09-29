@@ -1,29 +1,25 @@
 <script setup lang="ts">
 import type * as S from "@xieyuheng/semiosis.js"
 import { computed } from "vue"
-import Markdown from "../../markdown/Markdown.vue"
-import type { SignState } from "../signState.ts"
+import type { SignState } from "../../signState.ts"
 
 const props = defineProps<{
-  sign: S.ToolSign
+  sign: S.ToolCallSign
+  args: unknown
   state: SignState
 }>()
 
-const parametersText = computed(() =>
-  JSON.stringify(props.sign.parameters, null, 2),
-)
+const argumentsText = computed(() => JSON.stringify(props.args, null, 2) ?? "")
 </script>
 
 <template>
-  <div class="flex flex-col gap-3">
+  <div class="flex flex-col gap-2">
     <div class="font-mono text-ink-muted">
       {{ sign.name }}
     </div>
 
-    <Markdown :text="sign.description" />
-
     <div class="thin-scrollbar overflow-x-auto whitespace-pre font-mono">
-      {{ parametersText }}
+      {{ argumentsText }}
     </div>
   </div>
 </template>

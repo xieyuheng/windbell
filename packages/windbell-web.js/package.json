@@ -9,6 +9,7 @@
     "@xieyuheng/fs-api.js": "workspace:*",
     "@xieyuheng/semiosis-api.js": "workspace:*",
     "@xieyuheng/semiosis.js": "workspace:*",
+    "ajv": "8.20.0",
     "mdast-util-from-markdown": "2.0.3",
     "mdast-util-frontmatter": "2.0.1",
     "mdast-util-gfm": "3.1.0",
