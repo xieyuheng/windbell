@@ -54,16 +54,18 @@ function requestRemove(): void {
 
 <template>
   <Card as="article">
-    <template #header>
-      <h2 class="truncate text-lg">
+    <template #tag>
+      <h2 class="truncate">
         {{ workspace.name }}
       </h2>
+    </template>
 
-      <p class="mt-1 truncate font-mono text-sm" :title="workspace.root">
+    <div class="flex flex-col gap-2 px-3 py-2">
+      <p class="truncate font-mono text-sm" :title="workspace.root">
         {{ workspace.root }}
       </p>
 
-      <div class="mt-2 flex items-center gap-2">
+      <div class="flex items-center gap-2">
         <SmallButton
           type="button"
           :disabled="busy"
@@ -84,9 +86,7 @@ function requestRemove(): void {
           <span>{{ t("remove") }}</span>
         </SmallButton>
       </div>
-    </template>
 
-    <div class="flex flex-col px-3 py-2">
       <ul v-if="previewSessions.length > 0" class="flex flex-col gap-1">
         <li
           v-for="session in previewSessions"

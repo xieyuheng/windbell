@@ -72,20 +72,22 @@ function requestTrash(): void {
 
 <template>
   <Card as="article">
-    <template #header>
+    <template #tag>
       <RouterLink class="block min-w-0" :to="sessionListRoute">
-        <h2 class="truncate text-lg">
+        <h2 class="truncate">
           {{ workspace.name }}
         </h2>
       </RouterLink>
+    </template>
 
+    <div class="flex flex-col gap-2 px-3 py-2">
       <RouterLink class="block min-w-0" :to="sessionListRoute">
-        <p class="mt-1 truncate font-mono text-sm" :title="workspace.root">
+        <p class="truncate font-mono text-sm" :title="workspace.root">
           {{ workspace.root }}
         </p>
       </RouterLink>
 
-      <div class="mt-2 flex items-center gap-2">
+      <div class="flex items-center gap-2">
         <SmallButton type="button" @click="requestEditTitle">
           <Pencil :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("editTitle") }}</span>
@@ -96,9 +98,7 @@ function requestTrash(): void {
           <span>{{ t("trash") }}</span>
         </SmallButton>
       </div>
-    </template>
 
-    <div class="flex flex-col px-3 py-2">
       <ul v-if="previewSessions.length > 0" class="flex flex-col gap-1">
         <li
           v-for="session in previewSessions"

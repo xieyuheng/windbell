@@ -48,12 +48,14 @@ function requestRemove(): void {
 
 <template>
   <Card as="article">
-    <template #header>
-      <h2 class="truncate text-base text-ink">
+    <template #tag>
+      <h2 class="truncate">
         {{ session.title }}
       </h2>
+    </template>
 
-      <div class="mt-2 flex items-center gap-2">
+    <div class="flex flex-col gap-2 px-3 py-2">
+      <div class="flex items-center gap-2">
         <SmallButton type="button" :disabled="busy" @click="emit('restore')">
           <ArchiveRestore :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("restore") }}</span>
@@ -69,9 +71,7 @@ function requestRemove(): void {
           <span>{{ t("remove") }}</span>
         </SmallButton>
       </div>
-    </template>
 
-    <div class="flex flex-col gap-2 px-3 py-2">
       <ol v-if="previewSigns.length > 0" class="flex flex-col gap-1">
         <SignLine
           v-for="(sign, index) in previewSigns"

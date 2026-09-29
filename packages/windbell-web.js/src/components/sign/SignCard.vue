@@ -21,7 +21,7 @@ const config = computed(() => signCardConfig[props.sign.kind])
 
 <template>
   <Card as="li" :color="config.color">
-    <template #header>
+    <template #tag>
       <p class="tracking-wide">
         {{ t(config.labelKey) }}
       </p>

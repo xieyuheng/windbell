@@ -121,7 +121,7 @@ useHead(() => ({
 
     <div class="flex flex-col gap-4">
       <Card as="section">
-        <template #header>
+        <template #tag>
           <h2 class="text-ink">
             {{ t("language") }}
           </h2>
@@ -147,7 +147,7 @@ useHead(() => ({
       </Card>
 
       <Card as="section">
-        <template #header>
+        <template #tag>
           <h2 class="text-ink">
             {{ t("theme") }}
           </h2>
@@ -173,7 +173,7 @@ useHead(() => ({
       </Card>
 
       <Card as="section">
-        <template #header>
+        <template #tag>
           <h2 class="text-ink">
             {{ t("font") }}
           </h2>
@@ -199,7 +199,7 @@ useHead(() => ({
       </Card>
 
       <Card as="section">
-        <template #header>
+        <template #tag>
           <h2 class="text-ink">
             {{ t("defaultModel") }}
           </h2>
@@ -241,7 +241,7 @@ useHead(() => ({
       </Card>
 
       <Card as="section">
-        <template #header>
+        <template #tag>
           <h2 class="text-ink">
             {{ t("browserData") }}
           </h2>
