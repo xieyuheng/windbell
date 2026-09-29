@@ -23,6 +23,8 @@ const props = withDefaults(
       <div class="flex py-1 rounded-t-lg bg-[var(--card-color)] px-3">
         <slot name="tag" />
       </div>
+
+      <div class="card-tag-corner" aria-hidden="true"></div>
     </div>
 
     <div
@@ -40,3 +42,19 @@ const props = withDefaults(
     </div>
   </component>
 </template>
+
+<style scoped>
+.card-tag-corner {
+  align-self: flex-end;
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 100% 0,
+    transparent 0,
+    transparent calc(0.5rem - 1px),
+    var(--card-color) 0.5rem
+  );
+}
+</style>
