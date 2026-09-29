@@ -103,10 +103,11 @@ function requestTrash(): void {
         <li
           v-for="session in previewSessions"
           :key="session.id"
-          class="flex min-w-0 items-baseline justify-between"
+          class="markdown-list-item flex min-w-0 items-baseline"
         >
+          <span class="markdown-list-marker" aria-hidden="true">* </span>
           <RouterLink
-            class="hover:underline"
+            class="min-w-0 flex-1 truncate hover:underline"
             :to="{ name: 'session', params: { sessionId: session.id } }"
           >
             <span class="truncate">{{ session.title }}</span>
