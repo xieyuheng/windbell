@@ -3,6 +3,7 @@ import type * as S from "@xieyuheng/semiosis.js"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import Card from "../card/Card.vue"
+import Markdown from "../markdown/Markdown.vue"
 import { signMessages } from "./Sign.i18n"
 import { signBody } from "./signBody"
 import { signCardConfig } from "./SignCard.config"
@@ -17,6 +18,8 @@ const { t } = useI18n({
 })
 
 const config = computed(() => signCardConfig[props.sign.kind])
+const body = computed(() => signBody(props.sign))
+const markdown = computed(() => config.value.markdown === true)
 </script>
 
 <template>
@@ -27,8 +30,11 @@ const config = computed(() => signCardConfig[props.sign.kind])
       </p>
     </template>
 
-    <p class="whitespace-pre-wrap leading-7 px-3 py-2">
-      {{ signBody(sign) }}
-    </p>
+    <div class="px-3 py-2">
+      <Markdown v-if="markdown" :text="body" />
+      <p v-else class="whitespace-pre-wrap">
+        {{ body }}
+      </p>
+    </div>
   </Card>
 </template>
