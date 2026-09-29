@@ -3,8 +3,8 @@ export type Sign =
   | UserSign
   | ReasoningSign
   | AssistantSign
-  | ToolCallSign
   | ToolSign
+  | ToolCallSign
   | ToolOutputSign
   | ErrorSign
 
@@ -92,29 +92,6 @@ export function asAssistantSign(value: Sign): AssistantSign {
   throw new Error(`[asAssistantSign] fail on: ${value.kind}`)
 }
 
-export type ToolCallSign = {
-  kind: "ToolCallSign"
-  callId: string
-  name: string
-  arguments: string
-}
-
-export function ToolCallSign(input: Omit<ToolCallSign, "kind">): ToolCallSign {
-  return {
-    kind: "ToolCallSign",
-    ...input,
-  }
-}
-
-export function isToolCallSign(value: Sign): value is ToolCallSign {
-  return value.kind === "ToolCallSign"
-}
-
-export function asToolCallSign(value: Sign): ToolCallSign {
-  if (isToolCallSign(value)) return value
-  throw new Error(`[asToolCallSign] fail on: ${value.kind}`)
-}
-
 export type ToolSign = {
   kind: "ToolSign"
   name: string
@@ -142,6 +119,29 @@ export function isToolSign(value: Sign): value is ToolSign {
 export function asToolSign(value: Sign): ToolSign {
   if (isToolSign(value)) return value
   throw new Error(`[asToolSign] fail on: ${value.kind}`)
+}
+
+export type ToolCallSign = {
+  kind: "ToolCallSign"
+  callId: string
+  name: string
+  arguments: string
+}
+
+export function ToolCallSign(input: Omit<ToolCallSign, "kind">): ToolCallSign {
+  return {
+    kind: "ToolCallSign",
+    ...input,
+  }
+}
+
+export function isToolCallSign(value: Sign): value is ToolCallSign {
+  return value.kind === "ToolCallSign"
+}
+
+export function asToolCallSign(value: Sign): ToolCallSign {
+  if (isToolCallSign(value)) return value
+  throw new Error(`[asToolCallSign] fail on: ${value.kind}`)
 }
 
 export type ToolOutputSign = {
