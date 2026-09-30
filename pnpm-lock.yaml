@@ -28,11 +28,11 @@ importers:
   packages/fs-api.js:
     dependencies:
       '@hono/node-server':
-        specifier: 2.1.2
-        version: 2.1.2(hono@4.13.10)
+        specifier: 2.1.3
+        version: 2.1.3(hono@4.13.11)
       hono:
-        specifier: 4.13.10
-        version: 4.13.10
+        specifier: 4.13.11
+        version: 4.13.11
     devDependencies:
       '@types/node':
         specifier: ^26.6.3
@@ -47,14 +47,14 @@ importers:
   packages/semiosis-api.js:
     dependencies:
       '@hono/node-server':
-        specifier: 2.1.2
-        version: 2.1.2(hono@4.13.10)
+        specifier: 2.1.3
+        version: 2.1.3(hono@4.13.11)
       '@xieyuheng/semiosis.js':
         specifier: workspace:*
         version: link:../semiosis.js
       hono:
-        specifier: 4.13.10
-        version: 4.13.10
+        specifier: 4.13.11
+        version: 4.13.11
     devDependencies:
       '@types/node':
         specifier: ^26.6.3
@@ -106,8 +106,8 @@ importers:
   packages/windbell-api.js:
     dependencies:
       '@hono/node-server':
-        specifier: 2.1.2
-        version: 2.1.2(hono@4.13.10)
+        specifier: 2.1.3
+        version: 2.1.3(hono@4.13.11)
       '@xieyuheng/fs-api.js':
         specifier: workspace:*
         version: link:../fs-api.js
@@ -118,8 +118,8 @@ importers:
         specifier: workspace:*
         version: link:../semiosis.js
       hono:
-        specifier: 4.13.10
-        version: 4.13.10
+        specifier: 4.13.11
+        version: 4.13.11
     devDependencies:
       '@types/node':
         specifier: ^26.6.3
@@ -134,8 +134,8 @@ importers:
   packages/windbell-cli.js:
     dependencies:
       '@hono/node-server':
-        specifier: 2.1.2
-        version: 2.1.2(hono@4.13.10)
+        specifier: 2.1.3
+        version: 2.1.3(hono@4.13.11)
       '@xieyuheng/cli.js':
         specifier: workspace:*
         version: link:../cli.js
@@ -257,8 +257,8 @@ packages:
     resolution: {integrity: sha512-Vj1jF3cPfxg7OAfoI7QnVKLoILlm2JF9pnVHrX8qx7AHMiYWT+NDAA7jChlNgRS4WTLc/fD1lXLmPixluj+3Gg==}
     engines: {node: '>=6.9.0'}
 
-  '@hono/node-server@2.1.2':
-    resolution: {integrity: sha512-w0tqJ/ilmggKokOSvbp9y+F91Y4ROTyCTL/8EKj9B4qOhOZzNm/tyKElzxrz+9+4fJKQrBSaahIuCGRye5RJYg==}
+  '@hono/node-server@2.1.3':
+    resolution: {integrity: sha512-TA//nWMqPhbfdfneACk6t5a9eqbS9lABEPyKn0/xZTah3H3U2XaVg85rJFl0/Fyit0I552YDHgXGVSf3GwqbUw==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
@@ -775,8 +775,8 @@ packages:
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
-  hono@4.13.10:
-    resolution: {integrity: sha512-dQuLsa5oO+47QVMVMaaD9cIv8ctmVtK1iRvwWngkfloFJMeFeuoUFDswIqZGxmGX3hrRzREgEArjkK9OgsQEhA==}
+  hono@4.13.11:
+    resolution: {integrity: sha512-/SMX/RQNJn7oNmFwH6DtwDqcrzZU2otm1FD6OJe2cWF6cfy/F8hq0XVBv7xW3FTJshRQwuBnXHDq2kNsdZnshg==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -1366,9 +1366,9 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
-  '@hono/node-server@2.1.2(hono@4.13.10)':
+  '@hono/node-server@2.1.3(hono@4.13.11)':
     dependencies:
-      hono: 4.13.10
+      hono: 4.13.11
 
   '@intlify/core-base@11.4.12':
     dependencies:
@@ -1805,7 +1805,7 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
-  hono@4.13.10: {}
+  hono@4.13.11: {}
 
   hookable@5.5.3: {}
 
