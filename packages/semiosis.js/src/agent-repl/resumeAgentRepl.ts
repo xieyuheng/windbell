@@ -49,7 +49,7 @@ export async function resumeAgentRepl(
 
     const inputHandler = makeAgentReplInputHandler(agent, repl)
 
-    repl.registerCommand(makeExitCommand())
+    repl.registerCommand(makeExitCommand(repl))
     repl.registerCommand(
       makeTitleCommand(agent, repl, {
         onTitleChange: makeTitleChangeHandler(options.database, session),

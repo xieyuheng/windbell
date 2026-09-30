@@ -1,9 +1,9 @@
-import type { ReplCommand } from "../../repl/Repl.ts"
+import type { Repl, ReplCommand } from "../../repl/Repl.ts"
 
-export function makeExitCommand(): ReplCommand {
+export function makeExitCommand(repl: Repl): ReplCommand {
   return {
     name: "exit",
-    handler: ({ repl }) => {
+    handler: () => {
       repl.close()
     },
   }

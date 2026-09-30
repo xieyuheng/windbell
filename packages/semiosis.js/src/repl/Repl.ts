@@ -1,7 +1,6 @@
 export type ReplCommandContext = {
   command: string
   input: string
-  repl: Repl
 }
 
 export type ReplCommandHandler = (

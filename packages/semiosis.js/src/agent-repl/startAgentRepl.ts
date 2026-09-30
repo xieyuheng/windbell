@@ -60,7 +60,7 @@ export async function startAgentRepl(
       onTitleChange: makeTitleChangeHandler(options.database, session),
     })
 
-    repl.registerCommand(makeExitCommand())
+    repl.registerCommand(makeExitCommand(repl))
     repl.registerCommand(
       makeTitleCommand(agent, repl, {
         onTitleChange: makeTitleChangeHandler(options.database, session),

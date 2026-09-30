@@ -29,8 +29,6 @@ export function makeTtyRepl(): Repl {
   let isInputEnded = false
   let isCleanedUp = false
   let pendingResolve: ((result: ReplInputResult) => void) | undefined
-  let readline: Readline.Interface
-  let repl: Repl
 
   function println(message: string): void {
     output.write(`${message}\n`)
@@ -119,7 +117,6 @@ export function makeTtyRepl(): Repl {
     await handler({
       command: parsed.name,
       input: parsed.input,
-      repl,
     })
 
     return true
@@ -185,7 +182,7 @@ export function makeTtyRepl(): Repl {
     input.on("keypress", onKeypress)
   }
 
-  readline = Readline.createInterface({ input, output })
+  const readline = Readline.createInterface({ input, output })
   readline.on("line", onLine)
   readline.on("close", onClose)
 
@@ -193,7 +190,7 @@ export function makeTtyRepl(): Repl {
     output.write("\x1b[?2004h")
   }
 
-  repl = {
+  return {
     useColor,
     println,
     registerCommand,
@@ -202,8 +199,6 @@ export function makeTtyRepl(): Repl {
     run,
     close,
   }
-
-  return repl
 }
 
 type ParsedCommandLine =
