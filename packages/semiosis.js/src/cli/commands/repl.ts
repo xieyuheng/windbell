@@ -1,7 +1,7 @@
 import process from "node:process"
 import type * as Cli from "@xieyuheng/cli.js"
 import type { Database } from "../../database/index.ts"
-import { startAgentRepl } from "../../repl/index.ts"
+import { resumeAgentRepl, startAgentRepl } from "../../repl/index.ts"
 import { readOptionalOption } from "../options.ts"
 import { ensureWorkspace, makeModelFromOptions } from "../shared.ts"
 
@@ -27,7 +27,15 @@ export function makeReplHandler(options: ReplCommandOptions) {
       version: context.router.version,
     })
 
-    return startAgentRepl({
+    if (sessionId === undefined) {
+      return startAgentRepl({
+        database: options.database,
+        workspace,
+        model,
+      })
+    }
+
+    return resumeAgentRepl({
       database: options.database,
       workspace,
       model,

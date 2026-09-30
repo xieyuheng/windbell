@@ -5,6 +5,7 @@ import { agentInterpret } from "../../agent/index.ts"
 import type { Database } from "../../database/index.ts"
 import { formatSign } from "../../format/index.ts"
 import { readPromptBatch } from "../../prompts/index.ts"
+import { getOrMakeSession } from "../../session/index.ts"
 import { PersonaSign, UserSign, type Sign } from "../../sign/index.ts"
 import { makeToolRouter } from "../../tool/index.ts"
 import { makeBashToolHandler, makeBashToolSign } from "../../tools/index.ts"
@@ -15,7 +16,6 @@ import {
 } from "../options.ts"
 import {
   ensureWorkspace,
-  getOrMakeSession,
   makeAgentForCli,
   makeModelFromOptions,
 } from "../shared.ts"
