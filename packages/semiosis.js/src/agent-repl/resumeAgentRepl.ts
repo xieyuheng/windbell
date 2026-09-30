@@ -1,23 +1,24 @@
+import type { Database } from "../database/index.ts"
 import { formatSign } from "../format/index.ts"
+import type { Model } from "../model/index.ts"
+import type { Workspace } from "../workspace/Workspace.ts"
 import {
   loadSession,
   makeAgentFromSession,
   type SessionId,
 } from "../session/index.ts"
-import { exitCommand } from "./commands/exitCommand.ts"
-import { makeGenerateAndPrintTitle } from "./makeGenerateAndPrintTitle.ts"
-import { infoCommand } from "./commands/infoCommand.ts"
-import { titleCommand } from "./commands/titleCommand.ts"
+import { makeDefaultToolRouter } from "../tools/index.ts"
+import { makeExitCommand } from "./commands/ExitCommand.ts"
+import { makeInfoCommand } from "./commands/InfoCommand.ts"
+import { makeTitleCommand } from "./commands/TitleCommand.ts"
 import { makeAgentReplInputHandler } from "./AgentReplInputHandler.ts"
 import type { Repl } from "../repl/Repl.ts"
-import {
-  makeInfoPrinter,
-  makeReplToolRouter,
-  makeTitleChangeHandler,
-  type AgentReplBaseOptions,
-} from "./shared.ts"
+import { makeTitleChangeHandler } from "./shared.ts"
 
-export type ResumeAgentReplOptions = AgentReplBaseOptions & {
+export type ResumeAgentReplOptions = {
+  database: Database
+  workspace: Workspace
+  model: Model
   repl: Repl
   sessionId: SessionId
 }
@@ -25,7 +26,9 @@ export type ResumeAgentReplOptions = AgentReplBaseOptions & {
 export async function resumeAgentRepl(
   options: ResumeAgentReplOptions,
 ): Promise<void> {
-  const toolRouter = makeReplToolRouter(options)
+  const toolRouter = makeDefaultToolRouter({
+    cwd: options.workspace.root,
+  })
   const session = await loadSession({
     database: options.database,
     workspace: options.workspace,
@@ -45,15 +48,18 @@ export async function resumeAgentRepl(
     }
 
     const inputHandler = makeAgentReplInputHandler(agent, repl)
-    const generateAndPrintTitle = makeGenerateAndPrintTitle({
-      agent,
-      repl,
+
+    repl.registerCommand(makeExitCommand())
+    repl.registerCommand(makeTitleCommand(agent, repl, {
       onTitleChange: makeTitleChangeHandler(options.database, session),
-    })
-    repl.registerCommand(exitCommand())
-    repl.registerCommand(titleCommand(generateAndPrintTitle))
+    }))
     repl.registerCommand(
-      infoCommand(makeInfoPrinter(repl, options, agent, session)),
+      makeInfoCommand(agent, repl, {
+        database: options.database,
+        workspace: options.workspace,
+        model: options.model,
+        session,
+      }),
     )
 
     await repl.run(inputHandler, "> ")

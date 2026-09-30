@@ -1,3 +1,3 @@
-export * from "./exitCommand.ts"
-export * from "./infoCommand.ts"
-export * from "./titleCommand.ts"
+export * from "./ExitCommand.ts"
+export * from "./InfoCommand.ts"
+export * from "./TitleCommand.ts"
