@@ -60,27 +60,23 @@ export class TtyRepl implements Repl {
   }
 
   async tryDispatchCommand(input: string): Promise<boolean> {
-    if (input.includes("\n")) return false
+    const parsed = parseCommandLine(input)
+    if (parsed === undefined) return false
 
-    const trimmedStart = input.trimStart()
-    if (!trimmedStart.startsWith("/")) return false
-
-    const command = parseCommand(trimmedStart)
-
-    if (command.name === "") {
-      this.println(`unknown command: ${trimmedStart.trimEnd()}`)
+    if (parsed.type === "unknown") {
+      this.println(`unknown command: ${parsed.raw}`)
       return true
     }
 
-    const handler = this.commands.get(command.name)
+    const handler = this.commands.get(parsed.name)
     if (handler === undefined) {
-      this.println(`unknown command: ${trimmedStart.trimEnd()}`)
+      this.println(`unknown command: ${input.trimStart().trimEnd()}`)
       return true
     }
 
     await handler({
-      command: command.name,
-      input: command.input,
+      command: parsed.name,
+      input: parsed.input,
       repl: this,
     })
 
@@ -203,19 +199,47 @@ export class TtyRepl implements Repl {
   }
 }
 
-function parseCommand(input: string): { name: string; input: string } {
-  const content = input.slice(1)
+type ParsedCommandLine =
+  | {
+      type: "command"
+      name: string
+      input: string
+    }
+  | {
+      type: "unknown"
+      raw: string
+    }
+
+function parseCommandLine(input: string): ParsedCommandLine | undefined {
+  if (input.includes("\n")) return undefined
+
+  const trimmedStart = input.trimStart()
+  if (!trimmedStart.startsWith("/")) return undefined
+
+  const raw = trimmedStart.trimEnd()
+  const content = trimmedStart.slice(1)
   const whitespaceIndex = content.search(/\s/)
 
   if (whitespaceIndex === -1) {
+    if (content === "") {
+      return { type: "unknown", raw }
+    }
+
     return {
+      type: "command",
       name: content,
       input: "",
     }
   }
 
+  const name = content.slice(0, whitespaceIndex)
+  if (name === "") {
+    return { type: "unknown", raw }
+  }
+
   return {
-    name: content.slice(0, whitespaceIndex),
+    type: "command",
+    name,
     input: content.slice(whitespaceIndex + 1),
   }
 }
