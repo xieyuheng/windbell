@@ -20,7 +20,7 @@
     "trailingComma": "all"
   },
   "dependencies": {
-    "@hono/node-server": "2.1.1",
+    "@hono/node-server": "2.1.2",
     "@xieyuheng/semiosis.js": "workspace:*",
     "hono": "4.13.10"
   },
