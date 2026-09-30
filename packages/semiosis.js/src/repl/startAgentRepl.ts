@@ -34,120 +34,51 @@ type RunAgentReplOptions = {
   onTitleChange?: (title: string) => Promise<void> | void
 }
 
-function isNewlineKey(key: Readline.Key | undefined): boolean {
-  if (key === undefined) return false
-
-  // Ctrl+J and pasted newlines are LF, while Enter is usually CR.
-  if (key.sequence === "\n") return true
-
-  // Alt+Enter is usually ESC + Enter, which readline reports as meta.
-  if (key.name === "enter" && key.meta === true) return true
-  if (key.name === "return" && key.meta === true) return true
-
-  return false
-}
-
-function makeInfoPrinter(
+export async function startAgentRepl(
   options: StartAgentReplOptions,
-  agent: Agent,
-  session: Session,
-): () => Promise<void> {
-  return async () => {
-    const context = await agent.getContext()
-
-    console.log(`database: ${options.database.root}`)
-    console.log(`model: ${options.model.qualifiedName}`)
-    console.log(`workspace: ${options.workspace.name}`)
-    console.log(`  root: ${options.workspace.root}`)
-    console.log(`session: ${session.title}`)
-    console.log(`  id: ${session.id}`)
-    console.log(`  context.length: ${context.length}`)
-    console.log()
-  }
-}
-
-async function loadSession(
-  options: StartAgentReplOptions,
-  sessionId: string,
-): Promise<Session> {
-  const session = await options.database.sessions.get(sessionId)
-
-  if (session === undefined) {
-    throw new Error(`session not found: ${sessionId}`)
-  }
-
-  if (session.workspaceId !== options.workspace.id) {
-    throw new Error(
-      `session workspace mismatch: ${sessionId} belongs to ${session.workspaceId}`,
-    )
-  }
-
-  return session
-}
-
-async function createSession(
-  options: StartAgentReplOptions,
-  initialSigns: Array<Sign>,
-): Promise<Session> {
-  const session = await options.database.sessions.make({
-    workspaceId: options.workspace.id,
-    title: "untitled",
+): Promise<void> {
+  const toolRouter = makeDefaultToolRouter({
+    cwd: options.workspace.root,
   })
+  const personaSign = PersonaSign(
+    "You are a helpful software engineer assistant.",
+  )
+  const initialSigns: Array<Sign> = [...toolRouter.toolSigns, personaSign]
 
-  session.context = [...initialSigns]
-  await options.database.sessions.put(session)
-  return session
-}
-
-async function readFirstInput(): Promise<string | undefined> {
-  const readline = Readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  })
-
-  const readLine = (): Promise<string | undefined> => {
-    return new Promise((resolve) => {
-      const onLine = (line: string): void => {
-        cleanup()
-        resolve(line)
-      }
-
-      const onClose = (): void => {
-        cleanup()
-        resolve(undefined)
-      }
-
-      const cleanup = (): void => {
-        readline.off("line", onLine)
-        readline.off("close", onClose)
-      }
-
-      readline.once("line", onLine)
-      readline.once("close", onClose)
+  if (options.sessionId !== undefined) {
+    const session = await loadSession(options, options.sessionId)
+    const agent = await makeAgentFromSession({
+      database: options.database,
+      sessionId: session.id,
+      model: options.model,
+      makeToolRouter: () => toolRouter,
     })
+
+    await runAgentRepl(agent, {
+      showContext: true,
+      onInfo: makeInfoPrinter(options, agent, session),
+      onTitleChange: makeTitleChangeHandler(options.database, session),
+    })
+    return
   }
 
-  try {
-    while (true) {
-      readline.setPrompt("> ")
-      readline.prompt()
+  const firstInput = await readFirstInput()
+  if (firstInput === undefined) return
 
-      const line = await readLine()
-      if (line === undefined) return undefined
+  const session = await createSession(options, initialSigns)
+  const agent = await makeAgentFromSession({
+    database: options.database,
+    sessionId: session.id,
+    model: options.model,
+    makeToolRouter: () => toolRouter,
+  })
 
-      const input = line.trim()
-      if (input === "") continue
-
-      if (input === "/info" || input === "/title") {
-        console.log(`${input} is not available before a session is created.`)
-        continue
-      }
-
-      return line
-    }
-  } finally {
-    readline.close()
-  }
+  await runAgentRepl(agent, {
+    initialUserInput: firstInput,
+    showContext: false,
+    onInfo: makeInfoPrinter(options, agent, session),
+    onTitleChange: makeTitleChangeHandler(options.database, session),
+  })
 }
 
 async function runAgentRepl(
@@ -331,6 +262,122 @@ async function runAgentRepl(
   readline.close()
 }
 
+function isNewlineKey(key: Readline.Key | undefined): boolean {
+  if (key === undefined) return false
+
+  // Ctrl+J and pasted newlines are LF, while Enter is usually CR.
+  if (key.sequence === "\n") return true
+
+  // Alt+Enter is usually ESC + Enter, which readline reports as meta.
+  if (key.name === "enter" && key.meta === true) return true
+  if (key.name === "return" && key.meta === true) return true
+
+  return false
+}
+
+function makeInfoPrinter(
+  options: StartAgentReplOptions,
+  agent: Agent,
+  session: Session,
+): () => Promise<void> {
+  return async () => {
+    const context = await agent.getContext()
+
+    console.log(`database: ${options.database.root}`)
+    console.log(`model: ${options.model.qualifiedName}`)
+    console.log(`workspace: ${options.workspace.name}`)
+    console.log(`  root: ${options.workspace.root}`)
+    console.log(`session: ${session.title}`)
+    console.log(`  id: ${session.id}`)
+    console.log(`  context.length: ${context.length}`)
+    console.log()
+  }
+}
+
+async function loadSession(
+  options: StartAgentReplOptions,
+  sessionId: string,
+): Promise<Session> {
+  const session = await options.database.sessions.get(sessionId)
+
+  if (session === undefined) {
+    throw new Error(`session not found: ${sessionId}`)
+  }
+
+  if (session.workspaceId !== options.workspace.id) {
+    throw new Error(
+      `session workspace mismatch: ${sessionId} belongs to ${session.workspaceId}`,
+    )
+  }
+
+  return session
+}
+
+async function createSession(
+  options: StartAgentReplOptions,
+  initialSigns: Array<Sign>,
+): Promise<Session> {
+  const session = await options.database.sessions.make({
+    workspaceId: options.workspace.id,
+    title: "untitled",
+  })
+
+  session.context = [...initialSigns]
+  await options.database.sessions.put(session)
+  return session
+}
+
+async function readFirstInput(): Promise<string | undefined> {
+  const readline = Readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  })
+
+  const readLine = (): Promise<string | undefined> => {
+    return new Promise((resolve) => {
+      const onLine = (line: string): void => {
+        cleanup()
+        resolve(line)
+      }
+
+      const onClose = (): void => {
+        cleanup()
+        resolve(undefined)
+      }
+
+      const cleanup = (): void => {
+        readline.off("line", onLine)
+        readline.off("close", onClose)
+      }
+
+      readline.once("line", onLine)
+      readline.once("close", onClose)
+    })
+  }
+
+  try {
+    while (true) {
+      readline.setPrompt("> ")
+      readline.prompt()
+
+      const line = await readLine()
+      if (line === undefined) return undefined
+
+      const input = line.trim()
+      if (input === "") continue
+
+      if (input === "/info" || input === "/title") {
+        console.log(`${input} is not available before a session is created.`)
+        continue
+      }
+
+      return line
+    }
+  } finally {
+    readline.close()
+  }
+}
+
 function makeTitleChangeHandler(
   database: Database,
   session: Session,
@@ -339,51 +386,4 @@ function makeTitleChangeHandler(
     await database.sessions.updateTitle(session.id, title)
     session.title = title
   }
-}
-
-export async function startAgentRepl(
-  options: StartAgentReplOptions,
-): Promise<void> {
-  const toolRouter = makeDefaultToolRouter({
-    cwd: options.workspace.root,
-  })
-  const personaSign = PersonaSign(
-    "You are a helpful software engineer assistant.",
-  )
-  const initialSigns: Array<Sign> = [...toolRouter.toolSigns, personaSign]
-
-  if (options.sessionId !== undefined) {
-    const session = await loadSession(options, options.sessionId)
-    const agent = await makeAgentFromSession({
-      database: options.database,
-      sessionId: session.id,
-      model: options.model,
-      makeToolRouter: () => toolRouter,
-    })
-
-    await runAgentRepl(agent, {
-      showContext: true,
-      onInfo: makeInfoPrinter(options, agent, session),
-      onTitleChange: makeTitleChangeHandler(options.database, session),
-    })
-    return
-  }
-
-  const firstInput = await readFirstInput()
-  if (firstInput === undefined) return
-
-  const session = await createSession(options, initialSigns)
-  const agent = await makeAgentFromSession({
-    database: options.database,
-    sessionId: session.id,
-    model: options.model,
-    makeToolRouter: () => toolRouter,
-  })
-
-  await runAgentRepl(agent, {
-    initialUserInput: firstInput,
-    showContext: false,
-    onInfo: makeInfoPrinter(options, agent, session),
-    onTitleChange: makeTitleChangeHandler(options.database, session),
-  })
 }

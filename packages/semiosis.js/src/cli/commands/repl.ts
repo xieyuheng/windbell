@@ -9,11 +9,6 @@ export type ReplCommandOptions = {
   database: Database
 }
 
-function printReplHeader(options: { name: string; version: string }): void {
-  console.log(`${options.name} ${options.version}`)
-  console.log()
-}
-
 export function makeReplHandler(options: ReplCommandOptions) {
   return async (context: Cli.HandlerContext) => {
     const model = await makeModelFromOptions({
@@ -39,4 +34,9 @@ export function makeReplHandler(options: ReplCommandOptions) {
       sessionId,
     })
   }
+}
+
+function printReplHeader(options: { name: string; version: string }): void {
+  console.log(`${options.name} ${options.version}`)
+  console.log()
 }
