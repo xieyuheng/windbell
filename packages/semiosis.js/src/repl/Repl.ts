@@ -9,6 +9,7 @@ export type ReplCommandHandler = (
 
 export type ReplCommand = {
   name: string
+  description: string
   handler: ReplCommandHandler
 }
 
@@ -21,6 +22,7 @@ export type Repl = {
 
   println(message: string): void
   registerCommand(command: ReplCommand): void
+  listCommands(): Array<ReplCommand>
   tryDispatchCommand(input: string): Promise<boolean>
   readInput(prompt: string): Promise<ReplInputResult>
   run(onInput: ReplInputHandler, prompt: string): Promise<void>

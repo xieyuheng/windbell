@@ -3,7 +3,6 @@ import process from "node:process"
 import type {
   Repl,
   ReplCommand,
-  ReplCommandHandler,
   ReplInputHandler,
   ReplInputResult,
 } from "../repl/Repl.ts"
@@ -19,7 +18,7 @@ export function makeTtyRepl(): Repl {
     process.env.NO_COLOR === undefined &&
     process.env.TERM !== "dumb"
 
-  const commands = new Map<string, ReplCommandHandler>()
+  const commands = new Map<string, ReplCommand>()
   const messages: Array<string> = []
   const buffer: Array<string> = []
 
@@ -35,7 +34,11 @@ export function makeTtyRepl(): Repl {
   }
 
   function registerCommand(command: ReplCommand): void {
-    commands.set(command.name, command.handler)
+    commands.set(command.name, command)
+  }
+
+  function listCommands(): Array<ReplCommand> {
+    return [...commands.values()]
   }
 
   function onKeypress(_str: string, key: Readline.Key): void {
@@ -108,13 +111,13 @@ export function makeTtyRepl(): Repl {
       return true
     }
 
-    const handler = commands.get(parsed.name)
-    if (handler === undefined) {
+    const command = commands.get(parsed.name)
+    if (command === undefined) {
       println(`unknown command: ${input.trimStart().trimEnd()}`)
       return true
     }
 
-    await handler({
+    await command.handler({
       command: parsed.name,
       input: parsed.input,
     })
@@ -194,6 +197,7 @@ export function makeTtyRepl(): Repl {
     useColor,
     println,
     registerCommand,
+    listCommands,
     tryDispatchCommand,
     readInput,
     run,

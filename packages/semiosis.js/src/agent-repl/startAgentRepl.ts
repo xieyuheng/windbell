@@ -5,6 +5,7 @@ import { PersonaSign } from "../sign/index.ts"
 import { createSession, makeAgentFromSession } from "../session/index.ts"
 import { makeDefaultToolRouter } from "../tools/index.ts"
 import { makeExitCommand } from "./commands/ExitCommand.ts"
+import { makeHelpCommand } from "./commands/HelpCommand.ts"
 import { makeInfoCommand } from "./commands/InfoCommand.ts"
 import {
   generateAndPrintTitle,
@@ -74,6 +75,8 @@ export async function startAgentRepl(
         session,
       }),
     )
+
+    repl.registerCommand(makeHelpCommand(repl))
 
     await repl.run(inputHandler, "> ")
   } catch (error) {

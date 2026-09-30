@@ -38,6 +38,7 @@ export function makeTitleCommand(
 ): ReplCommand {
   return {
     name: "title",
+    description: "generate and print title",
     handler: async () => {
       await generateAndPrintTitle(agent, repl, options)
     },

@@ -17,6 +17,7 @@ export function makeInfoCommand(
 ): ReplCommand {
   return {
     name: "info",
+    description: "show session information",
     handler: async () => {
       const context = await agent.getContext()
 

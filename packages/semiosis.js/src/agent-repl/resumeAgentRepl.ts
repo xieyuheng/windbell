@@ -9,6 +9,7 @@ import {
 } from "../session/index.ts"
 import { makeDefaultToolRouter } from "../tools/index.ts"
 import { makeExitCommand } from "./commands/ExitCommand.ts"
+import { makeHelpCommand } from "./commands/HelpCommand.ts"
 import { makeInfoCommand } from "./commands/InfoCommand.ts"
 import { makeTitleCommand } from "./commands/TitleCommand.ts"
 import { makeAgentReplInputHandler } from "./AgentReplInputHandler.ts"
@@ -63,6 +64,8 @@ export async function resumeAgentRepl(
         session,
       }),
     )
+
+    repl.registerCommand(makeHelpCommand(repl))
 
     await repl.run(inputHandler, "> ")
   } catch (error) {
