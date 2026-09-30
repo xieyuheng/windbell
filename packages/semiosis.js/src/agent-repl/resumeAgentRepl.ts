@@ -50,9 +50,11 @@ export async function resumeAgentRepl(
     const inputHandler = makeAgentReplInputHandler(agent, repl)
 
     repl.registerCommand(makeExitCommand())
-    repl.registerCommand(makeTitleCommand(agent, repl, {
-      onTitleChange: makeTitleChangeHandler(options.database, session),
-    }))
+    repl.registerCommand(
+      makeTitleCommand(agent, repl, {
+        onTitleChange: makeTitleChangeHandler(options.database, session),
+      }),
+    )
     repl.registerCommand(
       makeInfoCommand(agent, repl, {
         database: options.database,

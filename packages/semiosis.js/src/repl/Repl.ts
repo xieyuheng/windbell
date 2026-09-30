@@ -22,6 +22,7 @@ export type Repl = {
 
   println(message: string): void
   registerCommand(command: ReplCommand): void
+  tryDispatchCommand(input: string): Promise<boolean>
   readInput(prompt: string): Promise<ReplInputResult>
   run(onInput: ReplInputHandler, prompt: string): Promise<void>
   close(): void

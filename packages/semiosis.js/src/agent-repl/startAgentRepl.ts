@@ -61,9 +61,11 @@ export async function startAgentRepl(
     })
 
     repl.registerCommand(makeExitCommand())
-    repl.registerCommand(makeTitleCommand(agent, repl, {
-      onTitleChange: makeTitleChangeHandler(options.database, session),
-    }))
+    repl.registerCommand(
+      makeTitleCommand(agent, repl, {
+        onTitleChange: makeTitleChangeHandler(options.database, session),
+      }),
+    )
     repl.registerCommand(
       makeInfoCommand(agent, repl, {
         database: options.database,
@@ -89,13 +91,9 @@ async function readFirstInput(
     if (result.kind === "end") return undefined
 
     const line = result.input
-    const input = line.trim()
-    if (input === "") continue
+    if (line.trim() === "") continue
 
-    if (input === "/info" || input === "/title") {
-      repl.println(`${input} is not available before a session is created.`)
-      continue
-    }
+    if (await repl.tryDispatchCommand(line)) continue
 
     return line
   }

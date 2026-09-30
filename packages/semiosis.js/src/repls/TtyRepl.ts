@@ -59,6 +59,34 @@ export class TtyRepl implements Repl {
     this.commands.set(command.name, command.handler)
   }
 
+  async tryDispatchCommand(input: string): Promise<boolean> {
+    if (input.includes("\n")) return false
+
+    const trimmedStart = input.trimStart()
+    if (!trimmedStart.startsWith("/")) return false
+
+    const command = parseCommand(trimmedStart)
+
+    if (command.name === "") {
+      this.println(`unknown command: ${trimmedStart.trimEnd()}`)
+      return true
+    }
+
+    const handler = this.commands.get(command.name)
+    if (handler === undefined) {
+      this.println(`unknown command: ${trimmedStart.trimEnd()}`)
+      return true
+    }
+
+    await handler({
+      command: command.name,
+      input: command.input,
+      repl: this,
+    })
+
+    return true
+  }
+
   readInput(prompt: string): Promise<ReplInputResult> {
     if (this.isClosed) return Promise.resolve({ kind: "end" })
 
@@ -94,21 +122,8 @@ export class TtyRepl implements Repl {
         const normalized = input.trim()
         if (normalized === "") continue
 
-        const command = input.includes("\n")
-          ? undefined
-          : parseCommand(input.trimStart())
-
-        if (command !== undefined) {
-          const handler = this.commands.get(command.name)
-          if (handler !== undefined) {
-            await handler({
-              command: command.name,
-              input: command.input,
-              repl: this,
-            })
-            continue
-          }
-        }
+        const handled = await this.tryDispatchCommand(input)
+        if (handled) continue
 
         await onInput(normalized)
       }
@@ -188,24 +203,19 @@ export class TtyRepl implements Repl {
   }
 }
 
-function parseCommand(
-  input: string,
-): { name: string; input: string } | undefined {
-  if (!input.startsWith("/")) return undefined
-
+function parseCommand(input: string): { name: string; input: string } {
   const content = input.slice(1)
   const whitespaceIndex = content.search(/\s/)
 
   if (whitespaceIndex === -1) {
-    if (content === "") return undefined
-    return { name: content, input: "" }
+    return {
+      name: content,
+      input: "",
+    }
   }
 
-  const name = content.slice(0, whitespaceIndex)
-  if (name === "") return undefined
-
   return {
-    name,
+    name: content.slice(0, whitespaceIndex),
     input: content.slice(whitespaceIndex + 1),
   }
 }
