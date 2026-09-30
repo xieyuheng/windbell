@@ -8,195 +8,202 @@ import type {
   ReplInputResult,
 } from "../repl/Repl.ts"
 
-export class TtyRepl implements Repl {
-  readonly useColor: boolean
+export function makeTtyRepl(): Repl {
+  const input = process.stdin
+  const output = process.stdout
 
-  private readonly readline: Readline.Interface
-  private readonly isInteractive: boolean
-  private readonly useBracketedPaste: boolean
-  private readonly commands = new Map<string, ReplCommandHandler>()
-  private readonly messages: Array<string> = []
-  private readonly buffer: Array<string> = []
-  private lastKey: Readline.Key | undefined = undefined
-  private isPasting = false
-  private isClosed = false
-  private isInputEnded = false
-  private isCleanedUp = false
-  private pendingResolve: ((result: ReplInputResult) => void) | undefined
+  const isInteractive = input.isTTY === true
+  const useBracketedPaste = isInteractive && output.isTTY === true
+  const useColor =
+    output.isTTY === true &&
+    process.env.NO_COLOR === undefined &&
+    process.env.TERM !== "dumb"
 
-  constructor() {
-    const input = process.stdin
-    const output = process.stdout
+  const commands = new Map<string, ReplCommandHandler>()
+  const messages: Array<string> = []
+  const buffer: Array<string> = []
 
-    this.isInteractive = input.isTTY === true
-    this.useBracketedPaste = this.isInteractive && output.isTTY === true
-    this.useColor =
-      output.isTTY === true &&
-      process.env.NO_COLOR === undefined &&
-      process.env.TERM !== "dumb"
+  let lastKey: Readline.Key | undefined = undefined
+  let isPasting = false
+  let isClosed = false
+  let isInputEnded = false
+  let isCleanedUp = false
+  let pendingResolve: ((result: ReplInputResult) => void) | undefined
+  let readline: Readline.Interface
+  let repl: Repl
 
-    if (this.isInteractive) {
-      // Register keypress before createInterface, otherwise readline emits
-      // the line event before we can inspect the terminating key.
-      Readline.emitKeypressEvents(input)
-      input.on("keypress", this.onKeypress)
+  function println(message: string): void {
+    output.write(`${message}\n`)
+  }
+
+  function registerCommand(command: ReplCommand): void {
+    commands.set(command.name, command.handler)
+  }
+
+  function onKeypress(_str: string, key: Readline.Key): void {
+    lastKey = key
+
+    // Bracketed paste lets multi-line pasted text bypass line submission.
+    if (key.name === "paste-start") {
+      isPasting = true
     }
 
-    this.readline = Readline.createInterface({ input, output })
-    this.readline.on("line", this.onLine)
-    this.readline.on("close", this.onClose)
-
-    if (this.useBracketedPaste) {
-      process.stdout.write("\x1b[?2004h")
+    if (key.name === "paste-end") {
+      isPasting = false
     }
   }
 
-  println(message: string): void {
-    process.stdout.write(`${message}\n`)
+  function onLine(line: string): void {
+    const shouldContinue = isInteractive && (isPasting || isNewlineKey(lastKey))
+    lastKey = undefined
+    buffer.push(line)
+
+    if (shouldContinue) return
+
+    const input = buffer.join("\n")
+    buffer.length = 0
+    deliver(input)
   }
 
-  registerCommand(command: ReplCommand): void {
-    this.commands.set(command.name, command.handler)
+  function onClose(): void {
+    isInputEnded = true
+    cleanup()
+    resolvePending()
   }
 
-  async tryDispatchCommand(input: string): Promise<boolean> {
+  function cleanup(): void {
+    if (isCleanedUp) return
+    isCleanedUp = true
+
+    input.off("keypress", onKeypress)
+
+    if (useBracketedPaste) {
+      output.write("\x1b[?2004l")
+    }
+
+    readline.close()
+  }
+
+  function resolvePending(): void {
+    const resolve = pendingResolve
+    pendingResolve = undefined
+    resolve?.({ kind: "end" })
+  }
+
+  function deliver(input: string): void {
+    if (pendingResolve !== undefined) {
+      const resolve = pendingResolve
+      pendingResolve = undefined
+      resolve({ kind: "input", input })
+      return
+    }
+
+    messages.push(input)
+  }
+
+  async function tryDispatchCommand(input: string): Promise<boolean> {
     const parsed = parseCommandLine(input)
     if (parsed === undefined) return false
 
     if (parsed.type === "unknown") {
-      this.println(`unknown command: ${parsed.raw}`)
+      println(`unknown command: ${parsed.raw}`)
       return true
     }
 
-    const handler = this.commands.get(parsed.name)
+    const handler = commands.get(parsed.name)
     if (handler === undefined) {
-      this.println(`unknown command: ${input.trimStart().trimEnd()}`)
+      println(`unknown command: ${input.trimStart().trimEnd()}`)
       return true
     }
 
     await handler({
       command: parsed.name,
       input: parsed.input,
-      repl: this,
+      repl,
     })
 
     return true
   }
 
-  readInput(prompt: string): Promise<ReplInputResult> {
-    if (this.isClosed) return Promise.resolve({ kind: "end" })
+  function readInput(prompt: string): Promise<ReplInputResult> {
+    if (isClosed) return Promise.resolve({ kind: "end" })
 
-    if (this.messages.length > 0) {
-      if (!this.isInputEnded) {
-        this.readline.setPrompt(prompt)
-        this.readline.prompt()
+    if (messages.length > 0) {
+      if (!isInputEnded) {
+        readline.setPrompt(prompt)
+        readline.prompt()
       }
 
       return Promise.resolve({
         kind: "input",
-        input: this.messages.shift() as string,
+        input: messages.shift() as string,
       })
     }
 
-    if (this.isInputEnded) return Promise.resolve({ kind: "end" })
+    if (isInputEnded) return Promise.resolve({ kind: "end" })
 
-    this.readline.setPrompt(prompt)
-    this.readline.prompt()
+    readline.setPrompt(prompt)
+    readline.prompt()
 
     return new Promise((resolve) => {
-      this.pendingResolve = resolve
+      pendingResolve = resolve
     })
   }
 
-  async run(onInput: ReplInputHandler, prompt: string): Promise<void> {
+  async function run(onInput: ReplInputHandler, prompt: string): Promise<void> {
     try {
       while (true) {
-        const result = await this.readInput(prompt)
+        const result = await readInput(prompt)
         if (result.kind === "end") break
 
         const input = result.input
         const normalized = input.trim()
         if (normalized === "") continue
 
-        const handled = await this.tryDispatchCommand(input)
+        const handled = await tryDispatchCommand(input)
         if (handled) continue
 
         await onInput(normalized)
       }
     } finally {
-      this.close()
+      close()
     }
   }
 
-  close(): void {
-    if (this.isClosed) return
+  function close(): void {
+    if (isClosed) return
 
-    this.isClosed = true
-    this.cleanup()
-    this.resolvePending()
+    isClosed = true
+    cleanup()
+    resolvePending()
   }
 
-  private readonly onKeypress = (_str: string, key: Readline.Key): void => {
-    this.lastKey = key
-
-    // Bracketed paste lets multi-line pasted text bypass line submission.
-    if (key.name === "paste-start") {
-      this.isPasting = true
-    }
-
-    if (key.name === "paste-end") {
-      this.isPasting = false
-    }
+  if (isInteractive) {
+    // Register keypress before createInterface, otherwise readline emits
+    // the line event before we can inspect the terminating key.
+    Readline.emitKeypressEvents(input)
+    input.on("keypress", onKeypress)
   }
 
-  private readonly onLine = (line: string): void => {
-    const shouldContinue =
-      this.isInteractive && (this.isPasting || isNewlineKey(this.lastKey))
-    this.lastKey = undefined
-    this.buffer.push(line)
+  readline = Readline.createInterface({ input, output })
+  readline.on("line", onLine)
+  readline.on("close", onClose)
 
-    if (shouldContinue) return
-
-    const input = this.buffer.join("\n")
-    this.buffer.length = 0
-    this.deliver(input)
+  if (useBracketedPaste) {
+    output.write("\x1b[?2004h")
   }
 
-  private readonly onClose = (): void => {
-    this.isInputEnded = true
-    this.cleanup()
-    this.resolvePending()
+  repl = {
+    useColor,
+    println,
+    registerCommand,
+    tryDispatchCommand,
+    readInput,
+    run,
+    close,
   }
 
-  private cleanup(): void {
-    if (this.isCleanedUp) return
-    this.isCleanedUp = true
-
-    process.stdin.off("keypress", this.onKeypress)
-
-    if (this.useBracketedPaste) {
-      process.stdout.write("\x1b[?2004l")
-    }
-
-    this.readline.close()
-  }
-
-  private resolvePending(): void {
-    const resolve = this.pendingResolve
-    this.pendingResolve = undefined
-    resolve?.({ kind: "end" })
-  }
-
-  private deliver(input: string): void {
-    if (this.pendingResolve !== undefined) {
-      const resolve = this.pendingResolve
-      this.pendingResolve = undefined
-      resolve({ kind: "input", input })
-      return
-    }
-
-    this.messages.push(input)
-  }
+  return repl
 }
 
 type ParsedCommandLine =
@@ -255,8 +262,4 @@ function isNewlineKey(key: Readline.Key | undefined): boolean {
   if (key.name === "return" && key.meta === true) return true
 
   return false
-}
-
-export function makeTtyRepl(): Repl {
-  return new TtyRepl()
 }
