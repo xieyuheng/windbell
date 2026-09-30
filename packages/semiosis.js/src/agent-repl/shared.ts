@@ -2,18 +2,19 @@ import type { Agent } from "../agent/index.ts"
 import type { Database } from "../database/index.ts"
 import type { Model } from "../model/index.ts"
 import { PersonaSign, type Sign } from "../sign/index.ts"
-import { makeAgentFromSession, type Session } from "../session/index.ts"
+import type { Session } from "../session/index.ts"
 import type { ToolRouter } from "../tool/index.ts"
 import { makeDefaultToolRouter } from "../tools/index.ts"
 import type { Workspace } from "../workspace/Workspace.ts"
+import type { Repl } from "../repl/Repl.ts"
 
-export type AgentReplOptions = {
+export type AgentReplBaseOptions = {
   database: Database
   workspace: Workspace
   model: Model
 }
 
-export function makeReplToolRouter(options: AgentReplOptions): ToolRouter {
+export function makeReplToolRouter(options: AgentReplBaseOptions): ToolRouter {
   return makeDefaultToolRouter({
     cwd: options.workspace.root,
   })
@@ -26,35 +27,23 @@ export function makeInitialSigns(toolRouter: ToolRouter): Array<Sign> {
   return [...toolRouter.toolSigns, personaSign]
 }
 
-export async function makeAgentForRepl(
-  options: AgentReplOptions,
-  session: Session,
-  toolRouter: ToolRouter,
-): Promise<Agent> {
-  return makeAgentFromSession({
-    database: options.database,
-    sessionId: session.id,
-    model: options.model,
-    makeToolRouter: () => toolRouter,
-  })
-}
-
 export function makeInfoPrinter(
-  options: AgentReplOptions,
+  repl: Repl,
+  options: AgentReplBaseOptions,
   agent: Agent,
   session: Session,
 ): () => Promise<void> {
   return async () => {
     const context = await agent.getContext()
 
-    console.log(`database: ${options.database.root}`)
-    console.log(`model: ${options.model.qualifiedName}`)
-    console.log(`workspace: ${options.workspace.name}`)
-    console.log(`  root: ${options.workspace.root}`)
-    console.log(`session: ${session.title}`)
-    console.log(`  id: ${session.id}`)
-    console.log(`  context.length: ${context.length}`)
-    console.log()
+    repl.println(`database: ${options.database.root}`)
+    repl.println(`model: ${options.model.qualifiedName}`)
+    repl.println(`workspace: ${options.workspace.name}`)
+    repl.println(`  root: ${options.workspace.root}`)
+    repl.println(`session: ${session.title}`)
+    repl.println(`  id: ${session.id}`)
+    repl.println(`  context.length: ${context.length}`)
+    repl.println("")
   }
 }
 
