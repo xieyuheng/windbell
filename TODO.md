@@ -1,6 +1,8 @@
 # semiosis.js
 
-用 repl 命令，实现 provider 和 model 选择流程
+用 cli command 实现 provider 和 model 流程
+
+用 repl 命令，model 选择流程
 
 # windbell-web.js
 
