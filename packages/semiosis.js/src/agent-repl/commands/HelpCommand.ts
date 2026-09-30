@@ -5,8 +5,9 @@ export function makeHelpCommand(repl: Repl): ReplCommand {
     name: "help",
     description: "show available commands",
     handler: () => {
+      repl.println(`commands:`)
       for (const command of repl.listCommands()) {
-        repl.println(`/${command.name} -- ${command.description}`)
+        repl.println(`  /${command.name} -- ${command.description}`)
       }
     },
   }

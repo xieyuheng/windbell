@@ -1,7 +1,5 @@
 # semiosis.js
 
-实现 /help 命令
-
 用 repl 命令，实现 provider 和 model 选择流程
 
 # windbell-web.js

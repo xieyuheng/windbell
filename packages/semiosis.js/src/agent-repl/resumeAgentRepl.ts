@@ -57,11 +57,11 @@ export async function resumeAgentRepl(
       }),
     )
     repl.registerCommand(
-      makeInfoCommand(agent, repl, {
+      makeInfoCommand(repl, {
         database: options.database,
         workspace: options.workspace,
         model: options.model,
-        session,
+        sessionId: session.id,
       }),
     )
 

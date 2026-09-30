@@ -35,6 +35,17 @@ export async function startAgentRepl(
       ...toolRouter.toolSigns,
       PersonaSign("You are a helpful software engineer assistant."),
     ]
+
+    repl.registerCommand(makeExitCommand(repl))
+    repl.registerCommand(makeHelpCommand(repl))
+    repl.registerCommand(
+      makeInfoCommand(repl, {
+        database: options.database,
+        workspace: options.workspace,
+        model: options.model,
+      }),
+    )
+
     const firstInput = await readFirstInput(repl, "> ")
     if (firstInput === undefined) {
       repl.close()
@@ -61,22 +72,19 @@ export async function startAgentRepl(
       onTitleChange: makeTitleChangeHandler(options.database, session),
     })
 
-    repl.registerCommand(makeExitCommand(repl))
     repl.registerCommand(
       makeTitleCommand(agent, repl, {
         onTitleChange: makeTitleChangeHandler(options.database, session),
       }),
     )
     repl.registerCommand(
-      makeInfoCommand(agent, repl, {
+      makeInfoCommand(repl, {
         database: options.database,
         workspace: options.workspace,
         model: options.model,
-        session,
+        sessionId: session.id,
       }),
     )
-
-    repl.registerCommand(makeHelpCommand(repl))
 
     await repl.run(inputHandler, "> ")
   } catch (error) {

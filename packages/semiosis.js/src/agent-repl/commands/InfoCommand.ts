@@ -1,34 +1,37 @@
-import type { Agent } from "../../agent/index.ts"
 import type { Database } from "../../database/index.ts"
 import type { Model } from "../../model/index.ts"
 import type { Repl, ReplCommand } from "../../repl/Repl.ts"
-import type { Session } from "../../session/index.ts"
+import type { SessionId } from "../../session/index.ts"
 import type { Workspace } from "../../workspace/Workspace.ts"
 
 export function makeInfoCommand(
-  agent: Agent,
   repl: Repl,
   options: {
     database: Database
     workspace: Workspace
     model: Model
-    session: Session
+    sessionId?: SessionId
   },
 ): ReplCommand {
   return {
     name: "info",
     description: "show session information",
     handler: async () => {
-      const context = await agent.getContext()
-
       repl.println(`database: ${options.database.root}`)
       repl.println(`model: ${options.model.qualifiedName}`)
       repl.println(`workspace: ${options.workspace.name}`)
       repl.println(`  root: ${options.workspace.root}`)
-      repl.println(`session: ${options.session.title}`)
-      repl.println(`  id: ${options.session.id}`)
-      repl.println(`  context.length: ${context.length}`)
-      repl.println("")
+
+      if (options.sessionId) {
+        const session = await options.database.sessions.get(options.sessionId)
+        if (session === undefined) {
+          throw new Error(`session not found: ${options.sessionId}`)
+        }
+
+        repl.println(`session: ${session.title}`)
+        repl.println(`  id: ${session.id}`)
+        repl.println(`  context.length: ${session.context.length}`)
+      }
     },
   }
 }
