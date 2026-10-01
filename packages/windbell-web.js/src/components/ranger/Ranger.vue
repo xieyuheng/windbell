@@ -53,9 +53,18 @@ function stopWatching(): void {
   stopWatch = undefined
 }
 
-function handleSelect(index: number): void {
+async function handleSelect(index: number): Promise<void> {
+  const entry = state.entries[index]
+  if (entry === undefined) return
+
+  const wasSelected = index === state.selectedIndex
+
   state.focus = "sidebar"
   selectEntry(state, index)
+
+  if (wasSelected && entry.kind === "Directory") {
+    await openSelectedEntry(state)
+  }
 }
 
 async function handleKeydown(event: KeyboardEvent): Promise<void> {
