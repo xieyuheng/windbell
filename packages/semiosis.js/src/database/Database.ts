@@ -32,6 +32,7 @@ export type Database = {
 
 export function makeDatabase(options: DatabaseOptions): Database {
   const root = options.root
+  const providersRoot = Path.join(root, "providers")
   const workspaces = makeWorkspaceStore({
     root: Path.join(root, "workspaces"),
   })
@@ -54,10 +55,10 @@ export function makeDatabase(options: DatabaseOptions): Database {
   return {
     root,
     providers: makeProviderStore({
-      root: Path.join(root, "providers"),
+      root: providersRoot,
     }),
     models: makeModelStore({
-      root: Path.join(root, "models"),
+      providersRoot,
     }),
     settings: makeSettingsStore({
       root,

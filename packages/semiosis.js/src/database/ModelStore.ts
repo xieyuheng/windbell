@@ -4,7 +4,7 @@ import { assertId, isValidId } from "./id.ts"
 import { listFiles, readJsonFile, writeJsonFile } from "./jsonFile.ts"
 
 export type ModelStoreOptions = {
-  root: string
+  providersRoot: string
 }
 
 export type ModelStore = {
@@ -18,10 +18,14 @@ export type ModelStore = {
 }
 
 export function makeModelStore(options: ModelStoreOptions): ModelStore {
-  const root = Path.resolve(options.root)
+  const providersRoot = Path.resolve(options.providersRoot)
+
+  const modelsDir = (providerName: string): string => {
+    return Path.join(providersRoot, providerName, "models")
+  }
 
   const modelPath = (providerName: string, modelName: string): string => {
-    return Path.join(root, providerName, `${modelName}.json`)
+    return Path.join(modelsDir(providerName), `${modelName}.json`)
   }
 
   const store: ModelStore = {
@@ -40,7 +44,7 @@ export function makeModelStore(options: ModelStoreOptions): ModelStore {
     async list(providerName) {
       assertId(providerName)
 
-      const fileNames = await listFiles(Path.join(root, providerName))
+      const fileNames = await listFiles(modelsDir(providerName))
       const modelNames: Array<string> = []
 
       for (const fileName of fileNames) {

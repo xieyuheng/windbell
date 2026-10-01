@@ -1,11 +1,5 @@
 # semiosis.js
 
-（3）然后我们重构 models/deepseek
-
-- 我们可能会完全修改目前的 model 配置机制
-
-下面实现（1）
-
 用 cli command 实现 provider 和 model 流程
 
 用 repl 命令，model 选择流程

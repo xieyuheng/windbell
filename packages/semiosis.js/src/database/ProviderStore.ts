@@ -1,7 +1,12 @@
 import fs from "node:fs/promises"
 import Path from "node:path"
 import { assertId, isValidId } from "./id.ts"
-import { listFiles, readJsonFile, writeJsonFile } from "./jsonFile.ts"
+import {
+  isEnoent,
+  listDirectories,
+  readJsonFile,
+  writeJsonFile,
+} from "./jsonFile.ts"
 
 export type ProviderStoreOptions = {
   root: string
@@ -19,8 +24,12 @@ export function makeProviderStore(
 ): ProviderStore {
   const root = Path.resolve(options.root)
 
+  const providerDir = (providerName: string): string => {
+    return Path.join(root, providerName)
+  }
+
   const providerPath = (providerName: string): string => {
-    return Path.join(root, `${providerName}.json`)
+    return Path.join(providerDir(providerName), "index.json")
   }
 
   const store: ProviderStore = {
@@ -35,14 +44,12 @@ export function makeProviderStore(
     },
 
     async list() {
-      const fileNames = await listFiles(root)
+      const directoryNames = await listDirectories(root)
       const providerNames: Array<string> = []
 
-      for (const fileName of fileNames) {
-        if (!fileName.endsWith(".json")) continue
-
-        const providerName = fileName.slice(0, -".json".length)
+      for (const providerName of directoryNames) {
         if (!isValidId(providerName)) continue
+        if (!(await pathExists(providerPath(providerName)))) continue
 
         providerNames.push(providerName)
       }
@@ -53,9 +60,19 @@ export function makeProviderStore(
 
     async remove(providerName) {
       assertId(providerName)
-      await fs.rm(providerPath(providerName), { force: true })
+      await fs.rm(providerDir(providerName), { recursive: true, force: true })
     },
   }
 
   return store
+}
+
+async function pathExists(path: string): Promise<boolean> {
+  try {
+    await fs.access(path)
+    return true
+  } catch (error) {
+    if (isEnoent(error)) return false
+    throw error
+  }
 }
