@@ -1,4 +1,9 @@
-import type * as DeepSeek from "../../providers/deepseek/index.ts"
+import type {
+  ChatCompletionInput,
+  Client,
+  Message,
+  Tool,
+} from "../client/index.ts"
 import {
   AssistantSign,
   ReasoningSign,
@@ -12,18 +17,18 @@ import {
   isUserSign,
   type Sign,
   type ToolSign,
-} from "../../sign/index.ts"
-import type { DeepSeekModelConfig } from "./DeepSeekModelConfig.ts"
+} from "../../../sign/index.ts"
+import type { ModelConfig } from "./ModelConfig.ts"
 
-export async function deepSeekInterpret(
-  client: DeepSeek.Client,
-  config: DeepSeekModelConfig,
+export async function interpret(
+  client: Client,
+  config: ModelConfig,
   input: Array<Sign>,
 ): Promise<Array<Sign>> {
-  const request: DeepSeek.ChatCompletionInput = {
+  const request: ChatCompletionInput = {
     model: config.name,
-    messages: Array.from(parseDeepSeekMessage(input)),
-    tools: input.filter(isToolSign).map(makeDeepSeekTool),
+    messages: Array.from(parseMessage(input)),
+    tools: input.filter(isToolSign).map(makeTool),
     thinking: {
       type: config.thinking,
     },
@@ -35,15 +40,13 @@ export async function deepSeekInterpret(
   const message = output.choices?.[0]?.message
 
   if (message === undefined) {
-    throw new Error("[deepSeekInterpret] output.choices[0].message is missing")
+    throw new Error("[interpret] output.choices[0].message is missing")
   }
 
   return makeOutputSigns(message)
 }
 
-function* parseDeepSeekMessage(
-  signs: Array<Sign>,
-): Generator<DeepSeek.Message> {
+function* parseMessage(signs: Array<Sign>): Generator<Message> {
   let index = 0
 
   while (index < signs.length) {
@@ -82,7 +85,7 @@ function* parseDeepSeekMessage(
         index += 1
       }
 
-      const message: DeepSeek.Message = {
+      const message: Message = {
         role: "assistant",
         content,
       }
@@ -92,14 +95,14 @@ function* parseDeepSeekMessage(
       }
 
       if (toolCalls.length !== 0) {
-        message.tool_calls = toolCalls.map(makeDeepSeekToolCall)
+        message.tool_calls = toolCalls.map(makeToolCall)
       }
 
       yield message
       continue
     }
 
-    yield makeDeepSeekMessage(sign)
+    yield makeMessage(sign)
     index += 1
   }
 }
@@ -110,7 +113,7 @@ function isAssistantPartSign(
   return isReasoningSign(sign) || isAssistantSign(sign) || isToolCallSign(sign)
 }
 
-function makeDeepSeekMessage(sign: Sign): DeepSeek.Message {
+function makeMessage(sign: Sign): Message {
   if (isPersonaSign(sign)) {
     return { role: "system", content: sign.content }
   }
@@ -133,13 +136,13 @@ function makeDeepSeekMessage(sign: Sign): DeepSeek.Message {
     isToolCallSign(sign) ||
     isToolSign(sign)
   ) {
-    throw new Error(`[deepSeekInterpret] unexpected message sign: ${sign.kind}`)
+    throw new Error(`[interpret] unexpected message sign: ${sign.kind}`)
   }
 
-  throw new Error(`[deepSeekInterpret] cannot send ${sign.kind}`)
+  throw new Error(`[interpret] cannot send ${sign.kind}`)
 }
 
-function makeOutputSigns(message: DeepSeek.Message): Array<Sign> {
+function makeOutputSigns(message: Message): Array<Sign> {
   const signs: Array<Sign> = []
 
   if (
@@ -171,7 +174,7 @@ function makeOutputSigns(message: DeepSeek.Message): Array<Sign> {
   return signs
 }
 
-function makeDeepSeekTool(sign: ToolSign): DeepSeek.Tool {
+function makeTool(sign: ToolSign): Tool {
   return {
     type: "function",
     function: {
@@ -182,7 +185,7 @@ function makeDeepSeekTool(sign: ToolSign): DeepSeek.Tool {
   }
 }
 
-function makeDeepSeekToolCall(toolCall: ToolCallSign) {
+function makeToolCall(toolCall: ToolCallSign) {
   return {
     id: toolCall.callId,
     type: "function" as const,

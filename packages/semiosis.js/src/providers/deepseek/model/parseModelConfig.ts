@@ -1,7 +1,7 @@
 import { z } from "zod"
-import type { DeepSeekModelConfig } from "./DeepSeekModelConfig.ts"
+import type { ModelConfig } from "./ModelConfig.ts"
 
-const deepSeekModelConfigSchema = z.object({
+const modelConfigSchema = z.object({
   thinking: z
     .union([z.literal("enabled"), z.literal("disabled")])
     .default("enabled"),
@@ -15,14 +15,11 @@ const deepSeekModelConfigSchema = z.object({
     .default("high"),
 })
 
-export function parseDeepSeekModelConfig(
-  name: string,
-  value: unknown,
-): DeepSeekModelConfig {
-  const result = deepSeekModelConfigSchema.safeParse(value)
+export function parseModelConfig(name: string, value: unknown): ModelConfig {
+  const result = modelConfigSchema.safeParse(value)
   if (!result.success) {
     throw new Error(
-      `[parseDeepSeekModelConfig] invalid model config: ${result.error.message}`,
+      `[parseModelConfig] invalid model config: ${result.error.message}`,
     )
   }
 

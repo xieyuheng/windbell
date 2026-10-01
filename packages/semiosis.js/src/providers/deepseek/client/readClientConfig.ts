@@ -1,4 +1,4 @@
-import type { Database } from "../../database/index.ts"
+import type { Database } from "../../../database/index.ts"
 import type { ClientConfig } from "./ClientConfig.ts"
 import { parseClientConfig } from "./parseClientConfig.ts"
 

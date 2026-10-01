@@ -1,8 +1,6 @@
 import type { Database } from "../database/index.ts"
 import type { Model } from "../model/index.ts"
 import * as DeepSeek from "../providers/deepseek/index.ts"
-import { makeDeepSeekModel } from "./deepseek/makeDeepSeekModel.ts"
-import { readDeepSeekModelConfig } from "./deepseek/readDeepSeekModelConfig.ts"
 import { readMockModel } from "./readMockModel.ts"
 
 export type MakeModelOptions = {
@@ -24,8 +22,8 @@ export async function makeModel(
       const client = DeepSeek.makeClient(
         await DeepSeek.readClientConfig(options.database),
       )
-      const config = await readDeepSeekModelConfig(options.database, modelName)
-      return makeDeepSeekModel(client, config)
+      const config = await DeepSeek.readModelConfig(options.database, modelName)
+      return DeepSeek.makeModel(client, config)
     }
 
     default:
