@@ -16,13 +16,11 @@ export function makeOpenRouterHeaders(
     headers["Content-Type"] = "application/json"
   }
 
-  if (config.siteUrl !== undefined) {
-    headers["HTTP-Referer"] = config.siteUrl
-  }
+  // 向 OpenRouter 标识应用来源，不参与鉴权，也不影响模型调用。
+  headers["HTTP-Referer"] = "https://windbell.xieyuheng.com"
 
-  if (config.siteName !== undefined) {
-    headers["X-Title"] = config.siteName
-  }
+  // OpenRouter 应用归因、排行榜和用量展示中使用的应用名称。
+  headers["X-Title"] = "windbell"
 
   return headers
 }

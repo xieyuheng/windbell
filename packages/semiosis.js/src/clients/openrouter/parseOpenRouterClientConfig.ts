@@ -4,8 +4,6 @@ import type { OpenRouterClientConfig } from "./OpenRouterClientConfig.ts"
 const openRouterClientConfigSchema = z.object({
   baseUrl: z.string().min(1),
   key: z.string().min(1),
-  siteUrl: z.string().min(1).optional(),
-  siteName: z.string().min(1).optional(),
 })
 
 export function parseOpenRouterClientConfig(
