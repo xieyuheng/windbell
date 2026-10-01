@@ -67,6 +67,13 @@ async function handleSelect(index: number): Promise<void> {
   }
 }
 
+async function handleGoParent(): Promise<void> {
+  if (state.currentDirectory === "") return
+
+  state.focus = "sidebar"
+  await goParent(state)
+}
+
 async function handleKeydown(event: KeyboardEvent): Promise<void> {
   switch (event.key) {
     case "ArrowUp": {
@@ -156,6 +163,7 @@ onBeforeUnmount(() => {
       :selected-index="state.selectedIndex"
       :focus="state.focus"
       @select="handleSelect($event)"
+      @go-parent="handleGoParent"
     />
 
     <ResizeDivider :state="sidebarDivider" />

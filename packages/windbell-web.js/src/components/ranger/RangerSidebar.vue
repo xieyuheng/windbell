@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { FileSystemEntry } from "@xieyuheng/fs-api.js/client"
 import { computed, nextTick, ref, watch } from "vue"
+import { isSamePath } from "./RangerPath.ts"
 
 const props = defineProps<{
   root: string
@@ -12,6 +13,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   select: [index: number]
+  goParent: []
 }>()
 
 const list = ref<HTMLOListElement | null>(null)
@@ -30,6 +32,12 @@ const currentName = computed(() => {
   return pathName(props.currentDirectory || props.root)
 })
 
+const canGoParent = computed(() => {
+  const directory = props.currentDirectory || props.root
+
+  return directory !== "" && !isSamePath(directory, props.root)
+})
+
 function pathName(value: string): string {
   const trimmed = value.replace(/[/\\]+$/, "")
   const index = Math.max(trimmed.lastIndexOf("/"), trimmed.lastIndexOf("\\"))
@@ -40,10 +48,16 @@ function pathName(value: string): string {
 
 <template>
   <aside class="flex h-full min-h-0 flex-col overflow-hidden bg-paper">
-    <header class="shrink-0 px-3 py-2">
-      <p class="truncate text-ink">
+    <header class="shrink-0">
+      <button
+        type="button"
+        class="block w-full truncate px-3 py-2 text-left text-ink transition-colors"
+        :class="canGoParent ? 'cursor-pointer hover:bg-line' : 'cursor-default'"
+        :disabled="!canGoParent"
+        @click="emit('goParent')"
+      >
         {{ currentName }}
-      </p>
+      </button>
     </header>
 
     <ol
@@ -53,13 +67,13 @@ function pathName(value: string): string {
       <li
         v-for="(entry, index) in entries"
         :key="entry.path"
-        class="w-full truncate px-3 py-1"
+        class="w-full cursor-pointer truncate px-3 py-1"
         :class="[
           index === selectedIndex
             ? focus === 'sidebar'
               ? 'bg-ink text-paper'
               : 'bg-ink/15 text-ink'
-            : 'text-ink',
+            : 'text-ink hover:bg-line',
         ]"
         @click="emit('select', index)"
       >
