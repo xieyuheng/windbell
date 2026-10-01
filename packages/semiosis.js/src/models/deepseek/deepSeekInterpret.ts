@@ -1,9 +1,4 @@
-import type {
-  DeepSeekChatCompletionInput,
-  DeepSeekClient,
-  DeepSeekMessage,
-  DeepSeekTool,
-} from "../../clients/deepseek/index.ts"
+import type * as DeepSeek from "../../providers/deepseek/index.ts"
 import {
   AssistantSign,
   ReasoningSign,
@@ -21,11 +16,11 @@ import {
 import type { DeepSeekModelConfig } from "./DeepSeekModelConfig.ts"
 
 export async function deepSeekInterpret(
-  client: DeepSeekClient,
+  client: DeepSeek.Client,
   config: DeepSeekModelConfig,
   input: Array<Sign>,
 ): Promise<Array<Sign>> {
-  const request: DeepSeekChatCompletionInput = {
+  const request: DeepSeek.ChatCompletionInput = {
     model: config.name,
     messages: Array.from(parseDeepSeekMessage(input)),
     tools: input.filter(isToolSign).map(makeDeepSeekTool),
@@ -46,7 +41,9 @@ export async function deepSeekInterpret(
   return makeOutputSigns(message)
 }
 
-function* parseDeepSeekMessage(signs: Array<Sign>): Generator<DeepSeekMessage> {
+function* parseDeepSeekMessage(
+  signs: Array<Sign>,
+): Generator<DeepSeek.Message> {
   let index = 0
 
   while (index < signs.length) {
@@ -85,7 +82,7 @@ function* parseDeepSeekMessage(signs: Array<Sign>): Generator<DeepSeekMessage> {
         index += 1
       }
 
-      const message: DeepSeekMessage = {
+      const message: DeepSeek.Message = {
         role: "assistant",
         content,
       }
@@ -113,7 +110,7 @@ function isAssistantPartSign(
   return isReasoningSign(sign) || isAssistantSign(sign) || isToolCallSign(sign)
 }
 
-function makeDeepSeekMessage(sign: Sign): DeepSeekMessage {
+function makeDeepSeekMessage(sign: Sign): DeepSeek.Message {
   if (isPersonaSign(sign)) {
     return { role: "system", content: sign.content }
   }
@@ -142,7 +139,7 @@ function makeDeepSeekMessage(sign: Sign): DeepSeekMessage {
   throw new Error(`[deepSeekInterpret] cannot send ${sign.kind}`)
 }
 
-function makeOutputSigns(message: DeepSeekMessage): Array<Sign> {
+function makeOutputSigns(message: DeepSeek.Message): Array<Sign> {
   const signs: Array<Sign> = []
 
   if (
@@ -174,7 +171,7 @@ function makeOutputSigns(message: DeepSeekMessage): Array<Sign> {
   return signs
 }
 
-function makeDeepSeekTool(sign: ToolSign): DeepSeekTool {
+function makeDeepSeekTool(sign: ToolSign): DeepSeek.Tool {
   return {
     type: "function",
     function: {

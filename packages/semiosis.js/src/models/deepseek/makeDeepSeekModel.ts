@@ -1,12 +1,12 @@
 import { errorReport } from "@xieyuheng/std.js/error"
-import type { DeepSeekClient } from "../../clients/deepseek/index.ts"
+import type * as DeepSeek from "../../providers/deepseek/index.ts"
 import type { Model } from "../../model/index.ts"
 import { ErrorSign } from "../../sign/index.ts"
 import { deepSeekInterpret } from "./deepSeekInterpret.ts"
 import type { DeepSeekModelConfig } from "./DeepSeekModelConfig.ts"
 
 export function makeDeepSeekModel(
-  client: DeepSeekClient,
+  client: DeepSeek.Client,
   config: DeepSeekModelConfig,
 ): Model {
   return {
