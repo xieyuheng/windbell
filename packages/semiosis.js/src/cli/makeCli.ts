@@ -14,7 +14,7 @@ export function makeCli() {
 
   router.defineRoutes([
     "provider-list -- list supported providers",
-    "model-list --provider <provider-name> -- list models",
+    "model-list --provider <provider-name> --all -- list models (use --all to include disabled models)",
     "repl --provider <provider-name> --model <model-name> --session <session-id> -- start agent repl in current directory",
     "batch --provider <provider-name> --model <model-name> --prompts <file> --cwd <dir> --max-output-chars <n> -- run prompts through agent",
   ])

@@ -32,3 +32,10 @@ export function parsePositiveInt(value: unknown, fallback: number): number {
 
   return number
 }
+
+export function readFlag(
+  options: Record<string, unknown>,
+  name: string,
+): boolean {
+  return Object.hasOwn(options, name)
+}
