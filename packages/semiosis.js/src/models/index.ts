@@ -1,4 +1,5 @@
 export * from "./makeMockModel.ts"
+export * from "./enableModel.ts"
 export * from "./isModelEnabled.ts"
 export * from "./listAvailableModels.ts"
 export * from "./listModelConfigs.ts"
