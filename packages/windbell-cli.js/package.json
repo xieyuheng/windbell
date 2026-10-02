@@ -17,7 +17,7 @@
     "@xieyuheng/semiosis.js": "workspace:*",
     "@xieyuheng/std.js": "workspace:*",
     "@xieyuheng/windbell-api.js": "workspace:*",
-    "vite": "8.3.1"
+    "vite": "8.3.2"
   },
   "devDependencies": {
     "@types/node": "^26.6.3",
