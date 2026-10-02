@@ -1,12 +1,19 @@
 # semiosis.js
 
-用 cli command 实现 provider 和 model 流程
+用 cli command 实现 provider api-keys 的填写和删除
+用 cli command 实现 default provider 选择
+用 cli command 实现 default model 选择
+用 cli command 实现 model disable
 
-用 repl 命令，model 选择流程
+用 repl 命令 实现 provider 和 model 的切换
 
 # windbell-web.js
 
-实现 provider 和 model 选择流程
+实现所支持的 provider 和 model 的展示页面
+实现 provider api-keys 的填写和删除
+实现 default provider 选择
+实现 default model 选择
+实现 model disable
 
 # meta-lisp
 
