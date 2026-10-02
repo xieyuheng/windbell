@@ -9,17 +9,20 @@ trap 'rm -rf "$database_dir"' EXIT
 mkdir -p snapshot
 
 node src/main.ts batch \
-  --model mock/conversation \
+  --provider mock \
+  --model conversation \
   --prompts mock/prompts/conversation.md \
   > snapshot/conversation.out
 
 node src/main.ts batch \
-  --model mock/tool-errors \
+  --provider mock \
+  --model tool-errors \
   --prompts mock/prompts/tool-errors.md \
   > snapshot/tool-errors.out
 
-node src/main.ts batch \
-  --model mock/truncate-output \
+  node src/main.ts batch \
+  --provider mock \
+  --model truncate-output \
   --prompts mock/prompts/truncate-output.md \
   --max-output-chars 4 \
   > snapshot/truncate-output.out
