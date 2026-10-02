@@ -8,6 +8,7 @@ export type SessionState = {
   workspaceRoot: string
   title: string
   context: Array<S.Sign>
+  modelRef: S.ModelRef | undefined
   loading: boolean
   interpreting: boolean
   error: string | undefined
@@ -24,6 +25,7 @@ export function makeSessionState(sessionId: S.SessionId): SessionState {
     workspaceRoot: "",
     title: "",
     context: [],
+    modelRef: undefined,
     loading: false,
     interpreting: false,
     error: undefined,
@@ -37,6 +39,7 @@ export async function loadSessionState(
   state.sessionId = sessionId
   state.workspaceId = ""
   state.workspaceRoot = ""
+  state.modelRef = undefined
   state.loading = true
   state.error = undefined
 
@@ -94,6 +97,13 @@ export async function interpretSession(
       throw new Error(`default model is not configured: ${providerName}`)
     }
 
+    const modelRef: S.ModelRef = {
+      providerName: providerInfo.name,
+      name: providerInfo.defaultModel,
+    }
+
+    state.modelRef = modelRef
+
     const input: S.UserSign = {
       kind: "UserSign",
       content,
@@ -102,10 +112,7 @@ export async function interpretSession(
     state.context.push(input)
 
     for await (const sign of semiosis.sessions.interpret(state.sessionId, {
-      model: {
-        providerName: providerInfo.name,
-        name: providerInfo.defaultModel,
-      },
+      model: modelRef,
       input: [input],
     })) {
       state.context.push(sign)
@@ -121,9 +128,13 @@ export async function interpretSession(
 }
 
 export async function generateSessionTitle(state: SessionState): Promise<void> {
+  if (state.modelRef === undefined) return
+
   try {
     const title = (
-      await semiosis.sessions.generateTitle(state.sessionId)
+      await semiosis.sessions.generateTitle(state.sessionId, {
+        model: state.modelRef,
+      })
     ).trim()
 
     if (title !== "") {

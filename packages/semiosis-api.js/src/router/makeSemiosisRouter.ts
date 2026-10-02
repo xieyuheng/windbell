@@ -152,14 +152,8 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       throw new HTTPException(404, { message: "session not found" })
     }
 
-    const modelRef = await S.readDefaultModelRef(options.database)
-
-    if (modelRef === undefined) {
-      throw new HTTPException(400, {
-        message: "default model is not configured",
-      })
-    }
-
+    const body = readRecord(await readJsonBody(c))
+    const modelRef = readModel(body, "model")
     const model = await S.makeModel(modelRef, {
       database: options.database,
     })

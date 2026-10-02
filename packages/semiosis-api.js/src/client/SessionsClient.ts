@@ -11,6 +11,10 @@ export type ListSessionsOptions = {
   workspaceId: S.WorkspaceId | undefined
 }
 
+export type GenerateTitleOptions = {
+  model: S.ModelRef
+}
+
 export type InterpretOptions = {
   model: S.ModelRef
   input: Array<S.Sign>
@@ -26,7 +30,7 @@ export type SessionsClient = {
   make(options: MakeSessionOptions): Promise<S.Session>
   get(id: S.SessionId): Promise<S.Session | undefined>
   put(session: S.Session): Promise<void>
-  generateTitle(id: S.SessionId): Promise<string>
+  generateTitle(id: S.SessionId, options: GenerateTitleOptions): Promise<string>
   interpret(id: S.SessionId, options: InterpretOptions): AsyncGenerator<S.Sign>
   remove(id: S.SessionId): Promise<void>
 }
@@ -62,11 +66,12 @@ export function makeSessionsClient(
       )
     },
 
-    generateTitle: async (id) => {
+    generateTitle: async (id, options) => {
       const result = await call<{ title: string }>(
         config.baseUrl,
         "POST",
         `/sessions/${encodeURIComponent(id)}/title`,
+        options,
       )
 
       return result.title
