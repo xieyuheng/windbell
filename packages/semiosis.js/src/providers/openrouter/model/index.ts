@@ -1,5 +1,7 @@
 export * from "./ModelConfig.ts"
 export * from "./interpret.ts"
+export * from "./isModelEnabled.ts"
+export * from "./listAvailableModels.ts"
 export * from "./listModelConfigs.ts"
 export * from "./makeModel.ts"
 export * from "./parseModelConfig.ts"
