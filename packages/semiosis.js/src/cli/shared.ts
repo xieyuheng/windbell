@@ -6,14 +6,31 @@ import { makeModel } from "../models/index.ts"
 import { makeAgentFromSession } from "../session/index.ts"
 import type { ToolRouter } from "../tool/index.ts"
 import type { Workspace } from "../workspace/Workspace.ts"
-import { readRequiredOption } from "./options.ts"
+import { readOptionalOption } from "./options.ts"
 
 export async function makeModelFromOptions(options: {
   database: Database
   cliOptions: Record<string, unknown>
 }): Promise<Model> {
-  const providerName = readRequiredOption(options.cliOptions, "--provider")
-  const name = readRequiredOption(options.cliOptions, "--model")
+  const providerOption = readOptionalOption(options.cliOptions, "--provider")
+  const modelOption = readOptionalOption(options.cliOptions, "--model")
+
+  const settings = await options.database.settings.get()
+  const providerName = providerOption ?? settings?.defaultProvider
+
+  if (providerName === undefined || providerName === null) {
+    throw new Error("default provider is not configured")
+  }
+
+  const providerInfo = await options.database.providers.get(providerName)
+  if (providerInfo === undefined) {
+    throw new Error(`provider not found: ${providerName}`)
+  }
+
+  const name = modelOption ?? providerInfo.defaultModel
+  if (name === null || name === undefined) {
+    throw new Error(`default model is not configured: ${providerName}`)
+  }
 
   return await makeModel(
     { providerName, name },
