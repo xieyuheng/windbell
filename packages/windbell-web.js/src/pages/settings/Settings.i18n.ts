@@ -1,9 +1,6 @@
 export const settingsMessages = {
   "zh-CN": {
     title: "设置",
-    defaultModel: "默认模型",
-    noModels: "database 中还没有可用模型。",
-    loading: "加载中...",
     language: "语言",
     theme: "主题",
     themeSystem: "跟随系统",
@@ -29,9 +26,6 @@ export const settingsMessages = {
   },
   "en-US": {
     title: "Settings",
-    defaultModel: "Default model",
-    noModels: "No models available in database.",
-    loading: "Loading...",
     language: "Language",
     theme: "Theme",
     themeSystem: "System",

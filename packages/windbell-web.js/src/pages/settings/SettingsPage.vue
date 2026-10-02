@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
-import { computed, onMounted, ref } from "vue"
+import { computed, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import MediumButton from "../../components/buttons/MediumButton.vue"
 import Card from "../../components/card/Card.vue"
@@ -10,11 +10,6 @@ import { useFont, type Font } from "../../app/font.ts"
 import { setLocale, supportedLocales } from "../../app/i18n.ts"
 import { useTheme, type ThemeMode } from "../../app/theme.ts"
 import { settingsMessages } from "./Settings.i18n.ts"
-import {
-  loadSettings,
-  makeSettingsState,
-  setDefaultModel,
-} from "./SettingsState.ts"
 import {
   clearStorageKeys,
   clearWindbellStorage,
@@ -28,7 +23,6 @@ const { locale, t } = useI18n({
 })
 const theme = useTheme()
 const font = useFont()
-const state = makeSettingsState()
 const storageEntries = ref(readWindbellStorage())
 const storageGroupLabelKeys: Record<StorageGroup, string> = {
   app: "storageApp",
@@ -97,10 +91,6 @@ const fontOptions: Array<{ value: Font; labelKey: string }> = [
   { value: "unifont", labelKey: "fontUnifont" },
   { value: "system", labelKey: "fontSystem" },
 ]
-
-onMounted(async () => {
-  await loadSettings(state)
-})
 
 useHead(() => ({
   title: t("title"),
@@ -195,48 +185,6 @@ useHead(() => ({
             />
             <span>{{ t(item.labelKey) }}</span>
           </label>
-        </div>
-      </Card>
-
-      <Card as="section">
-        <template #tag>
-          <h2 class="text-ink">
-            {{ t("defaultModel") }}
-          </h2>
-        </template>
-
-        <div class="flex flex-col gap-1 p-2">
-          <p v-if="state.loading" class="px-2 py-1.5 text-ink">
-            {{ t("loading") }}
-          </p>
-
-          <p
-            v-else-if="state.models.length === 0"
-            class="px-2 py-1.5 text-ink-muted"
-          >
-            {{ t("noModels") }}
-          </p>
-
-          <label
-            v-for="item in state.models"
-            :key="item.qualifiedName"
-            class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-ink transition-colors hover:bg-paper-deep"
-          >
-            <input
-              class="accent-ink"
-              type="radio"
-              name="default-model"
-              :value="item.qualifiedName"
-              :checked="state.defaultModelQualifiedName === item.qualifiedName"
-              :disabled="state.saving"
-              @change="setDefaultModel(state, item.qualifiedName)"
-            />
-            <span class="font-mono">{{ item.qualifiedName }}</span>
-          </label>
-
-          <p v-if="state.error !== undefined" class="px-2 py-1.5 text-danger">
-            {{ state.error }}
-          </p>
         </div>
       </Card>
 

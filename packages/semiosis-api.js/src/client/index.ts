@@ -1,7 +1,6 @@
 export * from "./DustbinSessionsClient.ts"
 export * from "./DustbinWorkspacesClient.ts"
 export * from "./HealthClient.ts"
-export * from "./ModelsClient.ts"
 export * from "./SemiosisClient.ts"
 export * from "./SemiosisClientConfig.ts"
 export * from "./SessionsClient.ts"

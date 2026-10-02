@@ -4,8 +4,6 @@ import type { DustbinWorkspacesClient } from "./DustbinWorkspacesClient.ts"
 import { makeDustbinWorkspacesClient } from "./DustbinWorkspacesClient.ts"
 import type { HealthClient } from "./HealthClient.ts"
 import { makeHealthClient } from "./HealthClient.ts"
-import type { ModelsClient } from "./ModelsClient.ts"
-import { makeModelsClient } from "./ModelsClient.ts"
 import type { SemiosisClientConfig } from "./SemiosisClientConfig.ts"
 import type { SessionsClient } from "./SessionsClient.ts"
 import { makeSessionsClient } from "./SessionsClient.ts"
@@ -16,7 +14,6 @@ import { makeWorkspacesClient } from "./WorkspacesClient.ts"
 
 export type SemiosisClient = {
   health: HealthClient
-  models: ModelsClient
   settings: SettingsClient
   workspaces: WorkspacesClient
   sessions: SessionsClient
@@ -31,7 +28,6 @@ export function makeSemiosisClient(
 ): SemiosisClient {
   return {
     health: makeHealthClient(config),
-    models: makeModelsClient(config),
     settings: makeSettingsClient(config),
     workspaces: makeWorkspacesClient(config),
     sessions: makeSessionsClient(config),

@@ -10,12 +10,6 @@ test("semiosis client and server", async (t) => {
   const root = await mkdtemp(Path.join(tmpdir(), "semiosis-api-"))
   const database = S.makeDatabase({ root })
 
-  await database.providers.put("deepseek", {
-    baseUrl: "https://example.com",
-    key: "test-key",
-  })
-  await database.models.put("deepseek", "chat", {})
-
   const { server, url } = await startSemiosisServer({
     database,
     hostname: "127.0.0.1",
@@ -35,12 +29,6 @@ test("semiosis client and server", async (t) => {
     ok: true,
     service: "semiosis-api",
   })
-
-  assert.deepEqual(await client.models.list(), [
-    {
-      qualifiedName: "deepseek/chat",
-    },
-  ])
 
   assert.deepEqual(await client.settings.get(), {
     defaultModel: null,
