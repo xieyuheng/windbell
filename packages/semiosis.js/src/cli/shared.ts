@@ -22,6 +22,19 @@ export async function makeModelFromOptions(options: {
     throw new Error("default provider is not configured")
   }
 
+  if (providerName === "mock") {
+    if (modelOption === undefined) {
+      throw new Error("model is required for provider: mock")
+    }
+
+    return await makeModel(
+      { providerName, name: modelOption },
+      {
+        database: options.database,
+      },
+    )
+  }
+
   const providerInfo = await options.database.providers.get(providerName)
   if (providerInfo === undefined) {
     throw new Error(`provider not found: ${providerName}`)
