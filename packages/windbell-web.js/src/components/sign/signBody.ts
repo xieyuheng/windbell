@@ -9,6 +9,10 @@ export function signBody(sign: S.Sign): string {
       return sign.content
     }
 
+    case "ProviderDataSign": {
+      return JSON.stringify(sign.data, null, 2)
+    }
+
     case "ToolSign": {
       return `${sign.name} ${sign.description}`
     }

@@ -11,6 +11,7 @@ const signTagBackgroundByKind = {
   UserSign: 24,
   ReasoningSign: 55,
   AssistantSign: 22,
+  ProviderDataSign: 60,
   ToolCallSign: 58,
   ToolSign: 25,
   ToolOutputSign: 94,
@@ -54,6 +55,10 @@ export function formatSign(
 
     case "AssistantSign": {
       return `${formatSignTag(sign.kind, "assistant", options)}\n\n${sign.content}\n`
+    }
+
+    case "ProviderDataSign": {
+      return `${formatSignTag(sign.kind, "provider-data", options)}\n\n${JSON.stringify(sign.data, null, 2)}\n`
     }
 
     case "ToolCallSign": {

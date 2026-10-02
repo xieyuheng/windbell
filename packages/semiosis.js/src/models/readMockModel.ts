@@ -23,6 +23,12 @@ const signSchema = z.discriminatedUnion("kind", [
     content: z.string(),
   }),
   z.object({
+    kind: z.literal("ProviderDataSign"),
+    provider: z.string(),
+    field: z.string(),
+    data: z.unknown(),
+  }),
+  z.object({
     kind: z.literal("ToolCallSign"),
     callId: z.string(),
     name: z.string(),

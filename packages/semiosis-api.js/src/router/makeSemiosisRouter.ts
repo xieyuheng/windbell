@@ -23,7 +23,10 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const models: Array<{ qualifiedName: string }> = []
 
     for (const providerName of providerNames) {
-      const modelNames = await options.database.models.list(providerName)
+      const modelNames =
+        providerName === "openrouter"
+          ? await S.OpenRouter.listModelConfigs(options.database)
+          : await options.database.models.list(providerName)
 
       for (const modelName of modelNames) {
         models.push({

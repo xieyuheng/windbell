@@ -2,6 +2,7 @@ import {
   ErrorSign,
   isAssistantSign,
   isErrorSign,
+  isProviderDataSign,
   isReasoningSign,
   isToolCallSign,
   type Sign,
@@ -30,6 +31,7 @@ export async function* agentInterpret(
       if (
         !isReasoningSign(sign) &&
         !isAssistantSign(sign) &&
+        !isProviderDataSign(sign) &&
         !isToolCallSign(sign)
       ) {
         yield ErrorSign(

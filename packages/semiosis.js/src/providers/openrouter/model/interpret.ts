@@ -6,6 +6,7 @@ import type {
 } from "../client/index.ts"
 import {
   AssistantSign,
+  ProviderDataSign,
   ReasoningSign,
   ToolCallSign,
   isAssistantSign,
@@ -30,11 +31,18 @@ export async function interpret(
     model: config.name,
     messages: Array.from(parseMessage(input)),
     tools: input.filter(isToolSign).map(makeTool),
-    thinking: {
-      type: config.thinking,
-    },
-    reasoning_effort:
-      config.thinking === "enabled" ? config.reasoningEffort : "none",
+  }
+
+  if (config.reasoning !== undefined) {
+    request.reasoning = config.reasoning
+  }
+
+  if (config.provider !== undefined) {
+    request.provider = config.provider
+  }
+
+  if (config.extraBody !== undefined) {
+    request.extraBody = config.extraBody
   }
 
   const output = await client.chatCompletion(request)
@@ -54,11 +62,6 @@ function* parseMessage(signs: Array<Sign>): Generator<Message> {
     const sign = signs[index]
     if (sign === undefined) break
 
-    if (isProviderDataSign(sign)) {
-      index += 1
-      continue
-    }
-
     if (isToolSign(sign)) {
       index += 1
       continue
@@ -67,16 +70,12 @@ function* parseMessage(signs: Array<Sign>): Generator<Message> {
     if (isAssistantPartSign(sign)) {
       let reasoning = ""
       let content = ""
+      let reasoningDetails: Array<unknown> | undefined
       const toolCalls: Array<ToolCallSign> = []
 
       while (index < signs.length) {
         const part = signs[index]
         if (part === undefined) break
-
-        if (isProviderDataSign(part)) {
-          index += 1
-          continue
-        }
 
         if (isToolSign(part)) {
           index += 1
@@ -87,6 +86,14 @@ function* parseMessage(signs: Array<Sign>): Generator<Message> {
 
         if (isReasoningSign(part)) {
           reasoning += part.content
+        } else if (isProviderDataSign(part)) {
+          if (
+            part.provider === "openrouter" &&
+            part.field === "reasoning_details" &&
+            Array.isArray(part.data)
+          ) {
+            reasoningDetails = part.data
+          }
         } else if (isAssistantSign(part)) {
           content += part.content
         } else if (isToolCallSign(part)) {
@@ -101,8 +108,10 @@ function* parseMessage(signs: Array<Sign>): Generator<Message> {
         content,
       }
 
-      if (reasoning !== "") {
-        message.reasoning_content = reasoning
+      if (reasoningDetails !== undefined) {
+        message.reasoning_details = reasoningDetails
+      } else if (reasoning !== "") {
+        message.reasoning = reasoning
       }
 
       if (toolCalls.length !== 0) {
@@ -120,8 +129,13 @@ function* parseMessage(signs: Array<Sign>): Generator<Message> {
 
 function isAssistantPartSign(
   sign: Sign,
-): sign is ReasoningSign | AssistantSign | ToolCallSign {
-  return isReasoningSign(sign) || isAssistantSign(sign) || isToolCallSign(sign)
+): sign is ReasoningSign | AssistantSign | ProviderDataSign | ToolCallSign {
+  return (
+    isReasoningSign(sign) ||
+    isAssistantSign(sign) ||
+    isProviderDataSign(sign) ||
+    isToolCallSign(sign)
+  )
 }
 
 function makeMessage(sign: Sign): Message {
@@ -144,6 +158,7 @@ function makeMessage(sign: Sign): Message {
   if (
     isReasoningSign(sign) ||
     isAssistantSign(sign) ||
+    isProviderDataSign(sign) ||
     isToolCallSign(sign) ||
     isToolSign(sign)
   ) {
@@ -157,11 +172,25 @@ function makeOutputSigns(message: Message): Array<Sign> {
   const signs: Array<Sign> = []
 
   if (
-    message.reasoning_content !== undefined &&
-    message.reasoning_content !== null &&
-    message.reasoning_content !== ""
+    message.reasoning !== undefined &&
+    message.reasoning !== null &&
+    message.reasoning !== ""
   ) {
-    signs.push(ReasoningSign(message.reasoning_content))
+    signs.push(ReasoningSign(message.reasoning))
+  }
+
+  if (
+    message.reasoning_details !== undefined &&
+    message.reasoning_details !== null &&
+    message.reasoning_details.length !== 0
+  ) {
+    signs.push(
+      ProviderDataSign({
+        provider: "openrouter",
+        field: "reasoning_details",
+        data: message.reasoning_details,
+      }),
+    )
   }
 
   if (

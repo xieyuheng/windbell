@@ -2,6 +2,7 @@ import type { Component } from "vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import SignErrorView from "./SignErrorView.vue"
 import SignMarkdownView from "./SignMarkdownView.vue"
+import SignProviderDataView from "./SignProviderDataView.vue"
 import SignToolCallView from "./SignToolCallView.vue"
 import SignToolOutputView from "./SignToolOutputView.vue"
 import SignToolView from "./SignToolView.vue"
@@ -33,6 +34,11 @@ const signViews = {
     component: SignMarkdownView,
     labelKey: "signKind.assistant",
     color: "var(--color-sign-assistant)",
+  },
+  ProviderDataSign: {
+    component: SignProviderDataView,
+    labelKey: "signKind.providerData",
+    color: "var(--color-sign-provider-data)",
   },
   ToolCallSign: {
     component: SignToolCallView,

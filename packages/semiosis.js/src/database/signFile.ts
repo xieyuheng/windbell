@@ -18,6 +18,7 @@ export const signTypeNameByKind = {
   UserSign: "user",
   ReasoningSign: "reasoning",
   AssistantSign: "assistant",
+  ProviderDataSign: "provider-data",
   ToolCallSign: "tool-call",
   ToolSign: "tool",
   ToolOutputSign: "tool-output",
@@ -29,6 +30,7 @@ const signKindByTypeName = {
   user: "UserSign",
   reasoning: "ReasoningSign",
   assistant: "AssistantSign",
+  "provider-data": "ProviderDataSign",
   "tool-call": "ToolCallSign",
   tool: "ToolSign",
   "tool-output": "ToolOutputSign",
@@ -48,6 +50,7 @@ export function signFileExtension(sign: Sign): ".md" | ".json" {
     case "ErrorSign":
       return ".md"
 
+    case "ProviderDataSign":
     case "ToolCallSign":
     case "ToolSign":
     case "ToolOutputSign":
@@ -73,6 +76,7 @@ export function serializeSign(sign: Sign): string {
     case "ErrorSign":
       return sign.message
 
+    case "ProviderDataSign":
     case "ToolCallSign":
     case "ToolSign":
     case "ToolOutputSign":
@@ -145,6 +149,7 @@ export function parseSign(fileName: string, text: string): Sign {
     case "ErrorSign":
       return ErrorSign(text)
 
+    case "ProviderDataSign":
     case "ToolCallSign":
     case "ToolSign":
     case "ToolOutputSign":

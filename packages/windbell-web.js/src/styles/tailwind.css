@@ -31,6 +31,7 @@
   --color-sign-user:        oklch(0.92 0.04 213);
   --color-sign-reasoning:   oklch(0.92 0.04 294);
   --color-sign-assistant:   oklch(0.92 0.04 153);
+  --color-sign-provider-data: oklch(0.92 0.04 273);
   --color-sign-tool-call:   oklch(0.92 0.04 96);
   --color-sign-tool:        oklch(0.92 0.04 253);
   --color-sign-tool-output: oklch(0.92 0.04 83);
@@ -57,6 +58,7 @@
   --color-sign-user:         oklch(0.4 0.2 213);
   --color-sign-reasoning:    oklch(0.4 0.2 294);
   --color-sign-assistant:    oklch(0.4 0.2 153);
+  --color-sign-provider-data: oklch(0.4 0.2 273);
   --color-sign-tool-call:    oklch(0.4 0.2 96);
   --color-sign-tool:         oklch(0.4 0.2 253);
   --color-sign-tool-output:  oklch(0.4 0.2 83);

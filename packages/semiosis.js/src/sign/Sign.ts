@@ -3,6 +3,7 @@ export type Sign =
   | UserSign
   | ReasoningSign
   | AssistantSign
+  | ProviderDataSign
   | ToolSign
   | ToolCallSign
   | ToolOutputSign
@@ -90,6 +91,31 @@ export function isAssistantSign(value: Sign): value is AssistantSign {
 export function asAssistantSign(value: Sign): AssistantSign {
   if (isAssistantSign(value)) return value
   throw new Error(`[asAssistantSign] fail on: ${value.kind}`)
+}
+
+export type ProviderDataSign = {
+  kind: "ProviderDataSign"
+  provider: string
+  field: string
+  data: unknown
+}
+
+export function ProviderDataSign(
+  input: Omit<ProviderDataSign, "kind">,
+): ProviderDataSign {
+  return {
+    kind: "ProviderDataSign",
+    ...input,
+  }
+}
+
+export function isProviderDataSign(value: Sign): value is ProviderDataSign {
+  return value.kind === "ProviderDataSign"
+}
+
+export function asProviderDataSign(value: Sign): ProviderDataSign {
+  if (isProviderDataSign(value)) return value
+  throw new Error(`[asProviderDataSign] fail on: ${value.kind}`)
 }
 
 export type ToolSign = {
