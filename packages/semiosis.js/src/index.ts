@@ -1,5 +1,6 @@
 export * as DeepSeek from "./providers/deepseek/index.ts"
 export * as OpenRouter from "./providers/openrouter/index.ts"
+export * from "./provider/index.ts"
 export * from "./database/index.ts"
 export * from "./agent/index.ts"
 export * from "./format/index.ts"
