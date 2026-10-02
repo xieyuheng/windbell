@@ -16,5 +16,5 @@ export async function readModelConfigs(
 }
 
 function modelConfigsPath(database: Database): string {
-  return Path.join(database.root, "providers", "openrouter", "models.json")
+  return Path.join(database.providersRoot, "openrouter", "models.json")
 }

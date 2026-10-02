@@ -7,9 +7,7 @@ import {
   makeDustbinWorkspaceStore,
   type DustbinWorkspaceStore,
 } from "./DustbinWorkspaceStore.ts"
-import { makeModelStore, type ModelStore } from "./ModelStore.ts"
 import { makeSettingsStore, type SettingsStore } from "./SettingsStore.ts"
-import { makeProviderStore, type ProviderStore } from "./ProviderStore.ts"
 import { makeSessionStore, type SessionStore } from "./SessionStore.ts"
 import { makeWorkspaceStore, type WorkspaceStore } from "./WorkspaceStore.ts"
 
@@ -19,8 +17,7 @@ export type DatabaseOptions = {
 
 export type Database = {
   root: string
-  providers: ProviderStore
-  models: ModelStore
+  providersRoot: string
   settings: SettingsStore
   workspaces: WorkspaceStore
   sessions: SessionStore
@@ -54,12 +51,7 @@ export function makeDatabase(options: DatabaseOptions): Database {
 
   return {
     root,
-    providers: makeProviderStore({
-      root: providersRoot,
-    }),
-    models: makeModelStore({
-      providersRoot,
-    }),
+    providersRoot,
     settings: makeSettingsStore({
       root,
     }),
