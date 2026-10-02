@@ -1,5 +1,5 @@
 import type { Database } from "../database/index.ts"
-import type { Model } from "../model/index.ts"
+import type { Model, ModelRef } from "../model/index.ts"
 import * as DeepSeek from "../providers/deepseek/index.ts"
 import * as OpenRouter from "../providers/openrouter/index.ts"
 import { readMockModel } from "./readMockModel.ts"
@@ -9,21 +9,19 @@ export type MakeModelOptions = {
 }
 
 export async function makeModel(
-  qualifiedName: string,
+  ref: ModelRef,
   options: MakeModelOptions,
 ): Promise<Model> {
-  const [providerName, modelName] = parseQualifiedName(qualifiedName)
-
-  switch (providerName) {
+  switch (ref.providerName) {
     case "mock": {
-      return readMockModel(modelName)
+      return readMockModel(ref.name)
     }
 
     case "deepseek": {
       const client = DeepSeek.makeClient(
         await DeepSeek.readClientConfig(options.database),
       )
-      const config = await DeepSeek.readModelConfig(options.database, modelName)
+      const config = await DeepSeek.readModelConfig(options.database, ref.name)
       return DeepSeek.makeModel(client, config)
     }
 
@@ -33,39 +31,19 @@ export async function makeModel(
       )
       const config = await OpenRouter.readModelConfig(
         options.database,
-        modelName,
+        ref.name,
       )
       return OpenRouter.makeModel(client, config)
     }
 
     default:
-      throw new Error(`unknown provider: ${providerName}`)
+      throw new Error(`unknown provider: ${ref.providerName}`)
   }
 }
 
-function parseQualifiedName(text: string): [string, string] {
-  const index = text.indexOf("/")
-  if (index <= 0 || index === text.length - 1) {
-    throw new Error(
-      `invalid qualifiedName: ${text}, expected <provider-name>/<model-name>`,
-    )
-  }
-
-  const providerName = text.slice(0, index)
-  const modelName = text.slice(index + 1)
-
-  if (providerName === "" || modelName === "") {
-    throw new Error(
-      `invalid qualifiedName: ${text}, expected <provider-name>/<model-name>`,
-    )
-  }
-
-  return [providerName, modelName]
-}
-
-export async function readDefaultModelQualifiedName(
+export async function readDefaultModelRef(
   database: Database,
-): Promise<string | undefined> {
+): Promise<ModelRef | undefined> {
   const settings = await database.settings.get()
   const providerName = settings?.defaultProvider
 
@@ -88,5 +66,8 @@ export async function readDefaultModelQualifiedName(
     return undefined
   }
 
-  return `${providerName}/${providerInfo.defaultModel}`
+  return {
+    providerName,
+    name: providerInfo.defaultModel,
+  }
 }

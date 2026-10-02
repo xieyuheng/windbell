@@ -7,7 +7,8 @@ import type { ModelConfig } from "./ModelConfig.ts"
 
 export function makeModel(client: Client, config: ModelConfig): Model {
   return {
-    qualifiedName: `openrouter/${config.name}`,
+    providerName: "openrouter",
+    name: config.name,
     interpret: async (input) => {
       try {
         return await interpret(client, config, input)

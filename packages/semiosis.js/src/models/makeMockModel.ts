@@ -1,4 +1,4 @@
-import type { Model } from "../model/index.ts"
+import type { Model, ModelRef } from "../model/index.ts"
 import type { Sign } from "../sign/index.ts"
 
 export type MockModel = Model & {
@@ -7,7 +7,7 @@ export type MockModel = Model & {
 }
 
 export function makeMockModel(
-  qualifiedName: string,
+  ref: ModelRef,
   outputs: Array<Array<Sign>>,
 ): MockModel {
   if (outputs.length === 0) {
@@ -15,7 +15,7 @@ export function makeMockModel(
   }
 
   const model: MockModel = {
-    qualifiedName,
+    ...ref,
     turns: [],
     step: 0,
     interpret: async (input) => {

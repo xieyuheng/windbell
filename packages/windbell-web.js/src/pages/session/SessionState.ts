@@ -94,8 +94,6 @@ export async function interpretSession(
       throw new Error(`default model is not configured: ${providerName}`)
     }
 
-    const qualifiedName = `${providerInfo.name}/${providerInfo.defaultModel}`
-
     const input: S.UserSign = {
       kind: "UserSign",
       content,
@@ -105,7 +103,8 @@ export async function interpretSession(
 
     for await (const sign of semiosis.sessions.interpret(state.sessionId, {
       model: {
-        qualifiedName,
+        providerName: providerInfo.name,
+        name: providerInfo.defaultModel,
       },
       input: [input],
     })) {

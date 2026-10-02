@@ -72,7 +72,8 @@ test("semiosis client and server", async (t) => {
 
   for await (const sign of client.sessions.interpret(session.id, {
     model: {
-      qualifiedName: "mock/conversation",
+      providerName: "mock",
+      name: "conversation",
     },
     input: [S.UserSign("hello")],
   })) {

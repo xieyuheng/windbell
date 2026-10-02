@@ -152,17 +152,15 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       throw new HTTPException(404, { message: "session not found" })
     }
 
-    const qualifiedName = await S.readDefaultModelQualifiedName(
-      options.database,
-    )
+    const modelRef = await S.readDefaultModelRef(options.database)
 
-    if (qualifiedName === undefined) {
+    if (modelRef === undefined) {
       throw new HTTPException(400, {
         message: "default model is not configured",
       })
     }
 
-    const model = await S.makeModel(qualifiedName, {
+    const model = await S.makeModel(modelRef, {
       database: options.database,
     })
 
@@ -312,7 +310,7 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       })
     }
 
-    const model = await S.makeModel(modelOptions.qualifiedName, {
+    const model = await S.makeModel(modelOptions, {
       database: options.database,
     })
 
@@ -481,15 +479,13 @@ function readSettings(body: Record<string, unknown>): S.Settings {
   }
 }
 
-function readModel(
-  body: Record<string, unknown>,
-  name: string,
-): { qualifiedName: string } {
+function readModel(body: Record<string, unknown>, name: string): S.ModelRef {
   const value = body[name]
   const record = readRecord(value)
 
   return {
-    qualifiedName: readString(record, "qualifiedName"),
+    providerName: readString(record, "providerName"),
+    name: readString(record, "name"),
   }
 }
 

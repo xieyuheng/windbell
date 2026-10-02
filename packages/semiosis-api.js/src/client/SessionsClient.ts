@@ -12,9 +12,7 @@ export type ListSessionsOptions = {
 }
 
 export type InterpretOptions = {
-  model: {
-    qualifiedName: string
-  }
+  model: S.ModelRef
   input: Array<S.Sign>
 }
 

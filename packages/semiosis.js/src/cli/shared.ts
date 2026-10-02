@@ -12,11 +12,15 @@ export async function makeModelFromOptions(options: {
   database: Database
   cliOptions: Record<string, unknown>
 }): Promise<Model> {
-  const qualifiedName = readRequiredOption(options.cliOptions, "--model")
+  const providerName = readRequiredOption(options.cliOptions, "--provider")
+  const name = readRequiredOption(options.cliOptions, "--model")
 
-  return await makeModel(qualifiedName, {
-    database: options.database,
-  })
+  return await makeModel(
+    { providerName, name },
+    {
+      database: options.database,
+    },
+  )
 }
 
 export async function ensureWorkspace(options: {

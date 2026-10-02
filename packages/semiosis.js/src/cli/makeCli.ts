@@ -11,8 +11,8 @@ export function makeCli() {
   const router = Cli.makeRouter("semiosis.js", version)
 
   router.defineRoutes([
-    "repl --model <provider-name>/<model-name> --session <session-id> -- start agent repl in current directory",
-    "batch --model <provider-name>/<model-name> --prompts <file> --cwd <dir> --max-output-chars <n> -- run prompts through agent",
+    "repl --provider <provider-name> --model <model-name> --session <session-id> -- start agent repl in current directory",
+    "batch --provider <provider-name> --model <model-name> --prompts <file> --cwd <dir> --max-output-chars <n> -- run prompts through agent",
   ])
 
   router.defineHandlers({
