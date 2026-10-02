@@ -10,80 +10,35 @@ export type ModelListCommandOptions = {
 
 export function makeModelListHandler(options: ModelListCommandOptions) {
   return async (context: Cli.HandlerContext) => {
-    const providerName = readOptionalOption(context.options, "--provider")
+    const providerOption = readOptionalOption(context.options, "--provider")
     const all = readFlag(context.options, "--all")
+    const targetProviderNames =
+      providerOption === undefined ? providerNames : [providerOption]
 
-    if (providerName !== undefined) {
-      await printProviderModels({
-        database: options.database,
-        providerName,
-        all,
-        indent: false,
-      })
+    for (const providerName of targetProviderNames) {
+      try {
+        const modelNames = await listAvailableModels(
+          options.database,
+          providerName,
+        )
 
-      return
-    }
+        for (const modelName of modelNames) {
+          const enabled = await isModelEnabled(
+            options.database,
+            providerName,
+            modelName,
+          )
 
-    for (const providerName of providerNames) {
-      console.log(providerName)
+          if (!all && !enabled) continue
 
-      await printProviderModels({
-        database: options.database,
-        providerName,
-        all,
-        indent: true,
-      })
-    }
-  }
-}
-
-async function printProviderModels(options: {
-  database: Database
-  providerName: string
-  all: boolean
-  indent: boolean
-}): Promise<void> {
-  const indent = options.indent ? "  " : ""
-
-  try {
-    const modelNames = await listAvailableModels(
-      options.database,
-      options.providerName,
-    )
-
-    const lines: Array<string> = []
-
-    for (const modelName of modelNames) {
-      const enabled = await isModelEnabled(
-        options.database,
-        options.providerName,
-        modelName,
-      )
-
-      if (!options.all && !enabled) continue
-
-      if (options.all) {
-        lines.push(`${indent}${formatModelName(modelName, enabled)}`)
-      } else {
-        lines.push(`${indent}${modelName}`)
+          const suffix = all && enabled ? " (enabled)" : ""
+          console.log(`${providerName} ${modelName}${suffix}`)
+        }
+      } catch (error) {
+        console.error(`[${providerName}] ${errorMessage(error)}`)
       }
     }
-
-    if (lines.length === 0) {
-      console.log(`${indent}(no models)`)
-      return
-    }
-
-    for (const line of lines) {
-      console.log(line)
-    }
-  } catch (error) {
-    console.error(`${indent}(error: ${errorMessage(error)})`)
   }
-}
-
-function formatModelName(name: string, enabled: boolean): string {
-  return enabled ? `${name} (enabled)` : name
 }
 
 function errorMessage(error: unknown): string {
