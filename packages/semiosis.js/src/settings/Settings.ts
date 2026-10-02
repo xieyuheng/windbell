@@ -1,5 +1,3 @@
 export type Settings = {
-  defaultModel: {
-    qualifiedName: string
-  } | null
+  defaultProvider: string | null
 }

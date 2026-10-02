@@ -1,6 +1,7 @@
 export * from "./Database.ts"
 export * from "./DustbinSessionStore.ts"
 export * from "./DustbinWorkspaceStore.ts"
+export * from "./ProviderStore.ts"
 export * from "./SettingsStore.ts"
 export * from "./SessionStore.ts"
 export * from "./WorkspaceStore.ts"

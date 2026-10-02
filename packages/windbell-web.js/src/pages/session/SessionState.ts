@@ -78,10 +78,23 @@ export async function interpretSession(
 
   try {
     const settings = await semiosis.settings.get()
+    const providerName = settings.defaultProvider
 
-    if (settings.defaultModel === null) {
-      throw new Error("default model is not configured")
+    if (providerName === null) {
+      throw new Error("default provider is not configured")
     }
+
+    const providerInfo = await semiosis.providers.get(providerName)
+
+    if (providerInfo === undefined) {
+      throw new Error(`provider not found: ${providerName}`)
+    }
+
+    if (providerInfo.defaultModel === null) {
+      throw new Error(`default model is not configured: ${providerName}`)
+    }
+
+    const qualifiedName = `${providerInfo.name}/${providerInfo.defaultModel}`
 
     const input: S.UserSign = {
       kind: "UserSign",
@@ -92,7 +105,7 @@ export async function interpretSession(
 
     for await (const sign of semiosis.sessions.interpret(state.sessionId, {
       model: {
-        qualifiedName: settings.defaultModel.qualifiedName,
+        qualifiedName,
       },
       input: [input],
     })) {

@@ -18,10 +18,36 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     })
   })
 
+  app.get("/providers", async () => {
+    const providerNames = await options.database.providers.list()
+    const providers: Array<S.ProviderInfo> = []
+
+    for (const providerName of providerNames) {
+      const providerInfo = await options.database.providers.get(providerName)
+      if (providerInfo === undefined) continue
+
+      providers.push(providerInfo)
+    }
+
+    return sendJson(200, providers)
+  })
+
+  app.get("/providers/:providerName", async (c) => {
+    const providerInfo = await options.database.providers.get(
+      c.req.param("providerName"),
+    )
+
+    if (providerInfo === undefined) {
+      throw new HTTPException(404, { message: "provider not found" })
+    }
+
+    return sendJson(200, providerInfo)
+  })
+
   app.get("/settings", async () => {
     const settings = await options.database.settings.get()
 
-    return sendJson(200, settings ?? { defaultModel: null })
+    return sendJson(200, settings ?? { defaultProvider: null })
   })
 
   app.put("/settings", async (c) => {
@@ -126,16 +152,17 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       throw new HTTPException(404, { message: "session not found" })
     }
 
-    const settings = await options.database.settings.get()
-    const defaultModel = settings?.defaultModel
+    const qualifiedName = await S.readDefaultModelQualifiedName(
+      options.database,
+    )
 
-    if (defaultModel === undefined || defaultModel === null) {
+    if (qualifiedName === undefined) {
       throw new HTTPException(400, {
         message: "default model is not configured",
       })
     }
 
-    const model = await S.makeModel(defaultModel.qualifiedName, {
+    const model = await S.makeModel(qualifiedName, {
       database: options.database,
     })
 
@@ -435,21 +462,22 @@ function readSession(body: unknown): S.Session {
 }
 
 function readSettings(body: Record<string, unknown>): S.Settings {
-  const value = body["defaultModel"]
+  const value = body["defaultProvider"]
 
   if (value === null) {
     return {
-      defaultModel: null,
+      defaultProvider: null,
     }
   }
 
-  const record = readRecord(value)
-  const qualifiedName = readString(record, "qualifiedName")
+  if (typeof value !== "string" || value === "") {
+    throw new HTTPException(400, {
+      message: "field `defaultProvider` must be a non-empty string or null",
+    })
+  }
 
   return {
-    defaultModel: {
-      qualifiedName,
-    },
+    defaultProvider: value,
   }
 }
 

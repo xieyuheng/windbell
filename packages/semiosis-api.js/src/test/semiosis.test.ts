@@ -31,19 +31,15 @@ test("semiosis client and server", async (t) => {
   })
 
   assert.deepEqual(await client.settings.get(), {
-    defaultModel: null,
+    defaultProvider: null,
   })
 
   await client.settings.put({
-    defaultModel: {
-      qualifiedName: "deepseek/chat",
-    },
+    defaultProvider: "deepseek",
   })
 
   assert.deepEqual(await client.settings.get(), {
-    defaultModel: {
-      qualifiedName: "deepseek/chat",
-    },
+    defaultProvider: "deepseek",
   })
 
   const workspaceRoot = Path.join(root, "workspace")

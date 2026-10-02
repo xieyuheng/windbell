@@ -62,3 +62,31 @@ function parseQualifiedName(text: string): [string, string] {
 
   return [providerName, modelName]
 }
+
+export async function readDefaultModelQualifiedName(
+  database: Database,
+): Promise<string | undefined> {
+  const settings = await database.settings.get()
+  const providerName = settings?.defaultProvider
+
+  if (providerName === undefined || providerName === null) {
+    return undefined
+  }
+
+  const providerInfo = await database.providers.get(providerName)
+  if (providerInfo === undefined) {
+    throw new Error(`unknown provider: ${providerName}`)
+  }
+
+  if (providerInfo.name !== providerName) {
+    throw new Error(
+      `provider name mismatch: expected ${providerName}, got ${providerInfo.name}`,
+    )
+  }
+
+  if (providerInfo.defaultModel === null) {
+    return undefined
+  }
+
+  return `${providerName}/${providerInfo.defaultModel}`
+}
