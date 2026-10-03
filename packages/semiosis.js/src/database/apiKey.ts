@@ -26,6 +26,14 @@ export async function readApiKey(
   return key
 }
 
+export async function hasApiKey(
+  database: Database,
+  providerName: string,
+): Promise<boolean> {
+  const value = await readTextFile(apiKeyPath(database, providerName))
+  return value !== undefined && value.trim() !== ""
+}
+
 export async function writeApiKey(
   database: Database,
   providerName: string,

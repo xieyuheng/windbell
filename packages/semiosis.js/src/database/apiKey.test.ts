@@ -3,7 +3,13 @@ import fs from "node:fs/promises"
 import Os from "node:os"
 import Path from "node:path"
 import { test } from "node:test"
-import { deleteApiKey, readApiKey, writeApiKey } from "./apiKey.ts"
+import {
+  apiKeyPath,
+  deleteApiKey,
+  hasApiKey,
+  readApiKey,
+  writeApiKey,
+} from "./apiKey.ts"
 import { makeDatabase } from "./Database.ts"
 
 test("write, read and delete provider api key", async () => {
@@ -12,10 +18,14 @@ test("write, read and delete provider api key", async () => {
   try {
     const database = makeDatabase({ root })
 
+    assert.equal(await hasApiKey(database, "deepseek"), false)
+
     await writeApiKey(database, "deepseek", "  sk-test  \n")
+    assert.equal(await hasApiKey(database, "deepseek"), true)
     assert.equal(await readApiKey(database, "deepseek"), "sk-test")
 
     assert.equal(await deleteApiKey(database, "deepseek"), true)
+    assert.equal(await hasApiKey(database, "deepseek"), false)
     assert.equal(await deleteApiKey(database, "deepseek"), false)
 
     await assert.rejects(
@@ -37,6 +47,22 @@ test("writeApiKey rejects empty api key", async () => {
       () => writeApiKey(database, "deepseek", "   \n"),
       /api key is empty/,
     )
+  } finally {
+    await fs.rm(root, { recursive: true, force: true })
+  }
+})
+
+test("hasApiKey returns false for whitespace-only file", async () => {
+  const root = await fs.mkdtemp(Path.join(Os.tmpdir(), "windbell-api-key-"))
+
+  try {
+    const database = makeDatabase({ root })
+    const path = apiKeyPath(database, "deepseek")
+
+    await fs.mkdir(Path.dirname(path), { recursive: true })
+    await fs.writeFile(path, "   \n")
+
+    assert.equal(await hasApiKey(database, "deepseek"), false)
   } finally {
     await fs.rm(root, { recursive: true, force: true })
   }
