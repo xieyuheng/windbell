@@ -1,34 +1,54 @@
 import { z } from "zod"
-import type { ChatCompletionOutput } from "./ChatCompletionOutput.ts"
+import { MessageSchema } from "./MessageSchema.ts"
 
-const toolCallSchema = z.looseObject({
+const PromptTokensDetailsSchema = z.strictObject({
+  cached_tokens: z.number().optional(),
+  cache_write_tokens: z.number().optional(),
+  audio_tokens: z.number().optional(),
+  video_tokens: z.number().optional(),
+})
+
+const CompletionTokensDetailsSchema = z.strictObject({
+  reasoning_tokens: z.number().optional(),
+  image_tokens: z.number().optional(),
+  audio_tokens: z.number().optional(),
+})
+
+const CostDetailsSchema = z.strictObject({
+  upstream_inference_cost: z.number().optional(),
+  upstream_inference_prompt_cost: z.number().optional(),
+  upstream_inference_completions_cost: z.number().optional(),
+})
+
+const UsageSchema = z.strictObject({
+  prompt_tokens: z.number(),
+  completion_tokens: z.number(),
+  total_tokens: z.number(),
+  cost: z.number().optional(),
+  is_byok: z.boolean().optional(),
+  prompt_tokens_details: PromptTokensDetailsSchema.optional(),
+  cost_details: CostDetailsSchema.optional(),
+  completion_tokens_details: CompletionTokensDetailsSchema.optional(),
+})
+
+const ChoiceSchema = z.strictObject({
+  index: z.number(),
+  message: MessageSchema,
+  logprobs: z.unknown().nullable(),
+  finish_reason: z.string().nullable(),
+  native_finish_reason: z.string().nullable().optional(),
+})
+
+export const ChatCompletionOutputSchema = z.strictObject({
   id: z.string(),
-  type: z.literal("function"),
-  function: z.looseObject({
-    name: z.string(),
-    arguments: z.string(),
-  }),
+  object: z.literal("chat.completion"),
+  created: z.number(),
+  model: z.string(),
+  provider: z.string(),
+  system_fingerprint: z.string().nullable().optional(),
+  service_tier: z.string().nullable().optional(),
+  choices: z.array(ChoiceSchema),
+  usage: UsageSchema,
 })
 
-const messageSchema = z.looseObject({
-  role: z.union([
-    z.literal("system"),
-    z.literal("user"),
-    z.literal("assistant"),
-    z.literal("tool"),
-  ]),
-  content: z.string().nullable().optional(),
-  reasoning: z.string().nullable().optional(),
-  reasoning_details: z.array(z.unknown()).nullable().optional(),
-  tool_calls: z.array(toolCallSchema).nullable().optional(),
-  tool_call_id: z.string().optional(),
-})
-
-export const chatCompletionOutputSchema: z.ZodType<ChatCompletionOutput> =
-  z.looseObject({
-    choices: z.array(
-      z.looseObject({
-        message: messageSchema,
-      }),
-    ),
-  })
+export type ChatCompletionOutput = z.infer<typeof ChatCompletionOutputSchema>

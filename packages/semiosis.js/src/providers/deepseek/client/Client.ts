@@ -1,10 +1,14 @@
 import { makeJsonEndpoint } from "../../../http/index.ts"
 import type { ChatCompletionInput } from "./ChatCompletionInput.ts"
-import type { ChatCompletionOutput } from "./ChatCompletionOutput.ts"
-import { chatCompletionOutputSchema } from "./ChatCompletionOutputSchema.ts"
+import {
+  ChatCompletionOutputSchema,
+  type ChatCompletionOutput,
+} from "./ChatCompletionOutputSchema.ts"
 import type { ClientConfig } from "./ClientConfig.ts"
-import type { ModelListOutput } from "./ModelListOutputSchema.ts"
-import { modelListOutputSchema } from "./ModelListOutputSchema.ts"
+import {
+  type ModelListOutput,
+  ModelListOutputSchema,
+} from "./ModelListOutputSchema.ts"
 
 export type Client = {
   chatCompletion: (input: ChatCompletionInput) => Promise<ChatCompletionOutput>
@@ -21,14 +25,14 @@ export function makeClient(config: ClientConfig): Client {
       method: "POST",
       path: "/chat/completions",
       body: makeChatCompletionBody,
-      output: chatCompletionOutputSchema,
+      output: ChatCompletionOutputSchema,
       headers,
     }),
 
     listModels: makeJsonEndpoint(config, {
       method: "GET",
       path: "/models",
-      output: modelListOutputSchema,
+      output: ModelListOutputSchema,
       headers,
     }),
   }

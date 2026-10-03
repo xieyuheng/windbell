@@ -1,4 +1,4 @@
-import type { Message } from "./Message.ts"
+import type { Message } from "./MessageSchema.ts"
 import type { Tool } from "./Tool.ts"
 
 export type Reasoning = {
