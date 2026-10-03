@@ -5,6 +5,8 @@ import { defaultDatabaseRoot, makeDatabase } from "../database/index.ts"
 import { makeBatchHandler } from "./commands/BatchCommand.ts"
 import { makeModelEnableHandler } from "./commands/ModelEnableCommand.ts"
 import { makeModelListHandler } from "./commands/ModelListCommand.ts"
+import { makeApiKeyDeleteHandler } from "./commands/ApiKeyDeleteCommand.ts"
+import { makeApiKeyPutHandler } from "./commands/ApiKeyPutCommand.ts"
 import { makeProviderListHandler } from "./commands/ProviderListCommand.ts"
 import { makeReplHandler } from "./commands/ReplCommand.ts"
 
@@ -18,6 +20,18 @@ export function makeCli() {
       path: ["provider", "list"],
       description: "list supported providers",
       handler: makeProviderListHandler({ database }),
+    },
+    {
+      path: ["api-key", "put"],
+      args: ["provider-name"],
+      description: "put provider api key",
+      handler: makeApiKeyPutHandler({ database }),
+    },
+    {
+      path: ["api-key", "delete"],
+      args: ["provider-name"],
+      description: "delete provider api key",
+      handler: makeApiKeyDeleteHandler({ database }),
     },
     {
       path: ["model", "enable"],
