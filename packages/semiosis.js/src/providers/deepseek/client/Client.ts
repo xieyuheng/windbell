@@ -1,18 +1,21 @@
 import { makeJsonEndpoint } from "../../../http/index.ts"
 import type { ChatCompletionInput } from "./ChatCompletionInput.ts"
 import {
-  ChatCompletionOutputSchema,
-  type ChatCompletionOutput,
-} from "./ChatCompletionOutputSchema.ts"
+  ChatCompletionSchema,
+  type ChatCompletion,
+} from "./ChatCompletionSchema.ts"
 import type { ClientConfig } from "./ClientConfig.ts"
-import {
-  type ModelListOutput,
-  ModelListOutputSchema,
-} from "./ModelListOutputSchema.ts"
+import { type ModelList, ModelListSchema } from "./ModelListSchema.ts"
 
 export type Client = {
-  chatCompletion: (input: ChatCompletionInput) => Promise<ChatCompletionOutput>
-  listModels: () => Promise<ModelListOutput>
+  chat: {
+    completions: {
+      create: (input: ChatCompletionInput) => Promise<ChatCompletion>
+    }
+  }
+  models: {
+    list: () => Promise<ModelList>
+  }
 }
 
 export function makeClient(config: ClientConfig): Client {
@@ -21,20 +24,26 @@ export function makeClient(config: ClientConfig): Client {
   })
 
   return {
-    chatCompletion: makeJsonEndpoint(config, {
-      method: "POST",
-      path: "/chat/completions",
-      body: makeChatCompletionBody,
-      output: ChatCompletionOutputSchema,
-      headers,
-    }),
+    chat: {
+      completions: {
+        create: makeJsonEndpoint(config, {
+          method: "POST",
+          path: "/chat/completions",
+          body: makeChatCompletionBody,
+          output: ChatCompletionSchema,
+          headers,
+        }),
+      },
+    },
 
-    listModels: makeJsonEndpoint(config, {
-      method: "GET",
-      path: "/models",
-      output: ModelListOutputSchema,
-      headers,
-    }),
+    models: {
+      list: makeJsonEndpoint(config, {
+        method: "GET",
+        path: "/models",
+        output: ModelListSchema,
+        headers,
+      }),
+    },
   }
 }
 

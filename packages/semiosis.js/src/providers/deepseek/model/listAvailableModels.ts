@@ -6,7 +6,7 @@ export async function listAvailableModels(
   database: Database,
 ): Promise<Array<string>> {
   const client = makeClient(await readClientConfig(database))
-  const output = await client.listModels()
+  const output = await client.models.list()
 
   return output.data.map((model) => model.id)
 }

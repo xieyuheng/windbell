@@ -5,10 +5,10 @@ const LinksSchema = z.object({
   next: z.string().nullable().optional(),
 })
 
-export const ModelListOutputSchema = z.object({
+export const ModelListSchema = z.object({
   data: z.array(ModelInfoSchema),
   total_count: z.number().optional(),
   links: LinksSchema.optional(),
 })
 
-export type ModelListOutput = z.infer<typeof ModelListOutputSchema>
+export type ModelList = z.infer<typeof ModelListSchema>

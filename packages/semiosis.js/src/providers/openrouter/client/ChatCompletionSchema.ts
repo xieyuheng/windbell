@@ -39,7 +39,7 @@ const ChoiceSchema = z.object({
   native_finish_reason: z.string().nullable().optional(),
 })
 
-export const ChatCompletionOutputSchema = z.object({
+export const ChatCompletionSchema = z.object({
   id: z.string(),
   object: z.literal("chat.completion"),
   created: z.number(),
@@ -51,4 +51,4 @@ export const ChatCompletionOutputSchema = z.object({
   usage: UsageSchema,
 })
 
-export type ChatCompletionOutput = z.infer<typeof ChatCompletionOutputSchema>
+export type ChatCompletion = z.infer<typeof ChatCompletionSchema>

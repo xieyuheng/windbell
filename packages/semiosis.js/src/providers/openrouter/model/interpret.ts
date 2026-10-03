@@ -45,7 +45,7 @@ export async function interpret(
     request.extraBody = config.extraBody
   }
 
-  const output = await client.chatCompletion(request)
+  const output = await client.chat.completions.create(request)
   const message = output.choices?.[0]?.message
 
   if (message === undefined) {

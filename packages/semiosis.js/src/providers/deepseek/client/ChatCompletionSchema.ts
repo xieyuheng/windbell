@@ -26,7 +26,7 @@ const ChoiceSchema = z.object({
   finish_reason: z.string().nullable(),
 })
 
-export const ChatCompletionOutputSchema = z.object({
+export const ChatCompletionSchema = z.object({
   id: z.string(),
   object: z.literal("chat.completion"),
   created: z.number(),
@@ -36,4 +36,4 @@ export const ChatCompletionOutputSchema = z.object({
   system_fingerprint: z.string().optional(),
 })
 
-export type ChatCompletionOutput = z.infer<typeof ChatCompletionOutputSchema>
+export type ChatCompletion = z.infer<typeof ChatCompletionSchema>

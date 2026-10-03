@@ -1,9 +1,9 @@
 import { z } from "zod"
 import { ModelInfoSchema } from "./ModelInfoSchema.ts"
 
-export const ModelListOutputSchema = z.object({
+export const ModelListSchema = z.object({
   object: z.literal("list"),
   data: z.array(ModelInfoSchema),
 })
 
-export type ModelListOutput = z.infer<typeof ModelListOutputSchema>
+export type ModelList = z.infer<typeof ModelListSchema>
