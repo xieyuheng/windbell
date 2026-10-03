@@ -6,7 +6,7 @@ export async function createWindow(state: MainState): Promise<void> {
 
   if (appUrl === undefined) {
     throw new Error(
-      "[windbell-desktop] app url is not initialized; call startApiServer first",
+      "[windbell-desktop] app url is not initialized; call startAppServer first",
     )
   }
 

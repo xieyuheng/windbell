@@ -5,28 +5,33 @@ import Path from "node:path"
 import { fileURLToPath } from "node:url"
 import type { MainState } from "./MainState.ts"
 
-const HOSTNAME = "127.0.0.1"
-const PORT = 17344
+export type StartAppServerOptions = {
+  hostname: string
+  port: number
+}
 
-export async function startApiServer(state: MainState): Promise<void> {
+export async function startAppServer(
+  state: MainState,
+  options: StartAppServerOptions,
+): Promise<void> {
   const database = S.makeDatabase({
     root: S.defaultDatabaseRoot(),
   })
 
-  console.log("[windbell-desktop] starting api server")
+  console.log("[windbell-desktop] starting app server")
 
   const { server, info } = await startWindbellServer({
     database,
-    hostname: HOSTNAME,
-    port: PORT,
+    hostname: options.hostname,
+    port: options.port,
     corsOrigin: undefined,
     webDistRoot: resolveWebDistRoot(),
   })
 
-  state.apiServer = server
-  state.appUrl = `http://${HOSTNAME}:${info.port}/`
+  state.appServer = server
+  state.appUrl = `http://${options.hostname}:${info.port}/`
 
-  console.log(`[windbell-desktop] api listening at ${state.appUrl}`)
+  console.log(`[windbell-desktop] app listening at ${state.appUrl}`)
 }
 
 function resolveWebDistRoot(): string {

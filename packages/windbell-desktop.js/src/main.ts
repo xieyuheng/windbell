@@ -2,10 +2,12 @@ import { app, BrowserWindow } from "electron"
 import { closeServer } from "@xieyuheng/windbell-api.js"
 import { createWindow } from "./createWindow.ts"
 import { makeMainState, type MainState } from "./MainState.ts"
-import { startApiServer } from "./startApiServer.ts"
+import { startAppServer } from "./startAppServer.ts"
 
 async function main(): Promise<void> {
   const state = makeMainState()
+  const hostname = "127.0.0.1"
+  const port = 17344
   const gotTheLock = app.requestSingleInstanceLock()
 
   if (!gotTheLock) {
@@ -23,16 +25,16 @@ async function main(): Promise<void> {
   app.on("window-all-closed", () => {
     if (process.platform === "darwin") {
       return
-    } else  {
+    } else {
       app.quit()
     }
   })
 
   app.on("before-quit", () => {
-    if (state.apiServer === undefined) return
+    if (state.appServer === undefined) return
 
-    void closeServer(state.apiServer).catch((error) => {
-      console.error("[windbell-desktop] failed to close api server:", error)
+    void closeServer(state.appServer).catch((error) => {
+      console.error("[windbell-desktop] failed to close app server:", error)
     })
   })
 
@@ -42,7 +44,7 @@ async function main(): Promise<void> {
 
   console.log("[windbell-desktop] app ready")
 
-  await startApiServer(state)
+  await startAppServer(state, { hostname, port })
   await createWindow(state)
 
   app.on("activate", () => {
