@@ -13,9 +13,19 @@ const PORT = 17344
 
 const dirname = Path.dirname(fileURLToPath(import.meta.url))
 
-let apiServer: ServeResult["server"] | undefined
-let apiOrigin: string | undefined
-let mainWindow: BrowserWindow | undefined
+type MainState = {
+  mainWindow: BrowserWindow | undefined
+  apiServer: ServeResult["server"] | undefined
+  appUrl: string | undefined
+}
+
+function makeMainState(): MainState {
+  return {
+    mainWindow: undefined,
+    apiServer: undefined,
+    appUrl: undefined,
+  }
+}
 
 function resolveWebDistRoot(): string {
   if (app.isPackaged) {
@@ -24,11 +34,11 @@ function resolveWebDistRoot(): string {
 
   return (
     process.env.WINDBELL_WEB_DIST ??
-      Path.resolve(dirname, "../../windbell-web.js/dist")
+    Path.resolve(dirname, "../../windbell-web.js/dist")
   )
 }
 
-async function startApiServer(): Promise<void> {
+async function startApiServer(state: MainState): Promise<void> {
   const database = S.makeDatabase({
     root: S.defaultDatabaseRoot(),
   })
@@ -43,18 +53,24 @@ async function startApiServer(): Promise<void> {
     webDistRoot: resolveWebDistRoot(),
   })
 
-  apiServer = server
-  apiOrigin = `http://${HOSTNAME}:${info.port}/`
+  state.apiServer = server
+  state.appUrl = `http://${HOSTNAME}:${info.port}/`
 
-  console.log(`[windbell-desktop] api listening at ${apiOrigin}`)
+  console.log(`[windbell-desktop] api listening at ${state.appUrl}`)
 }
 
-async function createWindow(): Promise<void> {
-  const url = apiOrigin ?? `http://${HOSTNAME}:${PORT}/`
+async function createWindow(state: MainState): Promise<BrowserWindow> {
+  const appUrl = state.appUrl
+
+  if (appUrl === undefined) {
+    throw new Error(
+      "[windbell-desktop] app url is not initialized; call startApiServer first",
+    )
+  }
 
   console.log("[windbell-desktop] creating window")
 
-  mainWindow = new BrowserWindow({
+  const window = new BrowserWindow({
     width: 1280,
     height: 800,
     title: "Windbell",
@@ -65,15 +81,19 @@ async function createWindow(): Promise<void> {
     },
   })
 
-  mainWindow.on("closed", () => {
-    mainWindow = undefined
+  state.mainWindow = window
+
+  window.on("closed", () => {
+    if (state.mainWindow === window) {
+      state.mainWindow = undefined
+    }
   })
 
-  mainWindow.once("ready-to-show", () => {
+  window.once("ready-to-show", () => {
     console.log("[windbell-desktop] window ready to show")
   })
 
-  mainWindow.webContents.on(
+  window.webContents.on(
     "did-fail-load",
     (_event, errorCode, errorDescription, validatedURL) => {
       console.error(
@@ -82,23 +102,36 @@ async function createWindow(): Promise<void> {
     },
   )
 
-  mainWindow.webContents.on("render-process-gone", (_event, details) => {
+  window.webContents.on("render-process-gone", (_event, details) => {
     console.error(`[windbell-desktop] render-process-gone ${details.reason}`)
   })
 
-  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+  window.webContents.setWindowOpenHandler(({ url }) => {
     void shell.openExternal(url)
     return { action: "deny" }
   })
 
-  console.log(`[windbell-desktop] loading ${url}`)
+  console.log(`[windbell-desktop] loading ${appUrl}`)
 
-  await mainWindow.loadURL(url)
+  await window.loadURL(appUrl)
 
   console.log("[windbell-desktop] window loaded")
+
+  return window
+}
+
+function focusMainWindow(state: MainState): void {
+  const window = state.mainWindow
+
+  if (window === undefined || window.isDestroyed()) return
+
+  if (window.isMinimized()) window.restore()
+
+  window.focus()
 }
 
 async function main(): Promise<void> {
+  const state = makeMainState()
   const gotTheLock = app.requestSingleInstanceLock()
 
   if (!gotTheLock) {
@@ -107,16 +140,7 @@ async function main(): Promise<void> {
   }
 
   app.on("second-instance", () => {
-    if (mainWindow === undefined) return
-
-    if (mainWindow.isMinimized()) mainWindow.restore()
-    mainWindow.focus()
-  })
-
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      void createWindow()
-    }
+    focusMainWindow(state)
   })
 
   app.on("window-all-closed", () => {
@@ -126,9 +150,9 @@ async function main(): Promise<void> {
   })
 
   app.on("before-quit", () => {
-    if (apiServer === undefined) return
+    if (state.apiServer === undefined) return
 
-    void closeServer(apiServer).catch((error) => {
+    void closeServer(state.apiServer).catch((error) => {
       console.error("[windbell-desktop] failed to close api server:", error)
     })
   })
@@ -139,8 +163,14 @@ async function main(): Promise<void> {
 
   console.log("[windbell-desktop] app ready")
 
-  await startApiServer()
-  await createWindow()
+  await startApiServer(state)
+  await createWindow(state)
+
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      void createWindow(state)
+    }
+  })
 }
 
 void main().catch((error) => {
