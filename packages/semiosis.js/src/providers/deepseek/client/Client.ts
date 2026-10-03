@@ -1,4 +1,4 @@
-import { makeJsonEndpoint } from "../../../http/index.ts"
+import { makeJsonEndpoint } from "@xieyuheng/http.js"
 import type { ChatCompletionInput } from "./ChatCompletionInput.ts"
 import {
   ChatCompletionSchema,

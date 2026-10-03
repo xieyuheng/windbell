@@ -1,5 +1,5 @@
 {
-  "name": "@xieyuheng/semiosis.js",
+  "name": "@xieyuheng/http.js",
   "version": "0.1.0",
   "license": "GPL-3.0-or-later",
   "type": "module",
@@ -18,13 +18,6 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@xieyuheng/cli.js": "workspace:*",
-    "@xieyuheng/http.js": "workspace:*",
-    "@xieyuheng/std.js": "workspace:*",
-    "ajv": "^8.20.0",
     "zod": "^4.6.5"
-  },
-  "bin": {
-    "semiosis.js": "src/main.ts"
   }
 }

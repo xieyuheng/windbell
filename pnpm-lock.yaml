@@ -44,6 +44,22 @@ importers:
         specifier: npm:typescript-native-bridge@6.0.3-bridge.17.tsgo.7.0.2
         version: typescript-native-bridge@6.0.3-bridge.17.tsgo.7.0.2
 
+  packages/http.js:
+    dependencies:
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.4
+        version: 26.6.4
+      prettier:
+        specifier: ^3.9.9
+        version: 3.9.9
+      typescript:
+        specifier: npm:typescript-native-bridge@6.0.3-bridge.17.tsgo.7.0.2
+        version: typescript-native-bridge@6.0.3-bridge.17.tsgo.7.0.2
+
   packages/semiosis-api.js:
     dependencies:
       '@hono/node-server':
@@ -71,6 +87,9 @@ importers:
       '@xieyuheng/cli.js':
         specifier: workspace:*
         version: link:../cli.js
+      '@xieyuheng/http.js':
+        specifier: workspace:*
+        version: link:../http.js
       '@xieyuheng/std.js':
         specifier: workspace:*
         version: link:../std.js
