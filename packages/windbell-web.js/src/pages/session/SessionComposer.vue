@@ -2,7 +2,7 @@
 import { ArrowUp, Square } from "@lucide/vue"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
-import { sessionMessages } from "../Session.i18n.ts"
+import { sessionMessages } from "./Session.i18n.ts"
 
 const props = defineProps<{
   modelValue: string

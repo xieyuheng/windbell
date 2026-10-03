@@ -5,7 +5,7 @@ import PageLayout from "../../components/layout/PageLayout.vue"
 import { onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import BackButton from "../../components/buttons/BackButton.vue"
-import DustbinWorkspaceCard from "./components/DustbinWorkspaceCard.vue"
+import DustbinWorkspaceCard from "./DustbinWorkspaceCard.vue"
 import { workspaceDustbinMessages } from "./WorkspaceDustbin.i18n.ts"
 import {
   loadWorkspaceDustbin,

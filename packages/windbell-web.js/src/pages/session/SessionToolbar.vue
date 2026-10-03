@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ArrowLeft, FolderTree } from "@lucide/vue"
 import { useI18n } from "vue-i18n"
-import RoundButton from "../../../components/buttons/RoundButton.vue"
-import { sessionMessages } from "../Session.i18n.ts"
-import type { SessionState } from "../SessionState.ts"
+import RoundButton from "../../components/buttons/RoundButton.vue"
+import { sessionMessages } from "./Session.i18n.ts"
+import type { SessionState } from "./SessionState.ts"
 
 const props = defineProps<{
   state: SessionState

@@ -7,8 +7,8 @@ import { onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRouter } from "vue-router"
 import MediumButton from "../../components/buttons/MediumButton.vue"
-import WorkspaceCard from "./components/WorkspaceCard.vue"
-import WorkspaceCreateDialog from "./components/WorkspaceCreateDialog.vue"
+import WorkspaceCard from "./WorkspaceCard.vue"
+import WorkspaceCreateDialog from "./WorkspaceCreateDialog.vue"
 import { homeMessages } from "./Home.i18n.ts"
 import {
   encodeMarkdownSource,

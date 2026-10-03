@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
-import SignCard from "../../../components/sign/SignCard.vue"
-import { sessionMessages } from "../Session.i18n.ts"
-import type { SessionState } from "../SessionState.ts"
+import SignCard from "../../components/sign/SignCard.vue"
+import { sessionMessages } from "./Session.i18n.ts"
+import type { SessionState } from "./SessionState.ts"
 
 const props = defineProps<{
   state: SessionState

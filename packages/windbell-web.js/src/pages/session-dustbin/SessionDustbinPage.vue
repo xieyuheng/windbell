@@ -6,7 +6,7 @@ import { computed, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
 import BackButton from "../../components/buttons/BackButton.vue"
-import DustbinSessionCard from "./components/DustbinSessionCard.vue"
+import DustbinSessionCard from "./DustbinSessionCard.vue"
 import { sessionDustbinMessages } from "./SessionDustbin.i18n.ts"
 import {
   loadSessionDustbin,

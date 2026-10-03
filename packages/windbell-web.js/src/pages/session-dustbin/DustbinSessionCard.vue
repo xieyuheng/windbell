@@ -3,12 +3,12 @@ import { ArchiveRestore, Trash2 } from "@lucide/vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
-import Card from "../../../components/card/Card.vue"
-import SmallButton from "../../../components/buttons/SmallButton.vue"
-import { formatDateTime } from "../../../utils/datetime/index.ts"
-import SignLine from "../../../components/sign/SignLine.vue"
-import { sessionDustbinMessages } from "../SessionDustbin.i18n.ts"
-import type { SessionDustbinListItem } from "../SessionDustbinState.ts"
+import Card from "../../components/card/Card.vue"
+import SmallButton from "../../components/buttons/SmallButton.vue"
+import { formatDateTime } from "../../utils/datetime/index.ts"
+import SignLine from "../../components/sign/SignLine.vue"
+import { sessionDustbinMessages } from "./SessionDustbin.i18n.ts"
+import type { SessionDustbinListItem } from "./SessionDustbinState.ts"
 
 const props = withDefaults(
   defineProps<{

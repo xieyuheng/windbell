@@ -2,7 +2,7 @@
 import { ArrowUp } from "@lucide/vue"
 import { computed, ref } from "vue"
 import { useI18n } from "vue-i18n"
-import { workspaceMessages } from "../Workspace.i18n.ts"
+import { workspaceMessages } from "./Workspace.i18n.ts"
 
 const props = defineProps<{
   creating: boolean

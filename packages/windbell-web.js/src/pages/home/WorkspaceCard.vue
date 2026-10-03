@@ -4,13 +4,13 @@ import type * as S from "@xieyuheng/semiosis.js"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { RouterLink } from "vue-router"
-import Card from "../../../components/card/Card.vue"
-import SmallButton from "../../../components/buttons/SmallButton.vue"
+import Card from "../../components/card/Card.vue"
+import SmallButton from "../../components/buttons/SmallButton.vue"
 import {
   formatDateTime,
   formatRelativeTime,
-} from "../../../utils/datetime/index.ts"
-import { homeMessages } from "../Home.i18n.ts"
+} from "../../utils/datetime/index.ts"
+import { homeMessages } from "./Home.i18n.ts"
 
 const props = withDefaults(
   defineProps<{
