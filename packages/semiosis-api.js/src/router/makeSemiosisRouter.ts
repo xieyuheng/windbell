@@ -28,12 +28,50 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     return sendJson(200, providers)
   })
 
+  app.get("/providers/:providerName/api-key", async (c) => {
+    const providerName = c.req.param("providerName")
+    assertSupportedProvider(providerName)
+
+    return sendJson(200, {
+      configured: await S.hasApiKey(options.database, providerName),
+    })
+  })
+
+  app.put("/providers/:providerName/api-key", async (c) => {
+    const providerName = c.req.param("providerName")
+    assertSupportedProvider(providerName)
+
+    const body = readRecord(await readJsonBody(c))
+    const key = readString(body, "key")
+    if (key.trim() === "") {
+      throw new HTTPException(400, { message: "api key is empty" })
+    }
+
+    await S.writeApiKey(options.database, providerName, key)
+    return sendEmpty(204)
+  })
+
+  app.delete("/providers/:providerName/api-key", async (c) => {
+    const providerName = c.req.param("providerName")
+    assertSupportedProvider(providerName)
+
+    await S.deleteApiKey(options.database, providerName)
+    return sendEmpty(204)
+  })
+
+  app.get("/providers/:providerName/models", async (c) => {
+    const providerName = c.req.param("providerName")
+    assertSupportedProvider(providerName)
+
+    return sendJson(
+      200,
+      await S.listModelSummaries(options.database, providerName),
+    )
+  })
+
   app.get("/providers/:providerName", async (c) => {
     const providerName = c.req.param("providerName")
-
-    if (!(S.providerNames as readonly string[]).includes(providerName)) {
-      throw new HTTPException(404, { message: "provider not found" })
-    }
+    assertSupportedProvider(providerName)
 
     return sendJson(
       200,
@@ -348,6 +386,12 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
   app.onError((error) => sendError(error))
 
   return app
+}
+
+function assertSupportedProvider(providerName: string): void {
+  if (!(S.providerNames as readonly string[]).includes(providerName)) {
+    throw new HTTPException(404, { message: "provider not found" })
+  }
 }
 
 function makeDefaultInitialSigns(workspace: S.Workspace): Array<S.Sign> {

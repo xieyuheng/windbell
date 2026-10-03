@@ -30,6 +30,31 @@ test("semiosis client and server", async (t) => {
     service: "semiosis-api",
   })
 
+  assert.deepEqual(
+    (await client.providers.list()).map(
+      (providerConfig) => providerConfig.name,
+    ),
+    ["deepseek", "openrouter"],
+  )
+
+  assert.deepEqual(await client.providers.getApiKeyStatus("deepseek"), {
+    configured: false,
+  })
+
+  await client.providers.putApiKey("deepseek", "sk-test")
+
+  assert.deepEqual(await client.providers.getApiKeyStatus("deepseek"), {
+    configured: true,
+  })
+
+  await client.providers.deleteApiKey("deepseek")
+
+  assert.deepEqual(await client.providers.getApiKeyStatus("deepseek"), {
+    configured: false,
+  })
+
+  assert.deepEqual(await client.providers.listModels("deepseek"), [])
+
   assert.deepEqual(await client.settings.get(), {
     defaultProvider: null,
   })
