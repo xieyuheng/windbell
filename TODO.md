@@ -29,3 +29,11 @@ IDE 如何与 meta-lisp 结合？
 - 自己尝试，先不要做成功能
 - 未来可以考虑做 git-api.js
   - 本地部署 git 管理工具
+
+# fs-api.js
+
+refactor http client -- try to extract to http.js
+
+# semiosis-api.js
+
+refactor http client -- try to extract to http.js
