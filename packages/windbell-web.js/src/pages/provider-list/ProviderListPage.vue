@@ -75,6 +75,12 @@ useHead(() => ({
       </div>
     </header>
 
+    <div class="flex flex-col gap-2">
+      <h2 class="text-base text-ink">
+        {{ t("providers") }}
+      </h2>
+    </div>
+
     <p v-if="state.loading" class="text-ink">
       {{ t("loading") }}
     </p>

@@ -31,9 +31,19 @@ useHead(() => ({
 <template>
   <PageLayout>
     <header class="flex flex-col gap-3">
-      <h1 class="break-all text-xl text-ink">
-        {{ state.providerConfig?.name ?? providerName }}
-      </h1>
+      <div class="flex min-w-0 flex-col gap-1">
+        <h1 class="break-all text-xl text-ink">
+          {{ state.providerConfig?.name ?? providerName }}
+        </h1>
+
+        <p
+          v-if="state.providerConfig"
+          class="truncate font-mono text-sm"
+          :title="state.providerConfig.baseUrl"
+        >
+          {{ state.providerConfig.baseUrl }}
+        </p>
+      </div>
 
       <div class="flex flex-wrap items-center gap-2">
         <BackButton :to="{ name: 'provider-list' }" />
@@ -65,13 +75,6 @@ useHead(() => ({
                 ? t("apiKeyConfigured")
                 : t("apiKeyNotConfigured")
             }}
-          </span>
-        </div>
-
-        <div v-if="state.providerConfig" class="flex flex-wrap gap-2">
-          <span class="text-ink-muted">{{ t("baseUrl") }}</span>
-          <span class="break-all font-mono text-ink">
-            {{ state.providerConfig.baseUrl }}
           </span>
         </div>
       </section>
