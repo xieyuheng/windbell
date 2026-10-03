@@ -1,9 +1,9 @@
 import type { BrowserWindow } from "electron"
-import type { ServeResult } from "@xieyuheng/windbell-api.js"
+import { type ServerType } from "@hono/node-server"
 
 export type MainState = {
   mainWindow: BrowserWindow | undefined
-  appServer: ServeResult["server"] | undefined
+  appServer: ServerType | undefined
   appUrl: string | undefined
 }
 
