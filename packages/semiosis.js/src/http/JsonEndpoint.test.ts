@@ -80,12 +80,9 @@ test("makeJsonEndpoint builds a JSON request and parses the response", async (t)
       message: input.message,
     }),
     output: outputSchema,
-    headers: [
-      ({ config }) =>
-        new Headers({
-          Authorization: `Bearer ${config.key}`,
-        }),
-    ],
+    headers: new Headers({
+      Authorization: `Bearer ${config.key}`,
+    }),
   })
 
   const output = await endpoint({

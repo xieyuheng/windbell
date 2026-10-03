@@ -5,7 +5,6 @@ import { chatCompletionOutputSchema } from "./ChatCompletionOutputSchema.ts"
 import type { ClientConfig } from "./ClientConfig.ts"
 import type { ModelListOutput } from "./ModelListOutputSchema.ts"
 import { modelListOutputSchema } from "./ModelListOutputSchema.ts"
-import { openrouterHeaders } from "./makeHeaders.ts"
 
 export type Client = {
   chatCompletion: (input: ChatCompletionInput) => Promise<ChatCompletionOutput>
@@ -13,20 +12,26 @@ export type Client = {
 }
 
 export function makeClient(config: ClientConfig): Client {
+  const headers = new Headers({
+    Authorization: `Bearer ${config.key}`,
+    "HTTP-Referer": "https://windbell.xieyuheng.com",
+    "X-Title": "windbell",
+  })
+
   return {
     chatCompletion: makeJsonEndpoint(config, {
       method: "POST",
       path: "/chat/completions",
       body: makeChatCompletionBody,
       output: chatCompletionOutputSchema,
-      headers: [openrouterHeaders],
+      headers,
     }),
 
     listModels: makeJsonEndpoint(config, {
       method: "GET",
       path: "/models",
       output: modelListOutputSchema,
-      headers: [openrouterHeaders],
+      headers,
     }),
   }
 }

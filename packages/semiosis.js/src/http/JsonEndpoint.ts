@@ -7,19 +7,13 @@ export type HttpClientConfig = {
   key: string
 }
 
-export type HeaderFactory<Input = unknown> = (context: {
-  config: HttpClientConfig
-  input: Input
-  method: HttpMethod
-}) => Headers
-
 export type JsonEndpointOptions<Input, Output> = {
   method: HttpMethod
   path: string | ((input: Input) => string)
   query?: (input: Input) => URLSearchParams
   body?: (input: Input) => unknown
   output: z.ZodType<Output>
-  headers?: Array<HeaderFactory<Input>>
+  headers?: Headers | ((input: Input) => Headers)
 }
 
 export type JsonEndpoint<Input, Output> = (input?: Input) => Promise<Output>
@@ -37,17 +31,16 @@ export function makeJsonEndpoint<Input, Output>(
     const body = options.body?.(input as Input)
     const url = makeUrl(config.baseUrl, path, options.query?.(input as Input))
 
+    const endpointHeaders =
+      typeof options.headers === "function"
+        ? options.headers(input as Input)
+        : options.headers
+
     const headers = mergeHeaders(
       new Headers({
         Accept: "application/json",
       }),
-      ...(options.headers ?? []).map((factory) =>
-        factory({
-          config,
-          input: input as Input,
-          method: options.method,
-        }),
-      ),
+      endpointHeaders,
     )
 
     if (body !== undefined && !headers.has("Content-Type")) {
