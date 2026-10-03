@@ -9,11 +9,15 @@ export type ProviderListCommandOptions = {
 
 export function makeProviderListHandler(options: ProviderListCommandOptions) {
   return async (_context: Cli.HandlerContext) => {
+    const settings = await options.database.settings.get()
+    const defaultProvider = settings?.defaultProvider
+
     for (const providerName of providerNames) {
       const providerInfo = await options.database.providers.get(providerName)
       const apiKeyConfigured = await hasApiKey(options.database, providerName)
+      const defaultSuffix = providerName === defaultProvider ? " (default)" : ""
 
-      console.log(providerName)
+      console.log(`${providerName}${defaultSuffix}`)
 
       if (providerInfo === undefined) {
         console.log("  (not configured)")

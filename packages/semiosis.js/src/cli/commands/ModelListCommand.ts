@@ -21,6 +21,9 @@ export function makeModelListHandler(options: ModelListCommandOptions) {
 
     for (const providerName of targetProviderNames) {
       try {
+        const providerInfo = await options.database.providers.get(providerName)
+        const defaultModel = providerInfo?.defaultModel
+
         if (!all) {
           const modelNames = await listModelConfigs(
             options.database,
@@ -28,7 +31,8 @@ export function makeModelListHandler(options: ModelListCommandOptions) {
           )
 
           for (const modelName of modelNames) {
-            console.log(`${providerName} ${modelName}`)
+            const defaultSuffix = modelName === defaultModel ? " (default)" : ""
+            console.log(`${providerName} ${modelName}${defaultSuffix}`)
           }
 
           continue
@@ -46,7 +50,11 @@ export function makeModelListHandler(options: ModelListCommandOptions) {
             modelName,
           )
 
-          const suffix = enabled ? " (enabled)" : ""
+          const tags: Array<string> = []
+          if (enabled) tags.push("enabled")
+          if (modelName === defaultModel) tags.push("default")
+          const suffix = tags.length === 0 ? "" : ` (${tags.join(", ")})`
+
           console.log(`${providerName} ${modelName}${suffix}`)
         }
       } catch (error) {

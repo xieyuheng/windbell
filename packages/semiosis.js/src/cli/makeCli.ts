@@ -3,10 +3,12 @@ import { getPackageJson } from "@xieyuheng/std.js/node"
 import { fileURLToPath } from "node:url"
 import { defaultDatabaseRoot, makeDatabase } from "../database/index.ts"
 import { makeBatchHandler } from "./commands/BatchCommand.ts"
+import { makeModelDefaultHandler } from "./commands/ModelDefaultCommand.ts"
 import { makeModelEnableHandler } from "./commands/ModelEnableCommand.ts"
 import { makeModelListHandler } from "./commands/ModelListCommand.ts"
 import { makeApiKeyDeleteHandler } from "./commands/ApiKeyDeleteCommand.ts"
 import { makeApiKeyPutHandler } from "./commands/ApiKeyPutCommand.ts"
+import { makeProviderDefaultHandler } from "./commands/ProviderDefaultCommand.ts"
 import { makeProviderListHandler } from "./commands/ProviderListCommand.ts"
 import { makeReplHandler } from "./commands/ReplCommand.ts"
 
@@ -20,6 +22,12 @@ export function makeCli() {
       path: ["provider", "list"],
       description: "list supported providers",
       handler: makeProviderListHandler({ database }),
+    },
+    {
+      path: ["provider", "default"],
+      args: ["provider-name"],
+      description: "select default provider",
+      handler: makeProviderDefaultHandler({ database }),
     },
     {
       path: ["api-key", "put"],
@@ -50,6 +58,15 @@ export function makeCli() {
       },
       description: "list models",
       handler: makeModelListHandler({ database }),
+    },
+    {
+      path: ["model", "default"],
+      args: ["model-name"],
+      options: {
+        "--provider": { valueName: "provider-name" },
+      },
+      description: "select default model for provider",
+      handler: makeModelDefaultHandler({ database }),
     },
     {
       path: ["repl"],
