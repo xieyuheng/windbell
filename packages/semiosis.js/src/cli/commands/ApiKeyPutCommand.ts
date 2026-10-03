@@ -1,3 +1,4 @@
+import process from "node:process"
 import type * as Cli from "@xieyuheng/cli.js"
 import type { Database } from "../../database/index.ts"
 import { writeApiKey } from "../../database/index.ts"
@@ -6,7 +7,7 @@ import { readLine } from "../input.ts"
 
 export type ApiKeyPutCommandOptions = {
   database: Database
-  readLine?: (prompt: string) => Promise<string>
+  readLine?: (prompt: string) => Promise<string | undefined>
 }
 
 export function makeApiKeyPutHandler(options: ApiKeyPutCommandOptions) {
@@ -21,7 +22,13 @@ export function makeApiKeyPutHandler(options: ApiKeyPutCommandOptions) {
 
     assertSupportedProvider(providerName)
 
-    const key = (await readLineFn(`api key for ${providerName}: `)).trim()
+    const line = await readLineFn(`api key for ${providerName}: `)
+    if (line === undefined) {
+      process.exitCode = 1
+      return
+    }
+
+    const key = line.trim()
     if (key === "") {
       throw new Error("api key is empty")
     }

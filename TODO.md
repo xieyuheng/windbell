@@ -1,6 +1,5 @@
 # semiosis.js
 
-用 cli command 实现 provider api-keys 的填写和删除
 用 cli command 实现 default provider 选择
 用 cli command 实现 default model 选择
 用 cli command 实现 model disable
