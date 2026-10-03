@@ -19,14 +19,6 @@ export const routes: Array<RouteRecordRaw> = [
     component: HomePage,
   },
   {
-    path: "/dashboard",
-    redirect: "/home",
-  },
-  {
-    path: "/workspaces",
-    redirect: "/home",
-  },
-  {
     path: "/workspaces/:workspaceId/sessions",
     redirect: (to) => ({
       name: "workspace",

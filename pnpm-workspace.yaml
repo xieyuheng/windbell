@@ -1,5 +1,9 @@
 packages:
   - "packages/*.js"
 
+allowBuilds:
+  electron-winstaller: false
+  esbuild: true
+
 overrides:
   typescript: npm:typescript-native-bridge@6.0.3-bridge.17.tsgo.7.0.2

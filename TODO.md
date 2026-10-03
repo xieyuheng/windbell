@@ -1,10 +1,10 @@
 # windbell-web.js
 
-实现所支持的 provider 和 model 的展示页面
-实现 provider api-keys 的填写和删除
-实现 default provider 选择
-实现 default model 选择
-实现 model disable
+配色可配置
+
+# windbell-desktop.js
+
+[windbell-desktop.js] 初始化 electron app
 
 # meta-lisp
 
@@ -13,10 +13,6 @@ IDE 如何与 meta-lisp 结合？
 - 初始化项目模板
 - 语法高亮
 - 按照惯例运行 scripts/ 中的脚本
-
-# windbell-web.js
-
-配色可配置
 
 # windbell-web.js
 

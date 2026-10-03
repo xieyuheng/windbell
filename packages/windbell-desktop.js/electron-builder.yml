@@ -1,0 +1,32 @@
+appId: com.xieyuheng.windbell
+productName: windbell
+executableName: windbell
+artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
+
+directories:
+  output: release
+
+files:
+  - dist/main.mjs
+  - package.json
+
+extraResources:
+  - from: ../windbell-web.js/dist
+    to: web
+
+asar: true
+npmRebuild: false
+
+linux:
+  target:
+    - AppImage
+  category: Utility
+  maintainer: xieyuheng
+
+mac:
+  target:
+    - dmg
+
+win:
+  target:
+    - nsis
