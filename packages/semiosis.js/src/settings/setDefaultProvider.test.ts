@@ -14,12 +14,6 @@ test("setDefaultProvider writes settings.defaultProvider", async () => {
   try {
     const database = makeDatabase({ root })
 
-    await database.providers.put("deepseek", {
-      name: "deepseek",
-      baseUrl: "https://api.deepseek.com",
-      defaultModel: null,
-    })
-
     await setDefaultProvider(database, "deepseek")
 
     assert.deepEqual(await database.settings.get(), {
@@ -41,23 +35,6 @@ test("setDefaultProvider rejects unsupported provider", async () => {
     await assert.rejects(
       () => setDefaultProvider(database, "unknown"),
       /unsupported provider/,
-    )
-  } finally {
-    await fs.rm(root, { recursive: true, force: true })
-  }
-})
-
-test("setDefaultProvider rejects provider without provider info", async () => {
-  const root = await fs.mkdtemp(
-    Path.join(Os.tmpdir(), "windbell-set-default-provider-"),
-  )
-
-  try {
-    const database = makeDatabase({ root })
-
-    await assert.rejects(
-      () => setDefaultProvider(database, "deepseek"),
-      /provider not found/,
     )
   } finally {
     await fs.rm(root, { recursive: true, force: true })

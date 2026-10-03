@@ -2,11 +2,6 @@
 
 配色可配置
 
-# windbell-desktop.js
-
-如何处理 ~/.windbell 目录，
-以及 ~/.windbell/database 的初始化问题？
-
 # semiosis.js
 
 [semiosis.js] 支持 pwsh

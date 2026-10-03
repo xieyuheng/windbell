@@ -1,7 +1,7 @@
 import fs from "node:fs/promises"
 import Path from "node:path"
-import type { ProviderInfo } from "../provider/index.ts"
-import { parseProviderInfo } from "../provider/index.ts"
+import type { ProviderConfig } from "../provider/index.ts"
+import { parseProviderConfig } from "../provider/index.ts"
 import { assertId, isValidId } from "./id.ts"
 import {
   isEnoent,
@@ -15,8 +15,8 @@ export type ProviderStoreOptions = {
 }
 
 export type ProviderStore = {
-  get(providerName: string): Promise<ProviderInfo | undefined>
-  put(providerName: string, value: ProviderInfo): Promise<void>
+  get(providerName: string): Promise<ProviderConfig | undefined>
+  put(providerName: string, value: ProviderConfig): Promise<void>
   list(): Promise<Array<string>>
   remove(providerName: string): Promise<void>
 }
@@ -41,7 +41,7 @@ export function makeProviderStore(
       const value = await readJsonFile(providerPath(providerName))
       if (value === undefined) return undefined
 
-      return parseProviderInfo(value)
+      return parseProviderConfig(value)
     },
 
     async put(providerName, value) {

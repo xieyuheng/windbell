@@ -87,19 +87,19 @@ export async function interpretSession(
       throw new Error("default provider is not configured")
     }
 
-    const providerInfo = await semiosis.providers.get(providerName)
+    const providerConfig = await semiosis.providers.get(providerName)
 
-    if (providerInfo === undefined) {
+    if (providerConfig === undefined) {
       throw new Error(`provider not found: ${providerName}`)
     }
 
-    if (providerInfo.defaultModel === null) {
+    if (providerConfig.defaultModel === null) {
       throw new Error(`default model is not configured: ${providerName}`)
     }
 
     const modelRef: S.ModelRef = {
-      providerName: providerInfo.name,
-      name: providerInfo.defaultModel,
+      providerName: providerConfig.name,
+      name: providerConfig.defaultModel,
     }
 
     state.modelRef = modelRef

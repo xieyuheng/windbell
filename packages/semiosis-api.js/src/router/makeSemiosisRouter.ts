@@ -19,29 +19,26 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
   })
 
   app.get("/providers", async () => {
-    const providerNames = await options.database.providers.list()
-    const providers: Array<S.ProviderInfo> = []
+    const providers: Array<S.ProviderConfig> = []
 
-    for (const providerName of providerNames) {
-      const providerInfo = await options.database.providers.get(providerName)
-      if (providerInfo === undefined) continue
-
-      providers.push(providerInfo)
+    for (const providerName of S.providerNames) {
+      providers.push(await S.readProviderConfig(options.database, providerName))
     }
 
     return sendJson(200, providers)
   })
 
   app.get("/providers/:providerName", async (c) => {
-    const providerInfo = await options.database.providers.get(
-      c.req.param("providerName"),
-    )
+    const providerName = c.req.param("providerName")
 
-    if (providerInfo === undefined) {
+    if (!(S.providerNames as readonly string[]).includes(providerName)) {
       throw new HTTPException(404, { message: "provider not found" })
     }
 
-    return sendJson(200, providerInfo)
+    return sendJson(
+      200,
+      await S.readProviderConfig(options.database, providerName),
+    )
   })
 
   app.get("/settings", async () => {

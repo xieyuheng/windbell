@@ -1,4 +1,5 @@
 import type { Database } from "../database/index.ts"
+import { readProviderConfig } from "../provider/index.ts"
 import type { Model, ModelRef } from "../model/index.ts"
 import * as DeepSeek from "../providers/deepseek/index.ts"
 import * as OpenRouter from "../providers/openrouter/index.ts"
@@ -51,23 +52,14 @@ export async function readDefaultModelRef(
     return undefined
   }
 
-  const providerInfo = await database.providers.get(providerName)
-  if (providerInfo === undefined) {
-    throw new Error(`unknown provider: ${providerName}`)
-  }
+  const providerConfig = await readProviderConfig(database, providerName)
 
-  if (providerInfo.name !== providerName) {
-    throw new Error(
-      `provider name mismatch: expected ${providerName}, got ${providerInfo.name}`,
-    )
-  }
-
-  if (providerInfo.defaultModel === null) {
+  if (providerConfig.defaultModel === null) {
     return undefined
   }
 
   return {
     providerName,
-    name: providerInfo.defaultModel,
+    name: providerConfig.defaultModel,
   }
 }

@@ -1,6 +1,7 @@
 import type * as Cli from "@xieyuheng/cli.js"
 import type { Database } from "../../database/index.ts"
 import { disableModel } from "../../models/index.ts"
+import { readProviderConfig } from "../../provider/index.ts"
 import { readOptionalOption } from "../options.ts"
 
 export type ModelDisableCommandOptions = {
@@ -23,8 +24,11 @@ export function makeModelDisableHandler(options: ModelDisableCommandOptions) {
       throw new Error("default provider is not configured")
     }
 
-    const providerInfo = await options.database.providers.get(providerName)
-    const wasDefaultModel = providerInfo?.defaultModel === modelName
+    const providerConfig = await readProviderConfig(
+      options.database,
+      providerName,
+    )
+    const wasDefaultModel = providerConfig.defaultModel === modelName
 
     const disabled = await disableModel(
       options.database,

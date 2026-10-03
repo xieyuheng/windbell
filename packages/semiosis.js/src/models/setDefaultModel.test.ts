@@ -15,13 +15,7 @@ test("setDefaultModel writes provider defaultModel", async () => {
   try {
     const database = makeDatabase({ root })
 
-    await database.providers.put("deepseek", {
-      name: "deepseek",
-      baseUrl: "https://api.deepseek.com",
-      defaultModel: null,
-    })
     await enableModel(database, "deepseek", "deepseek-flash")
-
     await setDefaultModel(database, "deepseek", "deepseek-flash")
 
     assert.deepEqual(await database.providers.get("deepseek"), {
@@ -42,12 +36,6 @@ test("setDefaultModel rejects model that is not enabled", async () => {
   try {
     const database = makeDatabase({ root })
 
-    await database.providers.put("deepseek", {
-      name: "deepseek",
-      baseUrl: "https://api.deepseek.com",
-      defaultModel: null,
-    })
-
     await assert.rejects(
       () => setDefaultModel(database, "deepseek", "deepseek-flash"),
       /model is not enabled/,
@@ -57,7 +45,7 @@ test("setDefaultModel rejects model that is not enabled", async () => {
   }
 })
 
-test("setDefaultModel rejects provider without provider info", async () => {
+test("setDefaultModel rejects unsupported provider", async () => {
   const root = await fs.mkdtemp(
     Path.join(Os.tmpdir(), "windbell-set-default-model-"),
   )
@@ -66,8 +54,8 @@ test("setDefaultModel rejects provider without provider info", async () => {
     const database = makeDatabase({ root })
 
     await assert.rejects(
-      () => setDefaultModel(database, "deepseek", "deepseek-flash"),
-      /provider not found/,
+      () => setDefaultModel(database, "unknown", "deepseek-flash"),
+      /unsupported provider/,
     )
   } finally {
     await fs.rm(root, { recursive: true, force: true })

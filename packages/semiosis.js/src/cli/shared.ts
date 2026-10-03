@@ -3,6 +3,7 @@ import type { Agent } from "../agent/index.ts"
 import type { Database } from "../database/index.ts"
 import type { Model } from "../model/index.ts"
 import { makeModel } from "../models/index.ts"
+import { readProviderConfig } from "../provider/index.ts"
 import { makeAgentFromSession } from "../session/index.ts"
 import type { ToolRouter } from "../tool/index.ts"
 import type { Workspace } from "../workspace/Workspace.ts"
@@ -35,12 +36,12 @@ export async function makeModelFromOptions(options: {
     )
   }
 
-  const providerInfo = await options.database.providers.get(providerName)
-  if (providerInfo === undefined) {
-    throw new Error(`provider not found: ${providerName}`)
-  }
+  const providerConfig = await readProviderConfig(
+    options.database,
+    providerName,
+  )
 
-  const name = modelOption ?? providerInfo.defaultModel
+  const name = modelOption ?? providerConfig.defaultModel
   if (name === null || name === undefined) {
     throw new Error(`default model is not configured: ${providerName}`)
   }

@@ -5,6 +5,7 @@ import {
   listAvailableModels,
   listModelConfigs,
 } from "../../models/index.ts"
+import { readProviderConfig } from "../../provider/index.ts"
 import { providerNames } from "../../providers/providerNames.ts"
 import { readFlag, readOptionalOption } from "../options.ts"
 
@@ -21,8 +22,11 @@ export function makeModelListHandler(options: ModelListCommandOptions) {
 
     for (const providerName of targetProviderNames) {
       try {
-        const providerInfo = await options.database.providers.get(providerName)
-        const defaultModel = providerInfo?.defaultModel
+        const providerConfig = await readProviderConfig(
+          options.database,
+          providerName,
+        )
+        const defaultModel = providerConfig.defaultModel
 
         if (!all) {
           const modelNames = await listModelConfigs(

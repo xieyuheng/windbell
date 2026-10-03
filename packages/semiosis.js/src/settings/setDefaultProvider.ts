@@ -9,11 +9,6 @@ export async function setDefaultProvider(
     throw new Error(`unsupported provider: ${providerName}`)
   }
 
-  const providerInfo = await database.providers.get(providerName)
-  if (providerInfo === undefined) {
-    throw new Error(`provider not found: ${providerName}`)
-  }
-
   const settings = await database.settings.get()
 
   await database.settings.put({

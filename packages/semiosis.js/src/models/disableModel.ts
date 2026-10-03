@@ -1,4 +1,5 @@
 import type { Database } from "../database/index.ts"
+import { readProviderConfig } from "../provider/index.ts"
 import * as DeepSeek from "../providers/deepseek/index.ts"
 import * as OpenRouter from "../providers/openrouter/index.ts"
 
@@ -27,10 +28,10 @@ export async function disableModel(
 
   if (!disabled) return false
 
-  const providerInfo = await database.providers.get(providerName)
-  if (providerInfo !== undefined && providerInfo.defaultModel === name) {
+  const providerConfig = await readProviderConfig(database, providerName)
+  if (providerConfig.defaultModel === name) {
     await database.providers.put(providerName, {
-      ...providerInfo,
+      ...providerConfig,
       defaultModel: null,
     })
   }

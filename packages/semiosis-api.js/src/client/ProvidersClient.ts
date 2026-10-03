@@ -3,8 +3,8 @@ import type { SemiosisClientConfig } from "./SemiosisClientConfig.ts"
 import { call, callOptional } from "./http.ts"
 
 export type ProvidersClient = {
-  list(): Promise<Array<S.ProviderInfo>>
-  get(providerName: string): Promise<S.ProviderInfo | undefined>
+  list(): Promise<Array<S.ProviderConfig>>
+  get(providerName: string): Promise<S.ProviderConfig | undefined>
 }
 
 export function makeProvidersClient(
