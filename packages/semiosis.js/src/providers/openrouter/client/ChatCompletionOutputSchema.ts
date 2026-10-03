@@ -1,26 +1,26 @@
 import { z } from "zod"
 import { MessageSchema } from "./MessageSchema.ts"
 
-const PromptTokensDetailsSchema = z.strictObject({
+const PromptTokensDetailsSchema = z.object({
   cached_tokens: z.number().optional(),
   cache_write_tokens: z.number().optional(),
   audio_tokens: z.number().optional(),
   video_tokens: z.number().optional(),
 })
 
-const CompletionTokensDetailsSchema = z.strictObject({
+const CompletionTokensDetailsSchema = z.object({
   reasoning_tokens: z.number().optional(),
   image_tokens: z.number().optional(),
   audio_tokens: z.number().optional(),
 })
 
-const CostDetailsSchema = z.strictObject({
+const CostDetailsSchema = z.object({
   upstream_inference_cost: z.number().optional(),
   upstream_inference_prompt_cost: z.number().optional(),
   upstream_inference_completions_cost: z.number().optional(),
 })
 
-const UsageSchema = z.strictObject({
+const UsageSchema = z.object({
   prompt_tokens: z.number(),
   completion_tokens: z.number(),
   total_tokens: z.number(),
@@ -31,7 +31,7 @@ const UsageSchema = z.strictObject({
   completion_tokens_details: CompletionTokensDetailsSchema.optional(),
 })
 
-const ChoiceSchema = z.strictObject({
+const ChoiceSchema = z.object({
   index: z.number(),
   message: MessageSchema,
   logprobs: z.unknown().nullable(),
@@ -39,7 +39,7 @@ const ChoiceSchema = z.strictObject({
   native_finish_reason: z.string().nullable().optional(),
 })
 
-export const ChatCompletionOutputSchema = z.strictObject({
+export const ChatCompletionOutputSchema = z.object({
   id: z.string(),
   object: z.literal("chat.completion"),
   created: z.number(),

@@ -1,15 +1,15 @@
 import { z } from "zod"
 import { MessageSchema } from "./MessageSchema.ts"
 
-const PromptTokensDetailsSchema = z.strictObject({
+const PromptTokensDetailsSchema = z.object({
   cached_tokens: z.number(),
 })
 
-const CompletionTokensDetailsSchema = z.strictObject({
+const CompletionTokensDetailsSchema = z.object({
   reasoning_tokens: z.number(),
 })
 
-const UsageSchema = z.strictObject({
+const UsageSchema = z.object({
   prompt_tokens: z.number(),
   completion_tokens: z.number(),
   total_tokens: z.number(),
@@ -19,14 +19,14 @@ const UsageSchema = z.strictObject({
   prompt_cache_miss_tokens: z.number().optional(),
 })
 
-const ChoiceSchema = z.strictObject({
+const ChoiceSchema = z.object({
   index: z.number(),
   message: MessageSchema,
   logprobs: z.unknown().nullable(),
   finish_reason: z.string().nullable(),
 })
 
-export const ChatCompletionOutputSchema = z.strictObject({
+export const ChatCompletionOutputSchema = z.object({
   id: z.string(),
   object: z.literal("chat.completion"),
   created: z.number(),

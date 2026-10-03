@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { ToolCallSchema } from "./ToolCallSchema.ts"
 
-export const MessageSchema = z.strictObject({
+export const MessageSchema = z.object({
   role: z.union([
     z.literal("system"),
     z.literal("user"),

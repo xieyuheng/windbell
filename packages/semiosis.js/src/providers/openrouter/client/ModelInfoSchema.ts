@@ -1,22 +1,22 @@
 import { z } from "zod"
 
-const AliasTargetSchema = z.strictObject({
+const AliasTargetSchema = z.object({
   name: z.string(),
   slug: z.string(),
 })
 
-const ArtificialAnalysisSchema = z.strictObject({
+const ArtificialAnalysisSchema = z.object({
   intelligence_index: z.number().nullable().optional(),
   coding_index: z.number().nullable().optional(),
   agentic_index: z.number().nullable().optional(),
 })
 
-const BenchmarksSchema = z.strictObject({
+const BenchmarksSchema = z.object({
   design_arena: z.array(z.unknown()).optional(),
   artificial_analysis: ArtificialAnalysisSchema.optional(),
 })
 
-export const ModelInfoSchema = z.strictObject({
+export const ModelInfoSchema = z.object({
   id: z.string(),
   canonical_slug: z.string().nullable().optional(),
   hugging_face_id: z.string().nullable().optional(),
@@ -26,7 +26,7 @@ export const ModelInfoSchema = z.strictObject({
   context_length: z.number(),
   alias_target: AliasTargetSchema.nullable().optional(),
   benchmarks: BenchmarksSchema.nullable().optional(),
-  architecture: z.strictObject({
+  architecture: z.object({
     modality: z.string().optional(),
     input_modalities: z.array(z.string()),
     output_modalities: z.array(z.string()),
@@ -35,7 +35,7 @@ export const ModelInfoSchema = z.strictObject({
   }),
   pricing: z.record(z.string(), z.unknown()),
   top_provider: z
-    .strictObject({
+    .object({
       context_length: z.number().nullable().optional(),
       max_completion_tokens: z.number().nullable().optional(),
       is_moderated: z.boolean().optional(),
@@ -49,13 +49,13 @@ export const ModelInfoSchema = z.strictObject({
   knowledge_cutoff: z.string().nullable().optional(),
   expiration_date: z.string().nullable().optional(),
   links: z
-    .strictObject({
+    .object({
       details: z.string().optional(),
     })
     .nullable()
     .optional(),
   reasoning: z
-    .strictObject({
+    .object({
       mandatory: z.boolean().optional(),
       default_enabled: z.boolean().optional(),
       supported_efforts: z.array(z.string()).optional(),

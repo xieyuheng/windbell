@@ -1,10 +1,10 @@
 import { z } from "zod"
 
-export const ToolCallSchema = z.strictObject({
+export const ToolCallSchema = z.object({
   id: z.string(),
   index: z.number().optional(),
   type: z.literal("function"),
-  function: z.strictObject({
+  function: z.object({
     name: z.string(),
     arguments: z.string(),
   }),

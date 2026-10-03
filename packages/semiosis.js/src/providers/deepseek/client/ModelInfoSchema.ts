@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const ModelInfoSchema = z.strictObject({
+export const ModelInfoSchema = z.object({
   id: z.string(),
   object: z.literal("model"),
   owned_by: z.string(),
@@ -10,7 +10,7 @@ export const ModelInfoSchema = z.strictObject({
   input_modalities: z.array(z.string()),
   output_modalities: z.array(z.string()),
   effort: z
-    .strictObject({
+    .object({
       supported_levels: z.array(z.string()),
       default_level: z.string().optional(),
     })
