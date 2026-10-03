@@ -1,7 +1,13 @@
 # semiosis.js
 
-用 cli command 实现 default provider 选择
-用 cli command 实现 default model 选择
+下面我计划：
+
+- 用 cli command 实现 default provider 选择
+- 用 cli command 实现某个 provider 的 default model 选择
+
+如何设计？给出方案。
+注意参考已有的 cli command 设计风格。
+
 用 cli command 实现 model disable
 
 用 repl 命令 实现 provider 和 model 的切换
