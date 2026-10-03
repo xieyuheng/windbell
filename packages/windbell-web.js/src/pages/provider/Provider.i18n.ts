@@ -30,6 +30,10 @@ export const providerMessages = {
     extraBody: "额外请求体",
     none: "无",
     warning: "提示",
+    enableModel: "启用模型",
+    disableModel: "禁用模型",
+    setAsDefaultModel: "设为默认",
+    defaultModel: "默认模型",
   },
   "en-US": {
     title: "Provider",
@@ -62,5 +66,9 @@ export const providerMessages = {
     extraBody: "Extra Body",
     none: "None",
     warning: "Warning",
+    enableModel: "Enable Model",
+    disableModel: "Disable Model",
+    setAsDefaultModel: "Set as default",
+    defaultModel: "Default Model",
   },
 }

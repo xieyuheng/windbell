@@ -55,6 +55,16 @@ test("semiosis client and server", async (t) => {
 
   assert.deepEqual(await client.providers.listModels("deepseek"), [])
 
+  await client.providers.enableModel("deepseek", "deepseek-flash")
+
+  const models = await client.providers.listModels("deepseek")
+  assert.equal(models.length, 1)
+  assert.equal(models[0]?.name, "deepseek-flash")
+  assert.equal(models[0]?.enabled, true)
+
+  await client.providers.setDefaultModel("deepseek", "deepseek-flash")
+  await client.providers.disableModel("deepseek", "deepseek-flash")
+
   assert.deepEqual(await client.settings.get(), {
     defaultProvider: null,
   })

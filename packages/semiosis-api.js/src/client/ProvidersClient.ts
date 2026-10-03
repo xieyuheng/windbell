@@ -18,6 +18,9 @@ export type ProvidersClient = {
     providerName: string,
     options?: ListModelsOptions,
   ): Promise<Array<S.ProviderModelEntry>>
+  enableModel(providerName: string, modelName: string): Promise<void>
+  disableModel(providerName: string, modelName: string): Promise<void>
+  setDefaultModel(providerName: string, modelName: string): Promise<void>
   putApiKey(providerName: string, key: string): Promise<void>
   deleteApiKey(providerName: string): Promise<void>
 }
@@ -55,6 +58,33 @@ export function makeProvidersClient(
           `/providers/${encodeURIComponent(providerName)}/models`,
           query,
         ),
+      )
+    },
+
+    enableModel: async (providerName, modelName) => {
+      await call(
+        config.baseUrl,
+        "POST",
+        `/providers/${encodeURIComponent(providerName)}/models/enable`,
+        { modelName },
+      )
+    },
+
+    disableModel: async (providerName, modelName) => {
+      await call(
+        config.baseUrl,
+        "POST",
+        `/providers/${encodeURIComponent(providerName)}/models/disable`,
+        { modelName },
+      )
+    },
+
+    setDefaultModel: async (providerName, modelName) => {
+      await call(
+        config.baseUrl,
+        "PUT",
+        `/providers/${encodeURIComponent(providerName)}/default-model`,
+        { modelName },
       )
     },
 

@@ -1,3 +1,16 @@
+# fs-api.js
+
+refactor http client -- try to extract to http.js
+
+# semiosis-api.js
+
+refactor http client -- try to extract to http.js
+
+# windbell-web.js
+
+改善 provider list page 和 provider card 和 model line
+改善 provider page 和 model card
+
 # windbell-web.js
 
 配色可配置
@@ -29,11 +42,3 @@ IDE 如何与 meta-lisp 结合？
 - 自己尝试，先不要做成功能
 - 未来可以考虑做 git-api.js
   - 本地部署 git 管理工具
-
-# fs-api.js
-
-refactor http client -- try to extract to http.js
-
-# semiosis-api.js
-
-refactor http client -- try to extract to http.js

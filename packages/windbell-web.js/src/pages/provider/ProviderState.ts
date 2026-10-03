@@ -14,6 +14,7 @@ export type ProviderState = {
   providerConfig: S.ProviderConfig | undefined
   apiKeyConfigured: boolean
   isDefaultProvider: boolean
+  busyModelNames: Record<string, boolean>
   models: Array<S.ProviderModelEntry>
 }
 
@@ -26,6 +27,7 @@ export function makeProviderState(providerName: string): ProviderState {
     providerConfig: undefined,
     apiKeyConfigured: false,
     isDefaultProvider: false,
+    busyModelNames: {},
     models: [],
   })
 }
@@ -72,5 +74,74 @@ export async function loadProviderState(state: ProviderState): Promise<void> {
     state.error = error instanceof Error ? error.message : String(error)
   } finally {
     state.loading = false
+  }
+}
+
+export async function enableProviderModel(
+  state: ProviderState,
+  modelName: string,
+): Promise<void> {
+  if (state.busyModelNames[modelName] === true) return
+
+  state.busyModelNames[modelName] = true
+
+  try {
+    await semiosis.providers.enableModel(state.providerName, modelName)
+    await refreshProviderModels(state)
+  } finally {
+    delete state.busyModelNames[modelName]
+  }
+}
+
+export async function disableProviderModel(
+  state: ProviderState,
+  modelName: string,
+): Promise<void> {
+  if (state.busyModelNames[modelName] === true) return
+
+  state.busyModelNames[modelName] = true
+
+  try {
+    await semiosis.providers.disableModel(state.providerName, modelName)
+    await refreshProviderModels(state)
+  } finally {
+    delete state.busyModelNames[modelName]
+  }
+}
+
+export async function setDefaultProviderModel(
+  state: ProviderState,
+  modelName: string,
+): Promise<void> {
+  if (state.busyModelNames[modelName] === true) return
+
+  state.busyModelNames[modelName] = true
+
+  try {
+    await semiosis.providers.setDefaultModel(state.providerName, modelName)
+
+    for (const entry of state.models) {
+      entry.isDefault = entry.name === modelName
+    }
+  } finally {
+    delete state.busyModelNames[modelName]
+  }
+}
+
+async function refreshProviderModels(state: ProviderState): Promise<void> {
+  const localModels = await semiosis.providers.listModels(state.providerName)
+
+  if (!state.apiKeyConfigured) {
+    state.models = localModels
+    return
+  }
+
+  try {
+    state.models = await semiosis.providers.listModels(state.providerName, {
+      all: true,
+    })
+  } catch (error) {
+    state.models = localModels
+    state.warning = error instanceof Error ? error.message : String(error)
   }
 }

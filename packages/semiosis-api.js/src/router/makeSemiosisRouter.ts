@@ -83,6 +83,39 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     )
   })
 
+  app.post("/providers/:providerName/models/enable", async (c) => {
+    const providerName = c.req.param("providerName")
+    assertSupportedProvider(providerName)
+
+    const body = readRecord(await readJsonBody(c))
+    const modelName = readString(body, "modelName")
+
+    await S.enableModel(options.database, providerName, modelName)
+    return sendEmpty(204)
+  })
+
+  app.post("/providers/:providerName/models/disable", async (c) => {
+    const providerName = c.req.param("providerName")
+    assertSupportedProvider(providerName)
+
+    const body = readRecord(await readJsonBody(c))
+    const modelName = readString(body, "modelName")
+
+    await S.disableModel(options.database, providerName, modelName)
+    return sendEmpty(204)
+  })
+
+  app.put("/providers/:providerName/default-model", async (c) => {
+    const providerName = c.req.param("providerName")
+    assertSupportedProvider(providerName)
+
+    const body = readRecord(await readJsonBody(c))
+    const modelName = readString(body, "modelName")
+
+    await S.setDefaultModel(options.database, providerName, modelName)
+    return sendEmpty(204)
+  })
+
   app.get("/settings", async () => {
     const settings = await options.database.settings.get()
 

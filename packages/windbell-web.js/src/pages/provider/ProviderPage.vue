@@ -7,7 +7,13 @@ import BackButton from "../../components/buttons/BackButton.vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
 import ModelCard from "./ModelCard.vue"
 import { providerMessages } from "./Provider.i18n.ts"
-import { loadProviderState, makeProviderState } from "./ProviderState.ts"
+import {
+  disableProviderModel,
+  enableProviderModel,
+  loadProviderState,
+  makeProviderState,
+  setDefaultProviderModel,
+} from "./ProviderState.ts"
 
 const route = useRoute()
 const providerName = String(route.params.providerName)
@@ -22,6 +28,30 @@ const state = makeProviderState(providerName)
 onMounted(async () => {
   await loadProviderState(state)
 })
+
+async function handleEnableModel(modelName: string): Promise<void> {
+  try {
+    await enableProviderModel(state, modelName)
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+  }
+}
+
+async function handleDisableModel(modelName: string): Promise<void> {
+  try {
+    await disableProviderModel(state, modelName)
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+  }
+}
+
+async function handleSetDefaultModel(modelName: string): Promise<void> {
+  try {
+    await setDefaultProviderModel(state, modelName)
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+  }
+}
 
 useHead(() => ({
   title: state.providerConfig?.name ?? providerName,
@@ -94,7 +124,13 @@ useHead(() => ({
 
         <ul v-else class="flex flex-col gap-4">
           <li v-for="entry in state.models" :key="entry.name">
-            <ModelCard :entry="entry" />
+            <ModelCard
+              :entry="entry"
+              :busy="state.busyModelNames[entry.name] === true"
+              @enable="handleEnableModel(entry.name)"
+              @disable="handleDisableModel(entry.name)"
+              @set-default="handleSetDefaultModel(entry.name)"
+            />
           </li>
         </ul>
       </section>
