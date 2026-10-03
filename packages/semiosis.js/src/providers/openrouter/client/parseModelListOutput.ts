@@ -1,5 +1,4 @@
 import { z } from "zod"
-import type { ModelListOutput } from "./ModelListOutput.ts"
 
 const modelInfoSchema = z.object({
   id: z.string(),
@@ -51,6 +50,8 @@ const modelInfoSchema = z.object({
 const modelListOutputSchema = z.object({
   data: z.array(modelInfoSchema),
 })
+
+export type ModelListOutput = z.infer<typeof modelListOutputSchema>
 
 export function parseModelListOutput(text: string): ModelListOutput {
   const value = parseJson(text)
