@@ -9,10 +9,10 @@ export type ModelEnableCommandOptions = {
 
 export function makeModelEnableHandler(options: ModelEnableCommandOptions) {
   return async (context: Cli.HandlerContext) => {
-    const [modelName] = context.args
+    const modelName = context.argValues["model-name"]
 
-    if (typeof modelName !== "string") {
-      throw new Error("expected command: model-enable <model-name>")
+    if (modelName === undefined) {
+      throw new Error("expected command: model enable <model-name>")
     }
 
     const providerOption = readOptionalOption(context.options, "--provider")

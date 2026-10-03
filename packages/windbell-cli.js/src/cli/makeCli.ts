@@ -9,14 +9,31 @@ export function makeCli() {
   const router = Cli.makeRouter("windbell-cli.js", version)
 
   router.defineRoutes([
-    "start --host <host> --port <port> --cors-origin <origin> --database-root <path> --web-dist-root <path> -- start windbell api and web",
-    "dev --host <host> --api-port <port> --web-port <port> --database-root <path> --web-source-root <path> -- start windbell api and web dev server",
+    {
+      path: ["start"],
+      options: {
+        "--host": { valueName: "host" },
+        "--port": { valueName: "port" },
+        "--cors-origin": { valueName: "origin" },
+        "--database-root": { valueName: "path" },
+        "--web-dist-root": { valueName: "path" },
+      },
+      description: "start windbell api and web",
+      handler: makeStartHandler(),
+    },
+    {
+      path: ["dev"],
+      options: {
+        "--host": { valueName: "host" },
+        "--api-port": { valueName: "port" },
+        "--web-port": { valueName: "port" },
+        "--database-root": { valueName: "path" },
+        "--web-source-root": { valueName: "path" },
+      },
+      description: "start windbell api and web dev server",
+      handler: makeDevHandler(),
+    },
   ])
-
-  router.defineHandlers({
-    start: makeStartHandler(),
-    dev: makeDevHandler(),
-  })
 
   return router
 }

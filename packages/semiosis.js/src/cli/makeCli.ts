@@ -14,20 +14,52 @@ export function makeCli() {
   const router = Cli.makeRouter("semiosis.js", version)
 
   router.defineRoutes([
-    "provider-list -- list supported providers",
-    "model-enable <model-name> --provider <provider-name> -- enable a model",
-    "model-list --provider <provider-name> --all -- list models (use --all to include disabled models)",
-    "repl --provider <provider-name> --model <model-name> --session <session-id> -- start agent repl in current directory",
-    "batch --provider <provider-name> --model <model-name> --prompts <file> --cwd <dir> --max-output-chars <n> -- run prompts through agent",
+    {
+      path: ["provider", "list"],
+      description: "list supported providers",
+      handler: makeProviderListHandler({ database }),
+    },
+    {
+      path: ["model", "enable"],
+      args: ["model-name"],
+      options: {
+        "--provider": { valueName: "provider-name" },
+      },
+      description: "enable a model",
+      handler: makeModelEnableHandler({ database }),
+    },
+    {
+      path: ["model", "list"],
+      options: {
+        "--provider": { valueName: "provider-name" },
+        "--all": {},
+      },
+      description: "list models",
+      handler: makeModelListHandler({ database }),
+    },
+    {
+      path: ["repl"],
+      options: {
+        "--provider": { valueName: "provider-name" },
+        "--model": { valueName: "model-name" },
+        "--session": { valueName: "session-id" },
+      },
+      description: "start agent repl in current directory",
+      handler: makeReplHandler({ database }),
+    },
+    {
+      path: ["batch"],
+      options: {
+        "--provider": { valueName: "provider-name" },
+        "--model": { valueName: "model-name" },
+        "--prompts": { valueName: "file", required: true },
+        "--cwd": { valueName: "dir" },
+        "--max-output-chars": { valueName: "n" },
+      },
+      description: "run prompts through agent",
+      handler: makeBatchHandler({ database }),
+    },
   ])
-
-  router.defineHandlers({
-    "provider-list": makeProviderListHandler({ database }),
-    "model-enable": makeModelEnableHandler({ database }),
-    "model-list": makeModelListHandler({ database }),
-    repl: makeReplHandler({ database }),
-    batch: makeBatchHandler({ database }),
-  })
 
   return router
 }

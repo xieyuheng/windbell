@@ -1,39 +1,5 @@
 # semiosis.js
 
-目前 command 是：
-
-```
-  xyh@lattice /home/xyh/projects/xieyuheng/windbell (master)
-$ ./bin/semiosis
-semiosis.js 0.1.0
-commands:
-  provider-list -- list supported providers
-  model-enable <model-name> --provider <provider-name> -- enable a model
-  model-list --provider <provider-name> --all -- list models (use --all to include disabled models)
-  repl --provider <provider-name> --model <model-name> --session <session-id> -- start agent repl in current directory
-  batch --provider <provider-name> --model <model-name> --prompts <file> --cwd <dir> --max-output-chars <n> -- run prompts through agent
-```
-
-是否应该做成两级的 command：
-
-```
-  provider list
-  model enable
-  model list
-  repl
-  batch
-```
-
-或：
-
-```
-  provider list
-  model enable
-  model list
-  agent repl
-  agent batch
-```
-
 用 cli command 实现 provider api-keys 的填写和删除
 用 cli command 实现 default provider 选择
 用 cli command 实现 default model 选择
