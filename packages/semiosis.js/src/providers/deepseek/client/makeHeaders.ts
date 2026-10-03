@@ -1,20 +1,6 @@
-import type { ClientConfig } from "./ClientConfig.ts"
+import type { HeaderFactory } from "../../../http/index.ts"
 
-export type MakeHeadersOptions = {
-  json?: boolean
-}
-
-export function makeHeaders(
-  config: ClientConfig,
-  options: MakeHeadersOptions = {},
-): Record<string, string> {
-  const headers: Record<string, string> = {
+export const deepseekHeaders: HeaderFactory = ({ config }) =>
+  new Headers({
     Authorization: `Bearer ${config.key}`,
-  }
-
-  if (options.json === true) {
-    headers["Content-Type"] = "application/json"
-  }
-
-  return headers
-}
+  })

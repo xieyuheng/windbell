@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-const modelInfoSchema = z.object({
+const modelInfoSchema = z.looseObject({
   id: z.string(),
   canonical_slug: z.string().nullable().optional(),
   hugging_face_id: z.string().nullable().optional(),
@@ -8,7 +8,7 @@ const modelInfoSchema = z.object({
   created: z.number().optional(),
   description: z.string().optional(),
   context_length: z.number(),
-  architecture: z.object({
+  architecture: z.looseObject({
     modality: z.string().optional(),
     input_modalities: z.array(z.string()),
     output_modalities: z.array(z.string()),
@@ -47,29 +47,8 @@ const modelInfoSchema = z.object({
     .optional(),
 })
 
-const modelListOutputSchema = z.object({
+export const modelListOutputSchema = z.looseObject({
   data: z.array(modelInfoSchema),
 })
 
 export type ModelListOutput = z.infer<typeof modelListOutputSchema>
-
-export function parseModelListOutput(text: string): ModelListOutput {
-  const value = parseJson(text)
-  const result = modelListOutputSchema.safeParse(value)
-  if (!result.success) {
-    throw new Error(
-      `[parseModelListOutput] invalid output: ${result.error.message}`,
-    )
-  }
-
-  return result.data
-}
-
-function parseJson(text: string): unknown {
-  try {
-    return JSON.parse(text)
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    throw new Error(`[parseModelListOutput] invalid JSON: ${message}`)
-  }
-}
