@@ -6,7 +6,7 @@ export const signMessages = {
       user: "用户",
       reasoning: "思考",
       assistant: "助手",
-      providerData: "供应商数据",
+      providerData: "提供商数据",
       toolCall: "工具调用",
       tool: "工具",
       toolOutput: "工具输出",

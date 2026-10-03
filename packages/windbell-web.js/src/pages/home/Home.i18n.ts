@@ -5,7 +5,7 @@ export const homeMessages = {
     workspaces: "工作区列表",
     workspaceDustbin: "工作区回收站",
     markdownPreview: "预览 Markdown",
-    providerList: "Provider 列表",
+    providerList: "提供商列表",
     createWorkspace: "创建工作区",
     createWorkspaceHint: "上下左右键选择，回车创建。",
     newWorkspace: "新建工作区",
