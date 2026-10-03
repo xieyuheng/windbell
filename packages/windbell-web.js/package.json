@@ -23,7 +23,7 @@
   "devDependencies": {
     "@tailwindcss/vite": "4.3.3",
     "@types/mdast": "4.0.4",
-    "@types/node": "26.6.3",
+    "@types/node": "26.6.4",
     "@vitejs/plugin-vue": "6.0.9",
     "prettier": "3.9.9",
     "tailwindcss": "4.3.3",
