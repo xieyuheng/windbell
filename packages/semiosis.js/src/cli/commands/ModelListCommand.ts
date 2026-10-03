@@ -42,12 +42,10 @@ export function makeModelListHandler(options: ModelListCommandOptions) {
           continue
         }
 
-        const modelNames = await listAvailableModels(
-          options.database,
-          providerName,
-        )
+        const models = await listAvailableModels(options.database, providerName)
 
-        for (const modelName of modelNames) {
+        for (const model of models) {
+          const modelName = model.id
           const enabled = await isModelEnabled(
             options.database,
             providerName,

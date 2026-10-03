@@ -2,6 +2,7 @@ import type { RouteRecordRaw } from "vue-router"
 import HomePage from "./home/HomePage.vue"
 import MarkdownRenderPage from "./markdown/MarkdownRenderPage.vue"
 import ProviderListPage from "./provider-list/ProviderListPage.vue"
+import ProviderPage from "./provider-list/ProviderPage.vue"
 import NotFoundPage from "./errors/NotFoundPage.vue"
 import SessionDustbinPage from "./session-dustbin/SessionDustbinPage.vue"
 import WorkspaceDustbinPage from "./workspace-dustbin/WorkspaceDustbinPage.vue"
@@ -52,6 +53,11 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/providers",
     name: "provider-list",
     component: ProviderListPage,
+  },
+  {
+    path: "/providers/:providerName",
+    name: "provider",
+    component: ProviderPage,
   },
   {
     path: "/settings",

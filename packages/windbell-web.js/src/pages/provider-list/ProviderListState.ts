@@ -5,7 +5,7 @@ const semiosis = makeSemiosisClient({
   baseUrl: "/api/semiosis",
 })
 
-export type ProviderModelSummary = {
+export type ProviderModelLine = {
   name: string
   enabled: boolean
   isDefault: boolean
@@ -17,7 +17,7 @@ export type ProviderSummary = {
   defaultModel: string | null
   apiKeyConfigured: boolean
   isDefaultProvider: boolean
-  models: Array<ProviderModelSummary>
+  models: Array<ProviderModelLine>
 }
 
 export type ProviderListState = {

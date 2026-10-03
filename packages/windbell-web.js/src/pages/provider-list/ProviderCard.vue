@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { Check, KeyRound, Trash2 } from "@lucide/vue"
+import { computed } from "vue"
 import { useI18n } from "vue-i18n"
+import { RouterLink } from "vue-router"
 import Card from "../../components/card/Card.vue"
 import SmallButton from "../../components/buttons/SmallButton.vue"
+import ModelLine from "./ModelLine.vue"
 import { providerListMessages } from "./ProviderList.i18n.ts"
 import type { ProviderSummary } from "./ProviderListState.ts"
 
@@ -20,6 +23,17 @@ const { t } = useI18n({
   messages: providerListMessages,
   useScope: "local",
 })
+
+const enabledModels = computed(() =>
+  props.provider.models.filter((model) => model.enabled),
+)
+
+const providerRoute = computed(() => ({
+  name: "provider",
+  params: {
+    providerName: props.provider.name,
+  },
+}))
 
 function requestSetDefault(): void {
   if (props.provider.isDefaultProvider) return
@@ -47,15 +61,19 @@ function requestDeleteApiKey(): void {
 <template>
   <Card as="article">
     <template #tag>
-      <h2 class="truncate">
-        {{ provider.name }}
-      </h2>
+      <RouterLink class="block min-w-0" :to="providerRoute">
+        <h2 class="truncate">
+          {{ provider.name }}
+        </h2>
+      </RouterLink>
     </template>
 
     <div class="flex flex-col gap-2 px-3 py-2">
-      <p class="truncate font-mono text-sm" :title="provider.baseUrl">
-        {{ provider.baseUrl }}
-      </p>
+      <RouterLink class="block min-w-0" :to="providerRoute">
+        <p class="truncate font-mono text-sm" :title="provider.baseUrl">
+          {{ provider.baseUrl }}
+        </p>
+      </RouterLink>
 
       <div class="flex flex-wrap items-center gap-2">
         <SmallButton
@@ -96,37 +114,19 @@ function requestDeleteApiKey(): void {
           {{ t("models") }}
         </h3>
 
-        <p v-if="provider.models.length === 0" class="text-sm text-ink-muted">
+        <p v-if="enabledModels.length === 0" class="text-sm text-ink-muted">
           {{ t("noModels") }}
         </p>
 
         <ul v-else class="flex flex-col gap-1">
           <li
-            v-for="model in provider.models"
+            v-for="model in enabledModels"
             :key="model.name"
-            class="flex flex-wrap items-center justify-between gap-2 rounded bg-paper-deep px-2 py-1.5"
+            class="rounded bg-paper-deep px-2 py-1.5"
           >
-            <code class="break-all font-mono text-sm text-ink">
-              {{ model.name }}
-            </code>
-
-            <span class="flex flex-wrap items-center gap-1 text-xs">
-              <span
-                class="rounded px-1.5 py-0.5"
-                :class="
-                  model.enabled ? 'bg-line text-ink' : 'bg-paper text-ink-muted'
-                "
-              >
-                {{ model.enabled ? t("enabled") : t("disabled") }}
-              </span>
-
-              <span
-                v-if="model.isDefault"
-                class="rounded bg-line px-1.5 py-0.5 text-ink"
-              >
-                {{ t("default") }}
-              </span>
-            </span>
+            <RouterLink class="block" :to="providerRoute">
+              <ModelLine :name="model.name" :is-default="model.isDefault" />
+            </RouterLink>
           </li>
         </ul>
       </section>

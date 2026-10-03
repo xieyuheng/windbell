@@ -63,9 +63,13 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const providerName = c.req.param("providerName")
     assertSupportedProvider(providerName)
 
+    const all = c.req.query("all") === "true"
+
     return sendJson(
       200,
-      await S.listModelSummaries(options.database, providerName),
+      await S.listProviderModelEntries(options.database, providerName, {
+        all,
+      }),
     )
   })
 
