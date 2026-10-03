@@ -9,6 +9,7 @@ const reasoningSchema = z.object({
 })
 
 const modelConfigSchema = z.object({
+  disabled: z.boolean().default(false),
   reasoning: reasoningSchema.nullable().optional(),
   provider: z.record(z.string(), z.unknown()).nullable().optional(),
   extraBody: z.record(z.string(), z.unknown()).optional(),

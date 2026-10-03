@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url"
 import { defaultDatabaseRoot, makeDatabase } from "../database/index.ts"
 import { makeBatchHandler } from "./commands/BatchCommand.ts"
 import { makeModelDefaultHandler } from "./commands/ModelDefaultCommand.ts"
+import { makeModelDisableHandler } from "./commands/ModelDisableCommand.ts"
 import { makeModelEnableHandler } from "./commands/ModelEnableCommand.ts"
 import { makeModelListHandler } from "./commands/ModelListCommand.ts"
 import { makeApiKeyDeleteHandler } from "./commands/ApiKeyDeleteCommand.ts"
@@ -49,6 +50,15 @@ export function makeCli() {
       },
       description: "enable a model",
       handler: makeModelEnableHandler({ database }),
+    },
+    {
+      path: ["model", "disable"],
+      args: ["model-name"],
+      options: {
+        "--provider": { valueName: "provider-name" },
+      },
+      description: "disable a model",
+      handler: makeModelDisableHandler({ database }),
     },
     {
       path: ["model", "list"],

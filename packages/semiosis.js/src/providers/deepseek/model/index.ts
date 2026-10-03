@@ -1,4 +1,5 @@
 export * from "./ModelConfig.ts"
+export * from "./disableModel.ts"
 export * from "./enableModel.ts"
 export * from "./interpret.ts"
 export * from "./isModelEnabled.ts"

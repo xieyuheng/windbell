@@ -1,4 +1,5 @@
 import type { Database } from "../../../database/index.ts"
+import { parseModelConfig } from "./parseModelConfig.ts"
 import { readModelConfigs } from "./readModelConfigs.ts"
 
 export async function isModelEnabled(
@@ -6,5 +7,7 @@ export async function isModelEnabled(
   name: string,
 ): Promise<boolean> {
   const configs = await readModelConfigs(database)
-  return Object.hasOwn(configs, name)
+  if (!Object.hasOwn(configs, name)) return false
+
+  return !parseModelConfig(name, configs[name]).disabled
 }

@@ -1,3 +1,4 @@
+export * from "./disableModel.ts"
 export * from "./makeMockModel.ts"
 export * from "./enableModel.ts"
 export * from "./isModelEnabled.ts"

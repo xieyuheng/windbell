@@ -4,25 +4,24 @@ import { writeJsonFile } from "../../../database/index.ts"
 import { parseModelConfig } from "./parseModelConfig.ts"
 import { readModelConfigs } from "./readModelConfigs.ts"
 
-export async function enableModel(
+export async function disableModel(
   database: Database,
   name: string,
-): Promise<void> {
+): Promise<boolean> {
   const configs = await readModelConfigs(database)
 
-  if (Object.hasOwn(configs, name)) {
-    const config = parseModelConfig(name, configs[name])
-    if (!config.disabled) return
+  if (!Object.hasOwn(configs, name)) return false
 
-    configs[name] = {
-      ...(configs[name] as Record<string, unknown>),
-      disabled: false,
-    }
-  } else {
-    configs[name] = { disabled: false }
+  const config = parseModelConfig(name, configs[name])
+  if (config.disabled) return false
+
+  configs[name] = {
+    ...(configs[name] as Record<string, unknown>),
+    disabled: true,
   }
 
   await writeJsonFile(modelConfigsPath(database), configs)
+  return true
 }
 
 function modelConfigsPath(database: Database): string {

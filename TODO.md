@@ -1,9 +1,3 @@
-# semiosis.js
-
-用 cli command 实现 model disable
-
-用 repl 命令 实现 provider 和 model 的切换
-
 # windbell-web.js
 
 实现所支持的 provider 和 model 的展示页面

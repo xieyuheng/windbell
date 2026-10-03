@@ -2,6 +2,7 @@ import { z } from "zod"
 import type { ModelConfig } from "./ModelConfig.ts"
 
 const modelConfigSchema = z.object({
+  disabled: z.boolean().default(false),
   thinking: z
     .union([z.literal("enabled"), z.literal("disabled")])
     .default("enabled"),

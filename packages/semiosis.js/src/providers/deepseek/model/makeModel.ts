@@ -6,6 +6,10 @@ import { interpret } from "./interpret.ts"
 import type { ModelConfig } from "./ModelConfig.ts"
 
 export function makeModel(client: Client, config: ModelConfig): Model {
+  if (config.disabled) {
+    throw new Error(`[makeModel] model is disabled: deepseek/${config.name}`)
+  }
+
   return {
     providerName: "deepseek",
     name: config.name,
