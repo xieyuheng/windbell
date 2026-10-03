@@ -1,11 +1,13 @@
-import { serve } from "@hono/node-server"
 import { serveStatic } from "@hono/node-server/serve-static"
 import fs from "node:fs/promises"
 import Path from "node:path"
 import { makeWindbellRouter } from "../router/index.ts"
+import { serveAndWait, type ServeResult } from "./serveAndWait.ts"
 import type { WindbellServerOptions } from "./WindbellServerOptions.ts"
 
-export function startWindbellServer(options: WindbellServerOptions) {
+export async function startWindbellServer(
+  options: WindbellServerOptions,
+): Promise<ServeResult> {
   const app = makeWindbellRouter({
     database: options.database,
     corsOrigin: options.corsOrigin,
@@ -30,7 +32,7 @@ export function startWindbellServer(options: WindbellServerOptions) {
     })
   }
 
-  return serve({
+  return serveAndWait({
     fetch: app.fetch,
     hostname: options.hostname,
     port: options.port,

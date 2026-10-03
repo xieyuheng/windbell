@@ -2,8 +2,6 @@
 
 set -e
 
-(cd ../windbell-web.js && ./scripts/build.sh)
-
-./scripts/build.sh
+export ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/
 
 npx electron .

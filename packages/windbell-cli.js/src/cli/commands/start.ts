@@ -46,7 +46,7 @@ export function makeStartHandler() {
       root: databaseRoot,
     })
 
-    startWindbellServer({
+    const { info } = await startWindbellServer({
       database,
       hostname,
       port,
@@ -54,7 +54,7 @@ export function makeStartHandler() {
       webDistRoot,
     })
 
-    console.log(`windbell listening on http://${hostname}:${port}`)
+    console.log(`windbell listening on http://${info.address}:${info.port}`)
   }
 }
 

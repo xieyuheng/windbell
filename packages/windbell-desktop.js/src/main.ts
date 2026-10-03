@@ -1,6 +1,10 @@
 import { app, BrowserWindow, shell } from "electron"
 import * as S from "@xieyuheng/semiosis.js"
-import { startWindbellServer } from "@xieyuheng/windbell-api.js"
+import {
+  closeServer,
+  startWindbellServer,
+  type ServeResult,
+} from "@xieyuheng/windbell-api.js"
 import Path from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -9,7 +13,8 @@ const PORT = 17344
 
 const dirname = Path.dirname(fileURLToPath(import.meta.url))
 
-let apiServer: ReturnType<typeof startWindbellServer> | undefined
+let apiServer: ServeResult["server"] | undefined
+let apiOrigin: string | undefined
 let mainWindow: BrowserWindow | undefined
 
 function resolveWebDistRoot(): string {
@@ -28,7 +33,7 @@ async function startApiServer(): Promise<void> {
     root: S.defaultDatabaseRoot(),
   })
 
-  apiServer = startWindbellServer({
+  const { server, info } = await startWindbellServer({
     database,
     hostname: HOSTNAME,
     port: PORT,
@@ -36,12 +41,8 @@ async function startApiServer(): Promise<void> {
     webDistRoot: resolveWebDistRoot(),
   })
 
-  if (apiServer.listening) return
-
-  await new Promise<void>((resolve, reject) => {
-    apiServer?.once("listening", () => resolve())
-    apiServer?.once("error", reject)
-  })
+  apiServer = server
+  apiOrigin = `http://${HOSTNAME}:${info.port}/`
 }
 
 async function createWindow(): Promise<void> {
@@ -65,43 +66,47 @@ async function createWindow(): Promise<void> {
     return { action: "deny" }
   })
 
-  await mainWindow.loadURL(`http://${HOSTNAME}:${PORT}/`)
+  await mainWindow.loadURL(apiOrigin ?? `http://${HOSTNAME}:${PORT}/`)
 }
 
-const gotTheLock = app.requestSingleInstanceLock()
+async function main(): Promise<void> {
+  const gotTheLock = app.requestSingleInstanceLock()
 
-if (!gotTheLock) {
-  app.quit()
-} else {
-  app.on("second-instance", () => {
-    if (mainWindow === undefined) return
+  if (!gotTheLock) {
+    app.quit()
+  } else {
+    app.on("second-instance", () => {
+      if (mainWindow === undefined) return
 
-    if (mainWindow.isMinimized()) mainWindow.restore()
-    mainWindow.focus()
-  })
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    })
 
-  app
-    .whenReady()
-    .then(async () => {
-      await startApiServer()
-      await createWindow()
+    await app.whenReady()
+    await startApiServer()
+    await createWindow()
 
-      app.on("activate", () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
-          void createWindow()
-        }
+    app.on("activate", () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        void createWindow()
+      }
+    })
+
+    app.on("window-all-closed", () => {
+      if (process.platform === "darwin") {
+      } else {
+        app.quit()
+      }
+    })
+
+    app.on("before-quit", () => {
+      if (apiServer === undefined) return
+
+      void closeServer(apiServer).catch((error) => {
+        console.error("[windbell-desktop] failed to close api server:", error)
       })
     })
-    .catch((error) => {
-      console.error("[windbell-desktop] failed to start:", error)
-      app.quit()
-    })
-
-  app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") app.quit()
-  })
-
-  app.on("before-quit", () => {
-    apiServer?.close()
-  })
+  }
 }
+
+await main()

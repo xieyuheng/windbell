@@ -1,8 +1,11 @@
 import * as S from "@xieyuheng/semiosis.js"
-import { startWindbellServer } from "@xieyuheng/windbell-api.js"
+import {
+  closeServer,
+  startWindbellServer,
+  type WindbellServer,
+} from "@xieyuheng/windbell-api.js"
 import Path from "node:path"
 import { createServer, type ViteDevServer } from "vite"
-import { closeServer } from "./closeServer.ts"
 import type { DevOptions } from "./resolveDevOptions.ts"
 
 export async function runDev(options: DevOptions): Promise<void> {
@@ -10,7 +13,7 @@ export async function runDev(options: DevOptions): Promise<void> {
     root: options.databaseRoot,
   })
 
-  const apiServer = startWindbellServer({
+  const { server: apiServer } = await startWindbellServer({
     database,
     hostname: options.hostname,
     port: options.apiPort,
@@ -47,7 +50,7 @@ export async function runDev(options: DevOptions): Promise<void> {
 }
 
 function installShutdownHandlers(options: {
-  apiServer: ReturnType<typeof startWindbellServer>
+  apiServer: WindbellServer["server"]
   viteServer: ViteDevServer
 }) {
   let stopped = false
