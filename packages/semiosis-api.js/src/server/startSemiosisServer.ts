@@ -1,8 +1,8 @@
-import { serve, type ServerType } from "@hono/node-server"
+import type { ServerType } from "@hono/node-server"
 import { Hono } from "hono"
-import type { AddressInfo } from "node:net"
 import { makeSemiosisRouter } from "../router/index.ts"
 import type { SemiosisServerOptions } from "./SemiosisServerOptions.ts"
+import { serveAndWait } from "./serveAndWait.ts"
 
 function makeApp(options: SemiosisServerOptions): Hono {
   const database = options.database
@@ -21,28 +21,16 @@ export async function startSemiosisServer(
   const port = options.port
   const basePath = normalizeBasePath(options.basePath)
 
-  const { server, url } = await new Promise<{
-    server: ServerType
-    url: string
-  }>((resolve, reject) => {
-    const server = serve(
-      {
-        fetch: app.fetch,
-        hostname,
-        port,
-      },
-      (info: AddressInfo) => {
-        resolve({
-          server,
-          url: `http://${hostname}:${info.port}${basePath}`,
-        })
-      },
-    )
-
-    server.once("error", reject)
+  const { server, info } = await serveAndWait({
+    fetch: app.fetch,
+    hostname,
+    port,
   })
 
-  return { server, url }
+  return {
+    server,
+    url: `http://${hostname}:${info.port}${basePath}`,
+  }
 }
 
 function normalizeBasePath(basePath: string): string {
