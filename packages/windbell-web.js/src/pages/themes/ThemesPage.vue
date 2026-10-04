@@ -111,12 +111,12 @@ useHead(() => ({
       <li v-for="theme in builtInThemes" :key="theme.id">
         <ThemeCard :theme="theme">
           <template #toolbar>
-            <MediumButton
+            <SmallButton
               :disabled="activeTheme.id === theme.id"
               @click="handleActivate(theme)"
             >
               {{ activeTheme.id === theme.id ? t("active") : t("use") }}
-            </MediumButton>
+            </SmallButton>
 
             <SmallButton @click="handleDuplicate(theme)">
               {{ t("duplicate") }}
@@ -145,18 +145,18 @@ useHead(() => ({
       <li v-for="theme in state.customThemes" :key="theme.id">
         <ThemeCard :theme="theme">
           <template #toolbar>
-            <MediumButton
+            <SmallButton
               :disabled="activeTheme.id === theme.id"
               @click="handleActivate(theme)"
             >
               {{ activeTheme.id === theme.id ? t("active") : t("use") }}
-            </MediumButton>
+            </SmallButton>
 
-            <MediumButton
+            <SmallButton
               :to="{ name: 'theme-editor', params: { themeId: theme.id } }"
             >
               {{ t("edit") }}
-            </MediumButton>
+            </SmallButton>
 
             <SmallButton tone="danger" @click="handleDelete(theme)">
               {{ t("delete") }}

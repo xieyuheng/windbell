@@ -21,7 +21,7 @@ const props = withDefaults(
   <RouterLink
     v-if="props.to !== undefined"
     v-bind="$attrs"
-    class="inline-flex items-center gap-2 rounded border-3 px-2 py-1 transition-colors"
+    class="inline-flex items-center gap-2 rounded-md border-3 px-2 py-1 transition-colors"
     :class="
       props.tone === 'danger'
         ? 'border-danger/60 text-danger hover:bg-danger/10'
@@ -35,7 +35,7 @@ const props = withDefaults(
   <button
     v-else
     v-bind="$attrs"
-    class="inline-flex items-center gap-2 rounded border-3 px-2 py-1 transition-colors disabled:pointer-events-none disabled:opacity-50"
+    class="inline-flex items-center gap-2 rounded-md border-3 px-2 py-1 transition-colors disabled:pointer-events-none disabled:opacity-50"
     :class="
       props.tone === 'danger'
         ? 'border-danger/60 text-danger hover:bg-danger/10'

@@ -14,7 +14,7 @@ const props = withDefaults(
 
 <template>
   <button
-    class="inline-flex items-center gap-1 rounded-md border-2 border-line text-ink hover:bg-line px-1 py-1 text-sm transition-colors disabled:pointer-events-none disabled:opacity-50"
+    class="inline-flex items-center gap-1 rounded-md border-3 border-line text-ink hover:bg-line px-2 py-1 text-sm transition-colors disabled:pointer-events-none disabled:opacity-50"
     :class="props.tone === 'danger' ? 'hover:text-danger' : 'hover:text-ink'"
     :type="props.type"
     :disabled="props.disabled"
