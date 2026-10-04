@@ -82,7 +82,7 @@ defineExpose({ scrollToBottom })
         {{ t("loading") }}
       </p>
 
-      <p v-else-if="props.state.error !== undefined" class="text-danger">
+      <p v-else-if="props.state.error !== undefined" class="text-sign-error">
         {{ props.state.error }}
       </p>
 

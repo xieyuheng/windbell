@@ -96,7 +96,7 @@ useHead(() => ({
 
     <p
       v-if="error"
-      class="rounded border border-danger/60 px-3 py-2 text-sm text-danger"
+      class="rounded border border-sign-error/60 px-3 py-2 text-sm text-sign-error"
     >
       {{ error }}
     </p>
@@ -158,7 +158,7 @@ useHead(() => ({
               {{ t("edit") }}
             </SmallButton>
 
-            <SmallButton tone="danger" @click="handleDelete(theme)">
+            <SmallButton @click="handleDelete(theme)">
               {{ t("delete") }}
             </SmallButton>
           </template>

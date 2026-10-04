@@ -10,6 +10,6 @@ defineProps<{
 
 <template>
   <pre
-    class="thin-scrollbar overflow-x-auto whitespace-pre-wrap font-mono text-danger"
+    class="thin-scrollbar overflow-x-auto whitespace-pre-wrap font-mono text-sign-error"
     >{{ sign.message }}</pre>
 </template>

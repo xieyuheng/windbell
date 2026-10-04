@@ -103,7 +103,7 @@ watch(
   <section
     class="relative flex h-full min-h-0 flex-col overflow-hidden bg-paper"
   >
-    <p v-if="error !== undefined" class="px-4 py-3 text-danger">
+    <p v-if="error !== undefined" class="px-4 py-3 text-sign-error">
       {{ error }}
     </p>
 

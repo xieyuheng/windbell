@@ -50,7 +50,7 @@ const colorGroups: Array<{
   },
   {
     labelKey: "semanticColors",
-    tokens: ["accent", "warning", "info", "danger", "interactive"],
+    tokens: ["accent", "warning", "info", "interactive"],
   },
   {
     labelKey: "signColors",
@@ -203,12 +203,7 @@ useHead(() => ({
         <MediumButton :disabled="saving" @click="handleSave">
           {{ t("save") }}
         </MediumButton>
-        <MediumButton
-          v-if="!isNew"
-          :disabled="saving"
-          tone="danger"
-          @click="handleDelete"
-        >
+        <MediumButton v-if="!isNew" :disabled="saving" @click="handleDelete">
           {{ t("delete") }}
         </MediumButton>
       </div>
@@ -216,7 +211,7 @@ useHead(() => ({
 
     <p
       v-if="error"
-      class="rounded border border-danger/60 px-3 py-2 text-sm text-danger"
+      class="rounded border border-sign-error/60 px-3 py-2 text-sm text-sign-error"
     >
       {{ error }}
     </p>

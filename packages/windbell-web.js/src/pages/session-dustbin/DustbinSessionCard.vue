@@ -61,12 +61,7 @@ function requestRemove(): void {
           <span>{{ t("restore") }}</span>
         </SmallButton>
 
-        <SmallButton
-          type="button"
-          tone="danger"
-          :disabled="busy"
-          @click="requestRemove"
-        >
+        <SmallButton type="button" :disabled="busy" @click="requestRemove">
           <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("remove") }}</span>
         </SmallButton>

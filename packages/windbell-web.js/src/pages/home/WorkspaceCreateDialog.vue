@@ -302,7 +302,7 @@ function parentDirectory(path: string): string {
 
             <p
               v-else-if="loadError !== undefined"
-              class="px-3 py-2 text-danger"
+              class="px-3 py-2 text-sign-error"
             >
               {{ loadError }}
             </p>
@@ -343,7 +343,7 @@ function parentDirectory(path: string): string {
 
             <p
               v-else-if="previewError !== undefined"
-              class="px-3 py-2 text-danger"
+              class="px-3 py-2 text-sign-error"
             >
               {{ previewError }}
             </p>
@@ -387,7 +387,7 @@ function parentDirectory(path: string): string {
           </label>
         </div>
 
-        <p v-if="props.error !== undefined" class="text-sm text-danger">
+        <p v-if="props.error !== undefined" class="text-sm text-sign-error">
           {{ props.error }}
         </p>
 

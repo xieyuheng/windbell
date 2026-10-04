@@ -140,7 +140,7 @@ useHead(() => ({
       {{ t("loading") }}
     </p>
 
-    <p v-else-if="state.error !== undefined" class="text-danger">
+    <p v-else-if="state.error !== undefined" class="text-sign-error">
       {{ state.error }}
     </p>
 

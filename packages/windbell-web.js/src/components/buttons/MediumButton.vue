@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue"
 import { RouterLink, type RouteLocationRaw } from "vue-router"
 
 defineOptions({ inheritAttrs: false })
@@ -8,26 +9,29 @@ const props = withDefaults(
     to?: RouteLocationRaw
     type?: "button" | "submit" | "reset"
     disabled?: boolean
-    tone?: "default" | "danger"
   }>(),
   {
     type: "button",
-    tone: "default",
   },
 )
+
+const baseClass =
+  "inline-flex items-center gap-2 rounded-md border-3 border-line px-2 py-1 text-ink transition-colors hover:bg-line"
+const classes = computed(() => [
+  baseClass,
+  props.to !== undefined && props.disabled === true
+    ? "pointer-events-none opacity-50"
+    : "disabled:pointer-events-none disabled:opacity-50",
+])
 </script>
 
 <template>
   <RouterLink
     v-if="props.to !== undefined"
     v-bind="$attrs"
-    class="inline-flex items-center gap-2 rounded-md border-3 px-2 py-1 transition-colors"
-    :class="
-      props.tone === 'danger'
-        ? 'border-danger/60 text-danger hover:bg-danger/10'
-        : 'border-line text-ink hover:bg-line'
-    "
+    :class="classes"
     :to="props.to"
+    :aria-disabled="props.disabled === true ? 'true' : undefined"
   >
     <slot />
   </RouterLink>
@@ -35,12 +39,7 @@ const props = withDefaults(
   <button
     v-else
     v-bind="$attrs"
-    class="inline-flex items-center gap-2 rounded-md border-3 px-2 py-1 transition-colors disabled:pointer-events-none disabled:opacity-50"
-    :class="
-      props.tone === 'danger'
-        ? 'border-danger/60 text-danger hover:bg-danger/10'
-        : 'border-line text-ink hover:bg-line'
-    "
+    :class="classes"
     :type="props.type"
     :disabled="props.disabled"
   >

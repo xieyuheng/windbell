@@ -181,7 +181,7 @@ onBeforeUnmount(() => {
       v-else-if="state.error !== undefined"
       class="flex min-w-0 flex-1 items-start px-4 py-3"
     >
-      <p class="text-danger">
+      <p class="text-sign-error">
         {{ state.error }}
       </p>
     </section>

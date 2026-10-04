@@ -267,11 +267,7 @@ useHead(() => ({
                 {{ t("clearSessionData") }}
               </MediumButton>
 
-              <MediumButton
-                type="button"
-                tone="danger"
-                @click="clearAllStorage"
-              >
+              <MediumButton type="button" @click="clearAllStorage">
                 {{ t("clearAllWindbellData") }}
               </MediumButton>
             </div>

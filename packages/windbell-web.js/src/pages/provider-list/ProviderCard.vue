@@ -97,7 +97,7 @@ function requestDeleteApiKey(): void {
             <span>{{ t("updateApiKey") }}</span>
           </SmallButton>
 
-          <SmallButton type="button" tone="danger" @click="requestDeleteApiKey">
+          <SmallButton type="button" @click="requestDeleteApiKey">
             <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
             <span>{{ t("deleteApiKey") }}</span>
           </SmallButton>

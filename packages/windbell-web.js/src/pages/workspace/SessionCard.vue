@@ -95,7 +95,7 @@ function requestTrash(): void {
           <span>{{ t("editTitle") }}</span>
         </SmallButton>
 
-        <SmallButton type="button" tone="danger" @click="requestTrash">
+        <SmallButton type="button" @click="requestTrash">
           <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("trash") }}</span>
         </SmallButton>
