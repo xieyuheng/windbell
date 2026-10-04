@@ -7,8 +7,7 @@ import { formatSign } from "../../format/index.ts"
 import { readPromptBatch } from "../../prompts/index.ts"
 import { getOrMakeSession } from "../../session/index.ts"
 import { PersonaSign, UserSign, type Sign } from "../../sign/index.ts"
-import { makeToolRouter } from "../../tool/index.ts"
-import { makeBashToolHandler, makeBashToolSign } from "../../tools/index.ts"
+import { makeDefaultToolRouter } from "../../tools/index.ts"
 import {
   parsePositiveInt,
   readOptionalOption,
@@ -48,17 +47,10 @@ export function makeBatchHandler(options: BatchCommandOptions) {
     )
 
     const personaSign = PersonaSign(promptBatch.system)
-    const toolRouter = makeToolRouter()
-    toolRouter.defineTool(
-      makeBashToolSign({
-        description: "Run commands in a bash shell.",
-      }),
-      makeBashToolHandler({
-        cwd: workspace.root,
-        timeoutMs: 300_000,
-        maxOutputChars,
-      }),
-    )
+    const toolRouter = makeDefaultToolRouter({
+      cwd: workspace.root,
+      maxOutputChars,
+    })
 
     const initialSigns: Array<Sign> = [...toolRouter.toolSigns, personaSign]
 

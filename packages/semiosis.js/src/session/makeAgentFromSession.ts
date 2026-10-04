@@ -2,6 +2,7 @@ import { makeAgent, type Agent } from "../agent/index.ts"
 import type { Database } from "../database/index.ts"
 import type { Model } from "../model/index.ts"
 import type { ToolRouter } from "../tool/index.ts"
+import { assertSessionToolPlatform } from "../tools/index.ts"
 import type { Workspace } from "../workspace/Workspace.ts"
 import type { Session, SessionId } from "./Session.ts"
 import { makeSessionContext } from "./makeSessionContext.ts"
@@ -32,6 +33,8 @@ export async function makeAgentFromSession(
       `[makeAgentFromSession] workspace not found: ${session.workspaceId}`,
     )
   }
+
+  assertSessionToolPlatform(session.context)
 
   const toolRouter = await options.makeToolRouter({ session, workspace })
 
