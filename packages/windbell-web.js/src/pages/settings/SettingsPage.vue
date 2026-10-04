@@ -8,7 +8,7 @@ import Card from "../../components/card/Card.vue"
 import BackButton from "../../components/buttons/BackButton.vue"
 import { useFont, type Font } from "../../app/font.ts"
 import { setLocale, supportedLocales } from "../../app/i18n.ts"
-import { useTheme, type ThemeMode } from "../../app/theme.ts"
+import { useColorMode, type ColorModePreference } from "../../app/color-mode.ts"
 import { settingsMessages } from "./Settings.i18n.ts"
 import {
   clearStorageKeys,
@@ -21,7 +21,7 @@ const { locale, t } = useI18n({
   messages: settingsMessages,
   useScope: "local",
 })
-const theme = useTheme()
+const colorMode = useColorMode()
 const font = useFont()
 const storageEntries = ref(readWindbellStorage())
 const storageGroupLabelKeys: Record<StorageGroup, string> = {
@@ -81,10 +81,13 @@ function clearAllStorage(): void {
   refreshStorage()
 }
 
-const themeOptions: Array<{ value: ThemeMode; labelKey: string }> = [
-  { value: "system", labelKey: "themeSystem" },
-  { value: "light", labelKey: "themeLight" },
-  { value: "dark", labelKey: "themeDark" },
+const colorModeOptions: Array<{
+  value: ColorModePreference
+  labelKey: string
+}> = [
+  { value: "system", labelKey: "colorModeSystem" },
+  { value: "light", labelKey: "colorModeLight" },
+  { value: "dark", labelKey: "colorModeDark" },
 ]
 
 const fontOptions: Array<{ value: Font; labelKey: string }> = [
@@ -139,23 +142,23 @@ useHead(() => ({
       <Card as="section">
         <template #tag>
           <h2 class="text-ink">
-            {{ t("theme") }}
+            {{ t("colorMode") }}
           </h2>
         </template>
 
         <div class="flex flex-col gap-1 p-2">
           <label
-            v-for="item in themeOptions"
+            v-for="item in colorModeOptions"
             :key="item.value"
             class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-ink transition-colors hover:bg-paper-deep"
           >
             <input
               class="accent-ink"
               type="radio"
-              name="theme"
+              name="color-mode"
               :value="item.value"
-              :checked="theme.mode === item.value"
-              @change="theme.setMode(item.value)"
+              :checked="colorMode.preference === item.value"
+              @change="colorMode.setPreference(item.value)"
             />
             <span>{{ t(item.labelKey) }}</span>
           </label>

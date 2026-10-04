@@ -42,7 +42,7 @@ export function clearWindbellStorage(): void {
 
 function classifyStorageKey(key: string): StorageGroup {
   if (
-    key === "windbell.theme" ||
+    key === "windbell.color-mode" ||
     key === "windbell.font" ||
     key === "windbell.locale"
   ) {

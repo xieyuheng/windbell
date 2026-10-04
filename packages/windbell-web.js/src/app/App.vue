@@ -2,10 +2,10 @@
 import { useHead } from "@unhead/vue"
 import { useI18n } from "vue-i18n"
 import { RouterView } from "vue-router"
-import { useTheme } from "./theme.ts"
+import { useColorMode } from "./color-mode.ts"
 
 const { locale } = useI18n()
-const theme = useTheme()
+const colorMode = useColorMode()
 
 useHead(() => ({
   htmlAttrs: {
@@ -14,7 +14,7 @@ useHead(() => ({
   meta: [
     {
       name: "theme-color",
-      content: theme.resolved === "dark" ? "#181818" : "#fafaf9",
+      content: colorMode.resolved === "dark" ? "#181818" : "#fafaf9",
     },
   ],
 }))
