@@ -152,6 +152,10 @@ useHead(() => ({
               {{ activeTheme.id === theme.id ? t("active") : t("use") }}
             </SmallButton>
 
+            <SmallButton @click="handleDuplicate(theme)">
+              {{ t("duplicate") }}
+            </SmallButton>
+
             <SmallButton
               :to="{ name: 'theme-editor', params: { themeId: theme.id } }"
             >
