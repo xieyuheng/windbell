@@ -121,6 +121,91 @@ export function isBuiltInTheme(themeId: string): boolean {
   return builtInThemes.some((theme) => theme.id === themeId)
 }
 
+const THEME_ID_STORAGE_KEY = "windbell.theme"
+const THEME_CACHE_STORAGE_KEY = "windbell.theme-cache"
+
+function isThemeModeColors(value: unknown): value is ThemeModeColors {
+  if (value === null || typeof value !== "object" || value instanceof Array) {
+    return false
+  }
+
+  const record = value as Record<string, unknown>
+  for (const token of themeColorTokens) {
+    if (typeof record[token] !== "string") return false
+  }
+
+  return true
+}
+
+function isCachedTheme(value: unknown): value is Theme {
+  if (value === null || typeof value !== "object" || value instanceof Array) {
+    return false
+  }
+
+  const record = value as Record<string, unknown>
+  const colors = record.colors
+  if (
+    colors === null ||
+    typeof colors !== "object" ||
+    colors instanceof Array
+  ) {
+    return false
+  }
+
+  const colorRecord = colors as Record<string, unknown>
+  return (
+    typeof record.id === "string" &&
+    typeof record.name === "string" &&
+    isThemeModeColors(colorRecord.light) &&
+    isThemeModeColors(colorRecord.dark)
+  )
+}
+
+function clearCachedTheme(): void {
+  localStorage.removeItem(THEME_ID_STORAGE_KEY)
+  localStorage.removeItem(THEME_CACHE_STORAGE_KEY)
+}
+
+function readCachedTheme(): Theme | undefined {
+  const themeId = localStorage.getItem(THEME_ID_STORAGE_KEY)
+  const raw = localStorage.getItem(THEME_CACHE_STORAGE_KEY)
+
+  if (themeId === null || raw === null) {
+    clearCachedTheme()
+    return undefined
+  }
+
+  try {
+    const value: unknown = JSON.parse(raw)
+    if (isCachedTheme(value) && value.id === themeId) return value
+  } catch {
+    // ignore invalid cache
+  }
+
+  clearCachedTheme()
+  return undefined
+}
+
+function writeCachedTheme(theme: Theme): void {
+  try {
+    localStorage.setItem(THEME_ID_STORAGE_KEY, theme.id)
+    localStorage.setItem(THEME_CACHE_STORAGE_KEY, JSON.stringify(theme))
+  } catch {
+    // ignore storage errors
+  }
+}
+
+function applyCachedTheme(theme: Theme): void {
+  if (isBuiltInTheme(theme.id)) {
+    state.customThemes = []
+  } else {
+    state.customThemes = [theme]
+  }
+
+  state.activeThemeId = theme.id
+  applyCurrentTheme()
+}
+
 export function applyTheme(theme: Theme, resolved: ColorMode): void {
   const colors = theme.colors[resolved]
 
@@ -166,6 +251,8 @@ async function applySelectedThemeFromOtherTab(themeId: string): Promise<void> {
   if (theme === undefined) return
 
   state.activeThemeId = theme.id
+  writeCachedTheme(theme)
+  state.error = undefined
   applyCurrentTheme()
 }
 
@@ -187,11 +274,23 @@ themeChannel?.addEventListener("message", (event: MessageEvent<unknown>) => {
 let initializePromise: Promise<void> | undefined
 
 export function ensureThemeReady(): Promise<void> {
-  initializePromise ??= initializeTheme()
+  if (initializePromise !== undefined) return initializePromise
+
+  const cachedTheme = readCachedTheme()
+
+  if (cachedTheme !== undefined) {
+    applyCachedTheme(cachedTheme)
+    state.loading = false
+    initializePromise = Promise.resolve()
+    void refreshThemeFromDatabase()
+    return initializePromise
+  }
+
+  initializePromise = refreshThemeFromDatabase()
   return initializePromise
 }
 
-async function initializeTheme(): Promise<void> {
+async function refreshThemeFromDatabase(): Promise<void> {
   state.loading = true
   state.error = undefined
 
@@ -203,10 +302,15 @@ async function initializeTheme(): Promise<void> {
 
     state.customThemes = customThemes
     const selectedThemeId = settings.themeId ?? defaultThemeId
-    state.activeThemeId = findThemeById(selectedThemeId)?.id ?? defaultThemeId
+    const selectedTheme = findThemeById(selectedThemeId) ?? builtInThemes[0]!
+    state.activeThemeId = selectedTheme.id
+    writeCachedTheme(selectedTheme)
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
-    state.activeThemeId = defaultThemeId
+
+    if (readCachedTheme() === undefined) {
+      state.activeThemeId = defaultThemeId
+    }
   } finally {
     state.loading = false
   }
@@ -229,6 +333,7 @@ export async function activateTheme(themeId: string): Promise<void> {
       ...settings,
       themeId: theme.id,
     })
+    writeCachedTheme(theme)
     notifyThemeSelected(theme.id)
     state.error = undefined
   } catch (error) {
@@ -261,6 +366,10 @@ export async function updateCustomTheme(theme: Theme): Promise<Theme> {
     state.customThemes = [...state.customThemes, updated]
   } else {
     state.customThemes.splice(index, 1, updated)
+  }
+
+  if (state.activeThemeId === updated.id) {
+    writeCachedTheme(updated)
   }
 
   return updated
