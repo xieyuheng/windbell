@@ -3,6 +3,7 @@ import { useHead } from "@unhead/vue"
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute, useRouter } from "vue-router"
+import { useColorMode } from "../../app/color-mode.ts"
 import {
   builtInThemes,
   findThemeById,
@@ -26,6 +27,7 @@ const { t } = useI18n({
 })
 const route = useRoute()
 const router = useRouter()
+const colorMode = useColorMode()
 const themes = useTheme()
 
 const themeId = computed(() => String(route.params.themeId ?? ""))
@@ -35,9 +37,8 @@ const isNew = computed(
 const existingTheme = computed(() => findThemeById(themeId.value))
 
 const draft = reactive<Theme>(makeDraft())
-const selectedMode = ref<"light" | "dark">("light")
+const selectedMode = ref<"light" | "dark">(colorMode.resolved)
 const saving = ref(false)
-const previewing = ref(false)
 const error = ref<string | undefined>(undefined)
 
 const colorGroups: Array<{
@@ -104,18 +105,7 @@ function updateColor(
 }
 
 function refreshPreview(): void {
-  if (!previewing.value) return
   setPreviewTheme(cloneDraft())
-}
-
-function togglePreview(): void {
-  previewing.value = !previewing.value
-
-  if (previewing.value) {
-    setPreviewTheme(cloneDraft())
-  } else {
-    setPreviewTheme(undefined)
-  }
 }
 
 async function handleSave(): Promise<void> {
@@ -131,9 +121,8 @@ async function handleSave(): Promise<void> {
           })
         : await themes.updateCustomTheme(cloneDraft())
 
-    previewing.value = false
-    setPreviewTheme(undefined)
     Object.assign(draft, saved)
+    setPreviewTheme(cloneDraft())
 
     if (isNew.value) {
       await router.replace({
@@ -156,7 +145,6 @@ async function handleDelete(): Promise<void> {
   error.value = undefined
 
   try {
-    previewing.value = false
     setPreviewTheme(undefined)
     await themes.deleteCustomTheme(draft.id)
     await router.push({ name: "themes" })
@@ -168,15 +156,19 @@ async function handleDelete(): Promise<void> {
 }
 
 onMounted(() => {
-  if (isNew.value) return
-  if (existingTheme.value === undefined) {
-    void router.replace({ name: "themes" })
-    return
+  if (!isNew.value) {
+    if (existingTheme.value === undefined) {
+      void router.replace({ name: "themes" })
+      return
+    }
+
+    if (isBuiltInTheme(existingTheme.value.id)) {
+      void router.replace({ name: "themes" })
+      return
+    }
   }
 
-  if (isBuiltInTheme(existingTheme.value.id)) {
-    void router.replace({ name: "themes" })
-  }
+  setPreviewTheme(cloneDraft())
 })
 
 onBeforeUnmount(() => {
@@ -197,9 +189,6 @@ useHead(() => ({
 
       <div class="flex flex-wrap items-center gap-2">
         <BackButton :to="{ name: 'themes' }" />
-        <MediumButton :disabled="saving" @click="togglePreview">
-          {{ previewing ? t("stopPreview") : t("preview") }}
-        </MediumButton>
         <MediumButton :disabled="saving" @click="handleSave">
           {{ t("save") }}
         </MediumButton>
