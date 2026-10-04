@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { Check, Power } from "@lucide/vue"
+import { Check } from "@lucide/vue"
 import { useI18n } from "vue-i18n"
 import SmallButton from "../../components/buttons/SmallButton.vue"
+import ToggleSwitch from "../../components/toggle/ToggleSwitch.vue"
 import { providerMessages } from "./Provider.i18n.ts"
 
 const props = defineProps<{
@@ -21,11 +22,13 @@ const { t } = useI18n({
   useScope: "local",
 })
 
-function requestToggleEnabled(): void {
-  if (props.enabled) {
-    emit("disable")
-  } else {
+function requestToggleEnabled(nextEnabled: boolean): void {
+  if (props.busy || nextEnabled === props.enabled) return
+
+  if (nextEnabled) {
     emit("enable")
+  } else {
+    emit("disable")
   }
 }
 
@@ -37,22 +40,24 @@ function requestSetDefault(): void {
 </script>
 
 <template>
-  <div class="flex flex-wrap items-center gap-2">
-    <SmallButton type="button" :disabled="busy" @click="requestToggleEnabled">
-      <Power :size="16" :stroke-width="1.5" aria-hidden="true" />
-      <span>
-        {{ enabled ? t("disableModel") : t("enableModel") }}
-      </span>
-    </SmallButton>
+  <div class="flex flex-wrap items-center gap-3 min-h-9">
+    <ToggleSwitch
+      :model-value="props.enabled"
+      :disabled="props.busy"
+      @update:model-value="requestToggleEnabled"
+    >
+      <span class="text-sm">{{ t("enableModel") }}</span>
+    </ToggleSwitch>
 
     <SmallButton
+      v-if="props.enabled"
       type="button"
-      :disabled="busy || !enabled || isDefault"
+      :disabled="props.busy || props.isDefault"
       @click="requestSetDefault"
     >
       <Check :size="16" :stroke-width="1.5" aria-hidden="true" />
       <span>
-        {{ isDefault ? t("defaultModel") : t("setAsDefaultModel") }}
+        {{ props.isDefault ? t("defaultModel") : t("setAsDefaultModel") }}
       </span>
     </SmallButton>
   </div>

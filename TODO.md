@@ -1,10 +1,5 @@
 # windbell-web.js
 
-改善 provider page 和 model card
-
-- 「启用模型/禁用模型」设计为 toggle 的形式。
-- 只有「启用模型」状态下，才显示默认模型的选项。
-
 改善 provider list page 和 provider card 和 model line
 
 # semiosis.js
