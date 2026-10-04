@@ -8,6 +8,10 @@ const props = defineProps<{
   theme: Theme
 }>()
 
+const emit = defineEmits<{
+  select: []
+}>()
+
 const { t } = useI18n({
   messages: themeListMessages,
   useScope: "local",
@@ -17,13 +21,13 @@ const themeModes = ["light", "dark"] as const
 </script>
 
 <template>
-  <Card as="article">
+  <Card as="article" class="cursor-pointer" @click="emit('select')">
     <template #tag>
       <h2 class="truncate">{{ props.theme.name }}</h2>
     </template>
 
     <div class="flex flex-col gap-3 px-3 py-2">
-      <div class="flex flex-wrap items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2" @click.stop>
         <slot name="toolbar" />
       </div>
 

@@ -71,6 +71,13 @@ async function handleDelete(theme: Theme): Promise<void> {
   }
 }
 
+function openTheme(theme: Theme): void {
+  void router.push({
+    name: "theme",
+    params: { themeId: theme.id },
+  })
+}
+
 function openNewTheme(): void {
   void router.push({
     name: "theme-new",
@@ -109,7 +116,7 @@ useHead(() => ({
 
     <ul class="flex flex-col gap-4">
       <li v-for="theme in builtInThemes" :key="theme.id">
-        <ThemeCard :theme="theme">
+        <ThemeCard :theme="theme" @select="openTheme(theme)">
           <template #toolbar>
             <SmallButton
               :disabled="activeTheme.id === theme.id"
@@ -143,7 +150,7 @@ useHead(() => ({
 
     <ul v-else class="flex flex-col gap-4">
       <li v-for="theme in state.customThemes" :key="theme.id">
-        <ThemeCard :theme="theme">
+        <ThemeCard :theme="theme" @select="openTheme(theme)">
           <template #toolbar>
             <SmallButton
               :disabled="activeTheme.id === theme.id"
@@ -154,10 +161,6 @@ useHead(() => ({
 
             <SmallButton @click="handleDuplicate(theme)">
               {{ t("duplicate") }}
-            </SmallButton>
-
-            <SmallButton :to="{ name: 'theme', params: { themeId: theme.id } }">
-              {{ t("edit") }}
             </SmallButton>
 
             <SmallButton @click="handleDelete(theme)">

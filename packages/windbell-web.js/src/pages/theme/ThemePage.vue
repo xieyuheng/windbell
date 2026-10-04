@@ -36,6 +36,7 @@ const isNew = computed(
   () => route.name === "theme-new" || themeId.value === "new",
 )
 const existingTheme = computed(() => findThemeById(themeId.value))
+const isBuiltIn = computed(() => isBuiltInTheme(themeId.value))
 
 const draft = reactive<Theme>(makeDraft())
 const selectedMode = ref<"light" | "dark">(colorMode.resolved)
@@ -112,7 +113,7 @@ function refreshPreview(): void {
 }
 
 async function handleSave(): Promise<void> {
-  if (!ready.value) return
+  if (!ready.value || isBuiltIn.value) return
 
   saving.value = true
   error.value = undefined
@@ -143,7 +144,14 @@ async function handleSave(): Promise<void> {
 }
 
 async function handleDelete(): Promise<void> {
-  if (!ready.value || isNew.value || existingTheme.value === undefined) return
+  if (
+    !ready.value ||
+    isBuiltIn.value ||
+    isNew.value ||
+    existingTheme.value === undefined
+  ) {
+    return
+  }
   if (!window.confirm(t("confirmDelete", { name: draft.name }))) return
 
   saving.value = true
@@ -172,11 +180,6 @@ onMounted(async () => {
       return
     }
 
-    if (isBuiltInTheme(existingTheme.value.id)) {
-      void router.replace({ name: "theme-list" })
-      return
-    }
-
     // 数据加载完成后，用真实主题覆盖初始化时回退到内置主题的草稿
     Object.assign(draft, makeDraft())
   }
@@ -199,16 +202,20 @@ useHead(() => ({
   <PageLayout>
     <header class="flex flex-col gap-3">
       <h1 class="text-xl text-ink">
-        {{ isNew ? t("newTheme") : t("edit") }}
+        {{ isNew ? t("newTheme") : t("title") }}
       </h1>
 
       <div class="flex flex-wrap items-center gap-2">
         <BackButton :to="{ name: 'theme-list' }" />
-        <MediumButton :disabled="saving || !ready" @click="handleSave">
+        <MediumButton
+          v-if="!isBuiltIn"
+          :disabled="saving || !ready"
+          @click="handleSave"
+        >
           {{ t("save") }}
         </MediumButton>
         <MediumButton
-          v-if="!isNew"
+          v-if="!isNew && !isBuiltIn"
           :disabled="saving || !ready"
           @click="handleDelete"
         >

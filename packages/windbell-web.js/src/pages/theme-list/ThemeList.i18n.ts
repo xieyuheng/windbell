@@ -1,12 +1,11 @@
 export const themeListMessages = {
   "zh-CN": {
-    title: "主题",
+    title: "主题列表",
     builtInThemes: "内置主题列表",
     customThemes: "自定义主题列表",
     newTheme: "新建主题",
     use: "使用",
     active: "当前主题",
-    edit: "编辑",
     duplicate: "复制",
     delete: "删除",
     light: "浅色",
@@ -17,13 +16,12 @@ export const themeListMessages = {
     sourceCustom: "自定义",
   },
   "en-US": {
-    title: "Themes",
+    title: "Theme List",
     builtInThemes: "Built-in Themes",
     customThemes: "Custom Themes",
     newTheme: "New Theme",
     use: "Use",
     active: "Active",
-    edit: "Edit",
     duplicate: "Duplicate",
     delete: "Delete",
     light: "Light",
