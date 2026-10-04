@@ -1,27 +1,39 @@
 import type * as S from "@xieyuheng/semiosis.js"
-import { requestJson, requestJsonOptional } from "@xieyuheng/http.js"
-import type { SemiosisClientConfig } from "./SemiosisClientConfig.ts"
-
-export type ProviderApiKeyStatus = {
-  configured: boolean
-}
+import { makeJsonEndpoint, withNotFoundAsUndefined } from "@xieyuheng/http.js"
+import type { SemiosisClientConfig } from "./SemiosisClient.ts"
+import {
+  ProviderApiKeyStatusSchema,
+  ProviderConfigListSchema,
+  ProviderConfigSchema,
+  ProviderModelEntryListSchema,
+  VoidSchema,
+  type ProviderApiKeyStatus,
+} from "./schemas.ts"
 
 export type ListModelsOptions = {
+  providerName: string
   all?: boolean
+}
+
+export type ModelActionOptions = {
+  providerName: string
+  modelName: string
+}
+
+export type PutApiKeyOptions = {
+  providerName: string
+  key: string
 }
 
 export type ProvidersClient = {
   list(): Promise<Array<S.ProviderConfig>>
   get(providerName: string): Promise<S.ProviderConfig | undefined>
   getApiKeyStatus(providerName: string): Promise<ProviderApiKeyStatus>
-  listModels(
-    providerName: string,
-    options?: ListModelsOptions,
-  ): Promise<Array<S.ProviderModelEntry>>
-  enableModel(providerName: string, modelName: string): Promise<void>
-  disableModel(providerName: string, modelName: string): Promise<void>
-  setDefaultModel(providerName: string, modelName: string): Promise<void>
-  putApiKey(providerName: string, key: string): Promise<void>
+  listModels(options: ListModelsOptions): Promise<Array<S.ProviderModelEntry>>
+  enableModel(options: ModelActionOptions): Promise<void>
+  disableModel(options: ModelActionOptions): Promise<void>
+  setDefaultModel(options: ModelActionOptions): Promise<void>
+  putApiKey(options: PutApiKeyOptions): Promise<void>
   deleteApiKey(providerName: string): Promise<void>
 }
 
@@ -29,83 +41,85 @@ export function makeProvidersClient(
   config: SemiosisClientConfig,
 ): ProvidersClient {
   return {
-    list: () =>
-      requestJson<Array<S.ProviderConfig>>({
-        baseUrl: config.baseUrl,
+    list: makeJsonEndpoint(config, {
+      method: "GET",
+      path: "/providers",
+      output: ProviderConfigListSchema,
+    }),
+
+    get: withNotFoundAsUndefined(
+      makeJsonEndpoint(config, {
         method: "GET",
-        path: "/providers",
+        path: (providerName: string) =>
+          `/providers/${encodeURIComponent(providerName)}`,
+        output: ProviderConfigSchema,
       }),
+    ),
 
-    get: (providerName) =>
-      requestJsonOptional<S.ProviderConfig>({
-        baseUrl: config.baseUrl,
-        method: "GET",
-        path: `/providers/${encodeURIComponent(providerName)}`,
+    getApiKeyStatus: makeJsonEndpoint(config, {
+      method: "GET",
+      path: (providerName: string) =>
+        `/providers/${encodeURIComponent(providerName)}/api-key`,
+      output: ProviderApiKeyStatusSchema,
+    }),
+
+    listModels: makeJsonEndpoint(config, {
+      method: "GET",
+      path: (options: ListModelsOptions) =>
+        `/providers/${encodeURIComponent(options.providerName)}/models`,
+      query: (options: ListModelsOptions) => {
+        const query = new URLSearchParams()
+        if (options.all === true) {
+          query.set("all", "true")
+        }
+        return query
+      },
+      output: ProviderModelEntryListSchema,
+    }),
+
+    enableModel: makeJsonEndpoint(config, {
+      method: "POST",
+      path: (options: ModelActionOptions) =>
+        `/providers/${encodeURIComponent(options.providerName)}/models/enable`,
+      body: (options: ModelActionOptions) => ({
+        modelName: options.modelName,
       }),
+      output: VoidSchema,
+    }),
 
-    getApiKeyStatus: (providerName) =>
-      requestJson<ProviderApiKeyStatus>({
-        baseUrl: config.baseUrl,
-        method: "GET",
-        path: `/providers/${encodeURIComponent(providerName)}/api-key`,
+    disableModel: makeJsonEndpoint(config, {
+      method: "POST",
+      path: (options: ModelActionOptions) =>
+        `/providers/${encodeURIComponent(options.providerName)}/models/disable`,
+      body: (options: ModelActionOptions) => ({
+        modelName: options.modelName,
       }),
+      output: VoidSchema,
+    }),
 
-    listModels: (providerName, options) => {
-      const query = new URLSearchParams()
-      if (options?.all === true) {
-        query.set("all", "true")
-      }
+    setDefaultModel: makeJsonEndpoint(config, {
+      method: "PUT",
+      path: (options: ModelActionOptions) =>
+        `/providers/${encodeURIComponent(options.providerName)}/default-model`,
+      body: (options: ModelActionOptions) => ({
+        modelName: options.modelName,
+      }),
+      output: VoidSchema,
+    }),
 
-      return requestJson<Array<S.ProviderModelEntry>>({
-        baseUrl: config.baseUrl,
-        method: "GET",
-        path: `/providers/${encodeURIComponent(providerName)}/models`,
-        query,
-      })
-    },
+    putApiKey: makeJsonEndpoint(config, {
+      method: "PUT",
+      path: (options: PutApiKeyOptions) =>
+        `/providers/${encodeURIComponent(options.providerName)}/api-key`,
+      body: (options: PutApiKeyOptions) => ({ key: options.key }),
+      output: VoidSchema,
+    }),
 
-    enableModel: async (providerName, modelName) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "POST",
-        path: `/providers/${encodeURIComponent(providerName)}/models/enable`,
-        body: { modelName },
-      })
-    },
-
-    disableModel: async (providerName, modelName) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "POST",
-        path: `/providers/${encodeURIComponent(providerName)}/models/disable`,
-        body: { modelName },
-      })
-    },
-
-    setDefaultModel: async (providerName, modelName) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "PUT",
-        path: `/providers/${encodeURIComponent(providerName)}/default-model`,
-        body: { modelName },
-      })
-    },
-
-    putApiKey: async (providerName, key) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "PUT",
-        path: `/providers/${encodeURIComponent(providerName)}/api-key`,
-        body: { key },
-      })
-    },
-
-    deleteApiKey: async (providerName) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "DELETE",
-        path: `/providers/${encodeURIComponent(providerName)}/api-key`,
-      })
-    },
+    deleteApiKey: makeJsonEndpoint(config, {
+      method: "DELETE",
+      path: (providerName: string) =>
+        `/providers/${encodeURIComponent(providerName)}/api-key`,
+      output: VoidSchema,
+    }),
   }
 }

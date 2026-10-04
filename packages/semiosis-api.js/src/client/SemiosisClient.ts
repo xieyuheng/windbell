@@ -6,13 +6,16 @@ import type { HealthClient } from "./HealthClient.ts"
 import { makeHealthClient } from "./HealthClient.ts"
 import type { ProvidersClient } from "./ProvidersClient.ts"
 import { makeProvidersClient } from "./ProvidersClient.ts"
-import type { SemiosisClientConfig } from "./SemiosisClientConfig.ts"
 import type { SessionsClient } from "./SessionsClient.ts"
 import { makeSessionsClient } from "./SessionsClient.ts"
 import type { SettingsClient } from "./SettingsClient.ts"
 import { makeSettingsClient } from "./SettingsClient.ts"
 import type { WorkspacesClient } from "./WorkspacesClient.ts"
 import { makeWorkspacesClient } from "./WorkspacesClient.ts"
+
+export type SemiosisClientConfig = {
+  baseUrl: string
+}
 
 export type SemiosisClient = {
   health: HealthClient

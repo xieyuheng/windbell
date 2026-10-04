@@ -43,7 +43,7 @@ export async function loadProviderState(state: ProviderState): Promise<void> {
         semiosis.providers.list(),
         semiosis.settings.get(),
         semiosis.providers.getApiKeyStatus(state.providerName),
-        semiosis.providers.listModels(state.providerName),
+        semiosis.providers.listModels({ providerName: state.providerName }),
       ])
 
     const providerConfig = providerConfigs.find(
@@ -61,7 +61,8 @@ export async function loadProviderState(state: ProviderState): Promise<void> {
 
     if (apiKeyStatus.configured) {
       try {
-        state.models = await semiosis.providers.listModels(state.providerName, {
+        state.models = await semiosis.providers.listModels({
+          providerName: state.providerName,
           all: true,
         })
       } catch (error) {
@@ -86,7 +87,10 @@ export async function enableProviderModel(
   state.busyModelNames[modelName] = true
 
   try {
-    await semiosis.providers.enableModel(state.providerName, modelName)
+    await semiosis.providers.enableModel({
+      providerName: state.providerName,
+      modelName,
+    })
     await refreshProviderModels(state)
   } finally {
     delete state.busyModelNames[modelName]
@@ -102,7 +106,10 @@ export async function disableProviderModel(
   state.busyModelNames[modelName] = true
 
   try {
-    await semiosis.providers.disableModel(state.providerName, modelName)
+    await semiosis.providers.disableModel({
+      providerName: state.providerName,
+      modelName,
+    })
     await refreshProviderModels(state)
   } finally {
     delete state.busyModelNames[modelName]
@@ -118,7 +125,10 @@ export async function setDefaultProviderModel(
   state.busyModelNames[modelName] = true
 
   try {
-    await semiosis.providers.setDefaultModel(state.providerName, modelName)
+    await semiosis.providers.setDefaultModel({
+      providerName: state.providerName,
+      modelName,
+    })
 
     for (const entry of state.models) {
       entry.isDefault = entry.name === modelName
@@ -129,7 +139,9 @@ export async function setDefaultProviderModel(
 }
 
 async function refreshProviderModels(state: ProviderState): Promise<void> {
-  const localModels = await semiosis.providers.listModels(state.providerName)
+  const localModels = await semiosis.providers.listModels({
+    providerName: state.providerName,
+  })
 
   if (!state.apiKeyConfigured) {
     state.models = localModels
@@ -137,7 +149,8 @@ async function refreshProviderModels(state: ProviderState): Promise<void> {
   }
 
   try {
-    state.models = await semiosis.providers.listModels(state.providerName, {
+    state.models = await semiosis.providers.listModels({
+      providerName: state.providerName,
       all: true,
     })
   } catch (error) {

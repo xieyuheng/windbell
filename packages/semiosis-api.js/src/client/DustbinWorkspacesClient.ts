@@ -1,6 +1,11 @@
 import type * as S from "@xieyuheng/semiosis.js"
-import { requestJson, requestJsonOptional } from "@xieyuheng/http.js"
-import type { SemiosisClientConfig } from "./SemiosisClientConfig.ts"
+import { makeJsonEndpoint, withNotFoundAsUndefined } from "@xieyuheng/http.js"
+import type { SemiosisClientConfig } from "./SemiosisClient.ts"
+import {
+  DustbinWorkspaceListSchema,
+  DustbinWorkspaceSchema,
+  VoidSchema,
+} from "./schemas.ts"
 
 export type DustbinWorkspacesClient = {
   list(): Promise<Array<S.DustbinWorkspace>>
@@ -14,43 +19,40 @@ export function makeDustbinWorkspacesClient(
   config: SemiosisClientConfig,
 ): DustbinWorkspacesClient {
   return {
-    list: () =>
-      requestJson<Array<S.DustbinWorkspace>>({
-        baseUrl: config.baseUrl,
+    list: makeJsonEndpoint(config, {
+      method: "GET",
+      path: "/dustbin/workspaces",
+      output: DustbinWorkspaceListSchema,
+    }),
+
+    get: withNotFoundAsUndefined(
+      makeJsonEndpoint(config, {
         method: "GET",
-        path: "/dustbin/workspaces",
+        path: (id: S.WorkspaceId) =>
+          `/dustbin/workspaces/${encodeURIComponent(id)}`,
+        output: DustbinWorkspaceSchema,
       }),
+    ),
 
-    get: (id) =>
-      requestJsonOptional<S.DustbinWorkspace>({
-        baseUrl: config.baseUrl,
-        method: "GET",
-        path: `/dustbin/workspaces/${encodeURIComponent(id)}`,
-      }),
+    trash: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/dustbin/workspaces",
+      body: (id: S.WorkspaceId) => ({ workspaceId: id }),
+      output: VoidSchema,
+    }),
 
-    trash: async (id) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "POST",
-        path: "/dustbin/workspaces",
-        body: { workspaceId: id },
-      })
-    },
+    restore: makeJsonEndpoint(config, {
+      method: "POST",
+      path: (id: S.WorkspaceId) =>
+        `/dustbin/workspaces/${encodeURIComponent(id)}/restore`,
+      output: VoidSchema,
+    }),
 
-    restore: async (id) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "POST",
-        path: `/dustbin/workspaces/${encodeURIComponent(id)}/restore`,
-      })
-    },
-
-    remove: async (id) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "DELETE",
-        path: `/dustbin/workspaces/${encodeURIComponent(id)}`,
-      })
-    },
+    remove: makeJsonEndpoint(config, {
+      method: "DELETE",
+      path: (id: S.WorkspaceId) =>
+        `/dustbin/workspaces/${encodeURIComponent(id)}`,
+      output: VoidSchema,
+    }),
   }
 }

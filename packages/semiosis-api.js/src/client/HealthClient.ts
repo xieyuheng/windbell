@@ -1,16 +1,13 @@
-import { requestJson } from "@xieyuheng/http.js"
-import type { SemiosisClientConfig } from "./SemiosisClientConfig.ts"
+import { makeJsonEndpoint } from "@xieyuheng/http.js"
+import type { SemiosisClientConfig } from "./SemiosisClient.ts"
+import { HealthSchema, type Health } from "./schemas.ts"
 
-export type HealthClient = () => Promise<{
-  ok: boolean
-  service: string
-}>
+export type HealthClient = () => Promise<Health>
 
 export function makeHealthClient(config: SemiosisClientConfig): HealthClient {
-  return () =>
-    requestJson<{ ok: boolean; service: string }>({
-      baseUrl: config.baseUrl,
-      method: "GET",
-      path: "/health",
-    })
+  return makeJsonEndpoint(config, {
+    method: "GET",
+    path: "/health",
+    output: HealthSchema,
+  })
 }

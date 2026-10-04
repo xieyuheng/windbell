@@ -1,10 +1,16 @@
 import type * as S from "@xieyuheng/semiosis.js"
 import {
-  requestJson,
-  requestJsonOptional,
+  makeJsonEndpoint,
+  withNotFoundAsUndefined,
   requestNdjson,
 } from "@xieyuheng/http.js"
-import type { SemiosisClientConfig } from "./SemiosisClientConfig.ts"
+import type { SemiosisClientConfig } from "./SemiosisClient.ts"
+import {
+  GenerateTitleOutputSchema,
+  SessionIndexListSchema,
+  SessionSchema,
+  VoidSchema,
+} from "./schemas.ts"
 
 export type MakeSessionOptions = {
   workspaceId: S.WorkspaceId
@@ -16,10 +22,12 @@ export type ListSessionsOptions = {
 }
 
 export type GenerateTitleOptions = {
+  sessionId: S.SessionId
   model: S.ModelRef
 }
 
 export type InterpretOptions = {
+  sessionId: S.SessionId
   model: S.ModelRef
   input: Array<S.Sign>
 }
@@ -34,8 +42,8 @@ export type SessionsClient = {
   make(options: MakeSessionOptions): Promise<S.Session>
   get(id: S.SessionId): Promise<S.Session | undefined>
   put(session: S.Session): Promise<void>
-  generateTitle(id: S.SessionId, options: GenerateTitleOptions): Promise<string>
-  interpret(id: S.SessionId, options: InterpretOptions): AsyncGenerator<S.Sign>
+  generateTitle(options: GenerateTitleOptions): Promise<string>
+  interpret(options: InterpretOptions): AsyncGenerator<S.Sign>
   remove(id: S.SessionId): Promise<void>
 }
 
@@ -43,60 +51,55 @@ export function makeSessionsClient(
   config: SemiosisClientConfig,
 ): SessionsClient {
   return {
-    list: (options) => {
-      const query = new URLSearchParams()
-      if (options.workspaceId !== undefined) {
-        query.set("workspaceId", options.workspaceId)
-      }
+    list: makeJsonEndpoint(config, {
+      method: "GET",
+      path: "/sessions",
+      query: (options: ListSessionsOptions) => {
+        const query = new URLSearchParams()
+        if (options.workspaceId !== undefined) {
+          query.set("workspaceId", options.workspaceId)
+        }
+        return query
+      },
+      output: SessionIndexListSchema,
+    }),
 
-      return requestJson<Array<S.SessionIndex>>({
-        baseUrl: config.baseUrl,
+    make: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/sessions",
+      body: (options: MakeSessionOptions) => options,
+      output: SessionSchema,
+    }),
+
+    get: withNotFoundAsUndefined(
+      makeJsonEndpoint(config, {
         method: "GET",
-        path: "/sessions",
-        query,
-      })
-    },
-
-    make: (options) =>
-      requestJson<S.Session>({
-        baseUrl: config.baseUrl,
-        method: "POST",
-        path: "/sessions",
-        body: options,
+        path: (id: S.SessionId) => `/sessions/${encodeURIComponent(id)}`,
+        output: SessionSchema,
       }),
+    ),
 
-    get: (id) =>
-      requestJsonOptional<S.Session>({
-        baseUrl: config.baseUrl,
-        method: "GET",
-        path: `/sessions/${encodeURIComponent(id)}`,
-      }),
+    put: makeJsonEndpoint(config, {
+      method: "PUT",
+      path: (session: S.Session) =>
+        `/sessions/${encodeURIComponent(session.id)}`,
+      body: (session: S.Session) => session,
+      output: VoidSchema,
+    }),
 
-    put: async (session) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "PUT",
-        path: `/sessions/${encodeURIComponent(session.id)}`,
-        body: session,
-      })
-    },
+    generateTitle: makeJsonEndpoint(config, {
+      method: "POST",
+      path: (options: GenerateTitleOptions) =>
+        `/sessions/${encodeURIComponent(options.sessionId)}/title`,
+      body: (options: GenerateTitleOptions) => options,
+      output: GenerateTitleOutputSchema,
+    }),
 
-    generateTitle: async (id, options) => {
-      const result = await requestJson<{ title: string }>({
-        baseUrl: config.baseUrl,
-        method: "POST",
-        path: `/sessions/${encodeURIComponent(id)}/title`,
-        body: options,
-      })
-
-      return result.title
-    },
-
-    async *interpret(id, options) {
+    async *interpret(options: InterpretOptions) {
       for await (const event of requestNdjson<InterpretEvent>({
         baseUrl: config.baseUrl,
         method: "POST",
-        path: `/sessions/${encodeURIComponent(id)}/interpret`,
+        path: `/sessions/${encodeURIComponent(options.sessionId)}/interpret`,
         body: options,
       })) {
         if (event.type === "sign") {
@@ -109,12 +112,10 @@ export function makeSessionsClient(
       }
     },
 
-    remove: async (id) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "DELETE",
-        path: `/sessions/${encodeURIComponent(id)}`,
-      })
-    },
+    remove: makeJsonEndpoint(config, {
+      method: "DELETE",
+      path: (id: S.SessionId) => `/sessions/${encodeURIComponent(id)}`,
+      output: VoidSchema,
+    }),
   }
 }

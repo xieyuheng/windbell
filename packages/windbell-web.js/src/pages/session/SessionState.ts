@@ -111,7 +111,8 @@ export async function interpretSession(
 
     state.context.push(input)
 
-    for await (const sign of semiosis.sessions.interpret(state.sessionId, {
+    for await (const sign of semiosis.sessions.interpret({
+      sessionId: state.sessionId,
       model: modelRef,
       input: [input],
     })) {
@@ -132,7 +133,8 @@ export async function generateSessionTitle(state: SessionState): Promise<void> {
 
   try {
     const title = (
-      await semiosis.sessions.generateTitle(state.sessionId, {
+      await semiosis.sessions.generateTitle({
+        sessionId: state.sessionId,
         model: state.modelRef,
       })
     ).trim()

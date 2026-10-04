@@ -1,10 +1,10 @@
 import type { z } from "zod"
-import { HttpRequestError } from "./HttpRequestError.ts"
+import { HttpRequestError, isHttpStatus } from "./HttpRequestError.ts"
 import { type HttpMethod, makeUrl, requestJson } from "./request.ts"
 
 export type HttpClientConfig = {
   baseUrl: string
-  key: string
+  key?: string
 }
 
 export type JsonEndpointOptions<Input, Output> = {
@@ -18,7 +18,7 @@ export type JsonEndpointOptions<Input, Output> = {
 
 export type JsonEndpoint<Input, Output> = (input?: Input) => Promise<Output>
 
-export function makeJsonEndpoint<Input, Output>(
+export function makeJsonEndpoint<Input = void, Output = unknown>(
   config: HttpClientConfig,
   options: JsonEndpointOptions<Input, Output>,
 ): JsonEndpoint<Input, Output> {
@@ -69,6 +69,20 @@ export function makeJsonEndpoint<Input, Output>(
           detail: error.detail,
         })
       }
+
+      throw error
+    }
+  }
+}
+
+export function withNotFoundAsUndefined<Input, Output>(
+  endpoint: JsonEndpoint<Input, Output>,
+): (input: Input) => Promise<Output | undefined> {
+  return async (input: Input) => {
+    try {
+      return await endpoint(input)
+    } catch (error) {
+      if (isHttpStatus(error, 404)) return undefined
 
       throw error
     }

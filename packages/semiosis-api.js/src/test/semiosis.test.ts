@@ -41,7 +41,10 @@ test("semiosis client and server", async (t) => {
     configured: false,
   })
 
-  await client.providers.putApiKey("deepseek", "sk-test")
+  await client.providers.putApiKey({
+    providerName: "deepseek",
+    key: "sk-test",
+  })
 
   assert.deepEqual(await client.providers.getApiKeyStatus("deepseek"), {
     configured: true,
@@ -53,17 +56,29 @@ test("semiosis client and server", async (t) => {
     configured: false,
   })
 
-  assert.deepEqual(await client.providers.listModels("deepseek"), [])
+  assert.deepEqual(
+    await client.providers.listModels({ providerName: "deepseek" }),
+    [],
+  )
 
-  await client.providers.enableModel("deepseek", "deepseek-flash")
+  await client.providers.enableModel({
+    providerName: "deepseek",
+    modelName: "deepseek-flash",
+  })
 
-  const models = await client.providers.listModels("deepseek")
+  const models = await client.providers.listModels({ providerName: "deepseek" })
   assert.equal(models.length, 1)
   assert.equal(models[0]?.name, "deepseek-flash")
   assert.equal(models[0]?.enabled, true)
 
-  await client.providers.setDefaultModel("deepseek", "deepseek-flash")
-  await client.providers.disableModel("deepseek", "deepseek-flash")
+  await client.providers.setDefaultModel({
+    providerName: "deepseek",
+    modelName: "deepseek-flash",
+  })
+  await client.providers.disableModel({
+    providerName: "deepseek",
+    modelName: "deepseek-flash",
+  })
 
   assert.deepEqual(await client.settings.get(), {
     defaultProvider: null,
@@ -105,7 +120,8 @@ test("semiosis client and server", async (t) => {
 
   const signs: Array<S.Sign> = []
 
-  for await (const sign of client.sessions.interpret(session.id, {
+  for await (const sign of client.sessions.interpret({
+    sessionId: session.id,
     model: {
       providerName: "mock",
       name: "conversation",

@@ -50,7 +50,7 @@ export async function loadProviderListState(
       providerConfigs.map(async (providerConfig) => {
         const [apiKeyStatus, models] = await Promise.all([
           semiosis.providers.getApiKeyStatus(providerConfig.name),
-          semiosis.providers.listModels(providerConfig.name),
+          semiosis.providers.listModels({ providerName: providerConfig.name }),
         ])
 
         return {
@@ -92,7 +92,7 @@ export async function putProviderApiKey(
   providerName: string,
   key: string,
 ): Promise<void> {
-  await semiosis.providers.putApiKey(providerName, key)
+  await semiosis.providers.putApiKey({ providerName, key })
 
   const provider = state.providers.find((item) => item.name === providerName)
   if (provider !== undefined) {

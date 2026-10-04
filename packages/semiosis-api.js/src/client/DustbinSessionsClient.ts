@@ -1,6 +1,11 @@
 import type * as S from "@xieyuheng/semiosis.js"
-import { requestJson, requestJsonOptional } from "@xieyuheng/http.js"
-import type { SemiosisClientConfig } from "./SemiosisClientConfig.ts"
+import { makeJsonEndpoint, withNotFoundAsUndefined } from "@xieyuheng/http.js"
+import type { SemiosisClientConfig } from "./SemiosisClient.ts"
+import {
+  DustbinSessionIndexListSchema,
+  SessionSchema,
+  VoidSchema,
+} from "./schemas.ts"
 
 export type ListDustbinSessionsOptions = {
   workspaceId: S.WorkspaceId | undefined
@@ -20,50 +25,47 @@ export function makeDustbinSessionsClient(
   config: SemiosisClientConfig,
 ): DustbinSessionsClient {
   return {
-    list: (options) => {
-      const query = new URLSearchParams()
-      if (options.workspaceId !== undefined) {
-        query.set("workspaceId", options.workspaceId)
-      }
+    list: makeJsonEndpoint(config, {
+      method: "GET",
+      path: "/dustbin/sessions",
+      query: (options: ListDustbinSessionsOptions) => {
+        const query = new URLSearchParams()
+        if (options.workspaceId !== undefined) {
+          query.set("workspaceId", options.workspaceId)
+        }
+        return query
+      },
+      output: DustbinSessionIndexListSchema,
+    }),
 
-      return requestJson<Array<S.DustbinSessionIndex>>({
-        baseUrl: config.baseUrl,
+    get: withNotFoundAsUndefined(
+      makeJsonEndpoint(config, {
         method: "GET",
-        path: "/dustbin/sessions",
-        query,
-      })
-    },
-
-    get: (id) =>
-      requestJsonOptional<S.Session>({
-        baseUrl: config.baseUrl,
-        method: "GET",
-        path: `/dustbin/sessions/${encodeURIComponent(id)}`,
+        path: (sessionId: S.SessionId) =>
+          `/dustbin/sessions/${encodeURIComponent(sessionId)}`,
+        output: SessionSchema,
       }),
+    ),
 
-    trash: async (id) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "POST",
-        path: "/dustbin/sessions",
-        body: { sessionId: id },
-      })
-    },
+    trash: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/dustbin/sessions",
+      body: (sessionId: S.SessionId) => ({ sessionId }),
+      output: VoidSchema,
+    }),
 
-    restore: async (id) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "POST",
-        path: `/dustbin/sessions/${encodeURIComponent(id)}/restore`,
-      })
-    },
+    restore: makeJsonEndpoint(config, {
+      method: "POST",
+      path: (sessionId: S.SessionId) =>
+        `/dustbin/sessions/${encodeURIComponent(sessionId)}/restore`,
+      output: VoidSchema,
+    }),
 
-    remove: async (id) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "DELETE",
-        path: `/dustbin/sessions/${encodeURIComponent(id)}`,
-      })
-    },
+    remove: makeJsonEndpoint(config, {
+      method: "DELETE",
+      path: (sessionId: S.SessionId) =>
+        `/dustbin/sessions/${encodeURIComponent(sessionId)}`,
+      output: VoidSchema,
+    }),
   }
 }

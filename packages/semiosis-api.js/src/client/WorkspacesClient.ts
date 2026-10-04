@@ -1,6 +1,7 @@
 import type * as S from "@xieyuheng/semiosis.js"
-import { requestJson, requestJsonOptional } from "@xieyuheng/http.js"
-import type { SemiosisClientConfig } from "./SemiosisClientConfig.ts"
+import { makeJsonEndpoint, withNotFoundAsUndefined } from "@xieyuheng/http.js"
+import type { SemiosisClientConfig } from "./SemiosisClient.ts"
+import { VoidSchema, WorkspaceListSchema, WorkspaceSchema } from "./schemas.ts"
 
 export type EnsureWorkspaceOptions = {
   name: string
@@ -19,43 +20,39 @@ export function makeWorkspacesClient(
   config: SemiosisClientConfig,
 ): WorkspacesClient {
   return {
-    list: () =>
-      requestJson<Array<S.Workspace>>({
-        baseUrl: config.baseUrl,
+    list: makeJsonEndpoint(config, {
+      method: "GET",
+      path: "/workspaces",
+      output: WorkspaceListSchema,
+    }),
+
+    ensure: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/workspaces/ensure",
+      body: (options: EnsureWorkspaceOptions) => options,
+      output: WorkspaceSchema,
+    }),
+
+    get: withNotFoundAsUndefined(
+      makeJsonEndpoint(config, {
         method: "GET",
-        path: "/workspaces",
+        path: (id: S.WorkspaceId) => `/workspaces/${encodeURIComponent(id)}`,
+        output: WorkspaceSchema,
       }),
+    ),
 
-    ensure: (options) =>
-      requestJson<S.Workspace>({
-        baseUrl: config.baseUrl,
-        method: "POST",
-        path: "/workspaces/ensure",
-        body: options,
-      }),
+    put: makeJsonEndpoint(config, {
+      method: "PUT",
+      path: (workspace: S.Workspace) =>
+        `/workspaces/${encodeURIComponent(workspace.id)}`,
+      body: (workspace: S.Workspace) => workspace,
+      output: VoidSchema,
+    }),
 
-    get: (id) =>
-      requestJsonOptional<S.Workspace>({
-        baseUrl: config.baseUrl,
-        method: "GET",
-        path: `/workspaces/${encodeURIComponent(id)}`,
-      }),
-
-    put: async (workspace) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "PUT",
-        path: `/workspaces/${encodeURIComponent(workspace.id)}`,
-        body: workspace,
-      })
-    },
-
-    remove: async (id) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "DELETE",
-        path: `/workspaces/${encodeURIComponent(id)}`,
-      })
-    },
+    remove: makeJsonEndpoint(config, {
+      method: "DELETE",
+      path: (id: S.WorkspaceId) => `/workspaces/${encodeURIComponent(id)}`,
+      output: VoidSchema,
+    }),
   }
 }

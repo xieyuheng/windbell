@@ -1,6 +1,7 @@
 import type * as S from "@xieyuheng/semiosis.js"
-import { requestJson } from "@xieyuheng/http.js"
-import type { SemiosisClientConfig } from "./SemiosisClientConfig.ts"
+import { makeJsonEndpoint } from "@xieyuheng/http.js"
+import type { SemiosisClientConfig } from "./SemiosisClient.ts"
+import { SettingsSchema, VoidSchema } from "./schemas.ts"
 
 export type SettingsClient = {
   get(): Promise<S.Settings>
@@ -11,20 +12,17 @@ export function makeSettingsClient(
   config: SemiosisClientConfig,
 ): SettingsClient {
   return {
-    get: () =>
-      requestJson<S.Settings>({
-        baseUrl: config.baseUrl,
-        method: "GET",
-        path: "/settings",
-      }),
+    get: makeJsonEndpoint(config, {
+      method: "GET",
+      path: "/settings",
+      output: SettingsSchema,
+    }),
 
-    put: async (settings) => {
-      await requestJson({
-        baseUrl: config.baseUrl,
-        method: "PUT",
-        path: "/settings",
-        body: settings,
-      })
-    },
+    put: makeJsonEndpoint(config, {
+      method: "PUT",
+      path: "/settings",
+      body: (settings: S.Settings) => settings,
+      output: VoidSchema,
+    }),
   }
 }
