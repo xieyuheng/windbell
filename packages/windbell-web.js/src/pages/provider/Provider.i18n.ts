@@ -1,6 +1,7 @@
 export const providerMessages = {
   "zh-CN": {
     title: "提供商",
+    colon: "：",
     loading: "加载中...",
     defaultProvider: "默认提供商",
     apiKey: "API Key",
@@ -12,8 +13,6 @@ export const providerMessages = {
     enabled: "已启用",
     disabled: "已禁用",
     default: "默认",
-    modelInfo: "模型信息",
-    config: "配置",
     ownedBy: "所属",
     contextWindow: "上下文窗口",
     maxOutputTokens: "最大输出 Tokens",
@@ -36,6 +35,7 @@ export const providerMessages = {
   },
   "en-US": {
     title: "Provider",
+    colon: ": ",
     loading: "Loading...",
     defaultProvider: "Default provider",
     apiKey: "API Key",
@@ -47,8 +47,6 @@ export const providerMessages = {
     enabled: "Enabled",
     disabled: "Disabled",
     default: "Default",
-    modelInfo: "Model Info",
-    config: "Config",
     ownedBy: "Owned By",
     contextWindow: "Context Window",
     maxOutputTokens: "Max Output Tokens",

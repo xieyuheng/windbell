@@ -1,10 +1,19 @@
 <script setup lang="ts">
 import type { OpenRouterProviderModelEntry } from "@xieyuheng/semiosis.js"
+import Card from "../../components/card/Card.vue"
+import ModelCardToolbar from "./ModelCardToolbar.vue"
 import { useI18n } from "vue-i18n"
 import { providerMessages } from "./Provider.i18n.ts"
 
 const props = defineProps<{
   entry: OpenRouterProviderModelEntry
+  busy: boolean
+}>()
+
+const emit = defineEmits<{
+  enable: []
+  disable: []
+  setDefault: []
 }>()
 
 const { t } = useI18n({
@@ -18,87 +27,114 @@ function json(value: unknown): string {
 </script>
 
 <template>
-  <section v-if="entry.info" class="flex flex-col gap-1 text-sm">
-    <h3 class="text-base text-ink">
-      {{ t("modelInfo") }}
-    </h3>
+  <Card as="article">
+    <template #tag>
+      <h2 class="break-all font-mono text-sm text-ink">
+        {{ entry.name }}
+      </h2>
+    </template>
 
-    <dl class="flex flex-col gap-1">
-      <div class="flex flex-wrap gap-2">
-        <dt class="text-ink">{{ t("contextLength") }}</dt>
-        <dd class="font-mono text-ink">
-          {{ entry.info.context_length }}
-        </dd>
-      </div>
+    <div class="flex flex-col gap-2 p-2">
+      <ModelCardToolbar
+        :enabled="entry.enabled"
+        :is-default="entry.isDefault"
+        :busy="busy"
+        @enable="emit('enable')"
+        @disable="emit('disable')"
+        @set-default="emit('setDefault')"
+      />
 
-      <div class="flex flex-wrap gap-2">
-        <dt class="text-ink">{{ t("modality") }}</dt>
-        <dd class="font-mono text-ink">
-          {{ entry.info.architecture.modality ?? t("none") }}
-        </dd>
-      </div>
+      <section v-if="entry.info" class="flex flex-col gap-1 text-sm">
+        <dl class="flex flex-col gap-1">
+          <div class="flex flex-wrap">
+            <dt class="text-ink">{{ t("contextLength") }}{{ t("colon") }}</dt>
+            <dd class="font-mono text-ink">
+              {{ entry.info.context_length }}
+            </dd>
+          </div>
 
-      <div class="flex flex-wrap gap-2">
-        <dt class="text-ink">{{ t("inputModalities") }}</dt>
-        <dd class="font-mono text-ink">
-          {{ entry.info.architecture.input_modalities.join(", ") }}
-        </dd>
-      </div>
+          <div class="flex flex-wrap">
+            <dt class="text-ink">{{ t("modality") }}{{ t("colon") }}</dt>
+            <dd class="font-mono text-ink">
+              {{ entry.info.architecture.modality ?? t("none") }}
+            </dd>
+          </div>
 
-      <div class="flex flex-wrap gap-2">
-        <dt class="text-ink">{{ t("outputModalities") }}</dt>
-        <dd class="font-mono text-ink">
-          {{ entry.info.architecture.output_modalities.join(", ") }}
-        </dd>
-      </div>
+          <div class="flex flex-wrap">
+            <dt class="text-ink">{{ t("inputModalities") }}{{ t("colon") }}</dt>
+            <dd class="font-mono text-ink">
+              {{ entry.info.architecture.input_modalities.join(", ") }}
+            </dd>
+          </div>
 
-      <div class="flex flex-wrap gap-2">
-        <dt class="text-ink">{{ t("supportedParameters") }}</dt>
-        <dd class="break-all font-mono text-ink">
-          {{ entry.info.supported_parameters.join(", ") }}
-        </dd>
-      </div>
-    </dl>
-  </section>
+          <div class="flex flex-wrap">
+            <dt class="text-ink">
+              {{ t("outputModalities") }}{{ t("colon") }}
+            </dt>
+            <dd class="font-mono text-ink">
+              {{ entry.info.architecture.output_modalities.join(", ") }}
+            </dd>
+          </div>
 
-  <section v-if="entry.config" class="flex flex-col gap-1 text-sm">
-    <h3 class="text-base text-ink">
-      {{ t("config") }}
-    </h3>
+          <div class="flex">
+            <dt class="shrink-0 text-ink">
+              {{ t("supportedParameters") }}{{ t("colon") }}
+            </dt>
+            <dd
+              v-if="entry.info.supported_parameters.length > 0"
+              class="min-w-0 flex-1 break-words font-mono text-ink"
+            >
+              {{ entry.info.supported_parameters.join(", ") }}
+            </dd>
+            <dd v-else class="font-mono text-ink">{{ t("none") }}</dd>
+          </div>
+        </dl>
+      </section>
+    </div>
 
-    <dl class="flex flex-col gap-1">
-      <div class="flex flex-wrap gap-2">
-        <dt class="text-ink">{{ t("reasoning") }}</dt>
-        <dd>
-          <pre
-            class="overflow-auto rounded bg-line p-2 font-mono text-xs text-ink"
-            >{{
-              entry.config.reasoning ? json(entry.config.reasoning) : t("none")
-            }}</pre>
-        </dd>
-      </div>
+    <template #footer v-if="entry.config">
+      <section class="flex flex-col gap-1 text-sm">
+        <dl class="flex flex-col gap-1">
+          <div class="flex flex-wrap">
+            <dt class="text-ink">{{ t("reasoning") }}{{ t("colon") }}</dt>
+            <dd>
+              <pre
+                class="overflow-auto rounded bg-line p-2 font-mono text-xs text-ink"
+                >{{
+                  entry.config.reasoning
+                    ? json(entry.config.reasoning)
+                    : t("none")
+                }}</pre>
+            </dd>
+          </div>
 
-      <div class="flex flex-wrap gap-2">
-        <dt class="text-ink">{{ t("provider") }}</dt>
-        <dd>
-          <pre
-            class="overflow-auto rounded bg-line p-2 font-mono text-xs text-ink"
-            >{{
-              entry.config.provider ? json(entry.config.provider) : t("none")
-            }}</pre>
-        </dd>
-      </div>
+          <div class="flex flex-wrap">
+            <dt class="text-ink">{{ t("provider") }}{{ t("colon") }}</dt>
+            <dd>
+              <pre
+                class="overflow-auto rounded bg-line p-2 font-mono text-xs text-ink"
+                >{{
+                  entry.config.provider
+                    ? json(entry.config.provider)
+                    : t("none")
+                }}</pre>
+            </dd>
+          </div>
 
-      <div class="flex flex-wrap gap-2">
-        <dt class="text-ink">{{ t("extraBody") }}</dt>
-        <dd>
-          <pre
-            class="overflow-auto rounded bg-line p-2 font-mono text-xs text-ink"
-            >{{
-              entry.config.extraBody ? json(entry.config.extraBody) : t("none")
-            }}</pre>
-        </dd>
-      </div>
-    </dl>
-  </section>
+          <div class="flex flex-wrap">
+            <dt class="text-ink">{{ t("extraBody") }}{{ t("colon") }}</dt>
+            <dd>
+              <pre
+                class="overflow-auto rounded bg-line p-2 font-mono text-xs text-ink"
+                >{{
+                  entry.config.extraBody
+                    ? json(entry.config.extraBody)
+                    : t("none")
+                }}</pre>
+            </dd>
+          </div>
+        </dl>
+      </section>
+    </template>
+  </Card>
 </template>

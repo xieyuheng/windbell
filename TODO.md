@@ -1,11 +1,3 @@
-# windbell-web.js
-
-改善 provider list page 和 provider card 和 model line
-
-# semiosis.js
-
-[semiosis.js] 支持 pwsh
-
 # windbell-desktop.js
 
 [windbell-desktop.js] 打包 windows electron app

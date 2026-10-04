@@ -99,8 +99,8 @@ useHead(() => ({
           </span>
 
           <span class="rounded bg-line px-2 py-0.5 text-ink">
-            {{ t("apiKey") }}:
-            {{
+            {{ t("apiKey") }}{{ t("colon")
+            }}{{
               state.apiKeyConfigured
                 ? t("apiKeyConfigured")
                 : t("apiKeyNotConfigured")
@@ -110,7 +110,7 @@ useHead(() => ({
       </section>
 
       <p v-if="state.warning !== undefined" class="text-sm text-ink">
-        {{ t("warning") }}: {{ state.warning }}
+        {{ t("warning") }}{{ t("colon") }}{{ state.warning }}
       </p>
 
       <section class="flex flex-col gap-4">
