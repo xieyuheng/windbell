@@ -254,19 +254,19 @@ useHead(() => ({
           </h3>
 
           <div class="grid gap-4 md:grid-cols-2">
-            <div
-              v-for="token in group.tokens"
-              :key="token"
-              class="flex min-w-0 flex-col gap-1 rounded border border-line p-2"
-            >
-              <span class="font-mono text-xs text-ink">
-                --color-{{ token }}
-              </span>
+            <Card v-for="token in group.tokens" :key="token">
+              <template #tag>
+                <span class="font-mono text-xs text-ink">
+                  --color-{{ token }}
+                </span>
+              </template>
+
               <ColorPicker
+                class="p-2"
                 :model-value="draft.colors[selectedMode][token]"
                 @update:modelValue="updateColor(selectedMode, token, $event)"
               />
-            </div>
+            </Card>
           </div>
         </section>
       </div>
