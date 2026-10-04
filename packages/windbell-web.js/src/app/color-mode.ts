@@ -11,6 +11,8 @@ export type ColorModeState = {
 
 const COLOR_MODE_STORAGE_KEY = "windbell.color-mode"
 
+let syncingFromStorage = false
+
 function isColorModePreference(
   value: string | null,
 ): value is ColorModePreference {
@@ -40,6 +42,13 @@ function applyColorMode(colorMode: ColorModeState): void {
   document.documentElement.style.colorScheme = colorMode.resolved
 }
 
+function preferenceFromStorage(
+  value: string | null,
+): ColorModePreference | undefined {
+  if (value === null) return "system"
+  return isColorModePreference(value) ? value : undefined
+}
+
 export function makeColorMode(): ColorModeState {
   const colorMode = reactive<ColorModeState>({
     preference: getInitialPreference(),
@@ -58,11 +67,14 @@ const colorMode = makeColorMode()
 watch(
   () => colorMode.preference,
   (preference) => {
-    localStorage.setItem(COLOR_MODE_STORAGE_KEY, preference)
+    if (!syncingFromStorage) {
+      localStorage.setItem(COLOR_MODE_STORAGE_KEY, preference)
+    }
+
     colorMode.resolved = resolveColorMode(preference)
     applyColorMode(colorMode)
   },
-  { immediate: true },
+  { immediate: true, flush: "sync" },
 )
 
 window
@@ -73,6 +85,17 @@ window
       applyColorMode(colorMode)
     }
   })
+
+window.addEventListener("storage", (event) => {
+  if (event.key !== COLOR_MODE_STORAGE_KEY) return
+
+  const preference = preferenceFromStorage(event.newValue)
+  if (preference === undefined || preference === colorMode.preference) return
+
+  syncingFromStorage = true
+  colorMode.setPreference(preference)
+  syncingFromStorage = false
+})
 
 export function useColorMode(): ColorModeState {
   return colorMode

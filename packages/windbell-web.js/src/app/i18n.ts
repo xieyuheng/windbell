@@ -7,6 +7,8 @@ export const supportedLocales: Array<{ value: Locale; label: string }> = [
   { value: "en-US", label: "English" },
 ]
 
+const LOCALE_STORAGE_KEY = "windbell.locale"
+
 const messages = {
   "zh-CN": {
     app: {
@@ -22,9 +24,13 @@ const messages = {
   },
 }
 
+function isLocale(value: string): value is Locale {
+  return value === "zh-CN" || value === "en-US"
+}
+
 function getInitialLocale(): Locale {
-  const stored = localStorage.getItem("windbell.locale")
-  if (stored === "zh-CN" || stored === "en-US") return stored
+  const stored = localStorage.getItem(LOCALE_STORAGE_KEY)
+  if (stored !== null && isLocale(stored)) return stored
   return navigator.language.toLowerCase().startsWith("zh") ? "zh-CN" : "en-US"
 }
 
@@ -35,8 +41,19 @@ export const i18n = createI18n({
   messages,
 })
 
-export function setLocale(locale: Locale): void {
+function applyLocale(locale: Locale): void {
   i18n.global.locale.value = locale
-  localStorage.setItem("windbell.locale", locale)
   document.documentElement.lang = locale
 }
+
+export function setLocale(locale: Locale): void {
+  localStorage.setItem(LOCALE_STORAGE_KEY, locale)
+  applyLocale(locale)
+}
+
+window.addEventListener("storage", (event) => {
+  if (event.key !== LOCALE_STORAGE_KEY) return
+
+  const stored = event.newValue
+  applyLocale(stored !== null && isLocale(stored) ? stored : getInitialLocale())
+})

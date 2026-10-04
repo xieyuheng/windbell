@@ -2,12 +2,22 @@ import { reactive, watch } from "vue"
 
 export type Font = "unifont" | "system"
 
+const FONT_STORAGE_KEY = "windbell.font"
+
+let syncingFromStorage = false
+
+function isFont(value: string): value is Font {
+  return value === "unifont" || value === "system"
+}
+
 function getInitialFont(): Font {
-  const stored = localStorage.getItem("windbell.font")
-  if (stored === "unifont" || stored === "system") {
-    return stored
-  }
-  return "unifont"
+  const stored = localStorage.getItem(FONT_STORAGE_KEY)
+  return stored !== null && isFont(stored) ? stored : "unifont"
+}
+
+function fontFromStorage(value: string | null): Font | undefined {
+  if (value === null) return "unifont"
+  return isFont(value) ? value : undefined
 }
 
 function applyFont(font: Font): void {
@@ -24,11 +34,25 @@ const state = reactive({
 watch(
   () => state.name,
   (name) => {
-    localStorage.setItem("windbell.font", name)
+    if (!syncingFromStorage) {
+      localStorage.setItem(FONT_STORAGE_KEY, name)
+    }
+
     applyFont(name)
   },
-  { immediate: true },
+  { immediate: true, flush: "sync" },
 )
+
+window.addEventListener("storage", (event) => {
+  if (event.key !== FONT_STORAGE_KEY) return
+
+  const font = fontFromStorage(event.newValue)
+  if (font === undefined || font === state.name) return
+
+  syncingFromStorage = true
+  state.setFont(font)
+  syncingFromStorage = false
+})
 
 export function useFont() {
   return state

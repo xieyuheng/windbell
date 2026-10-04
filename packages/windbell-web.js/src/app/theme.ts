@@ -100,6 +100,16 @@ const activeTheme = computed<Theme>(() => {
 const colorMode = useColorMode()
 let previewTheme: Theme | undefined
 
+type ThemeChannelMessage = {
+  type: "theme-selected"
+  themeId: string
+}
+
+const themeChannel =
+  typeof BroadcastChannel === "undefined"
+    ? undefined
+    : new BroadcastChannel("windbell.theme")
+
 export function findThemeById(themeId: string): Theme | undefined {
   return (
     builtInThemes.find((theme) => theme.id === themeId) ??
@@ -130,6 +140,48 @@ function applyCurrentTheme(): void {
 
 watch([activeTheme, () => colorMode.resolved], () => applyCurrentTheme(), {
   immediate: true,
+})
+
+function notifyThemeSelected(themeId: string): void {
+  themeChannel?.postMessage({
+    type: "theme-selected",
+    themeId,
+  } satisfies ThemeChannelMessage)
+}
+
+async function applySelectedThemeFromOtherTab(themeId: string): Promise<void> {
+  let theme = findThemeById(themeId)
+
+  if (theme === undefined) {
+    try {
+      await refreshCustomThemes()
+    } catch (error) {
+      state.error = error instanceof Error ? error.message : String(error)
+      return
+    }
+
+    theme = findThemeById(themeId)
+  }
+
+  if (theme === undefined) return
+
+  state.activeThemeId = theme.id
+  applyCurrentTheme()
+}
+
+themeChannel?.addEventListener("message", (event: MessageEvent<unknown>) => {
+  const data = event.data
+  if (data === null || typeof data !== "object") return
+
+  const message = data as Record<string, unknown>
+  if (
+    message.type !== "theme-selected" ||
+    typeof message.themeId !== "string"
+  ) {
+    return
+  }
+
+  void applySelectedThemeFromOtherTab(message.themeId)
 })
 
 let initializePromise: Promise<void> | undefined
@@ -177,6 +229,7 @@ export async function activateTheme(themeId: string): Promise<void> {
       ...settings,
       themeId: theme.id,
     })
+    notifyThemeSelected(theme.id)
     state.error = undefined
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
