@@ -1,5 +1,6 @@
 export const sessionDustbinMessages = {
   "zh-CN": {
+    colon: "：",
     title: "对话回收站",
     description: "当前工作区下已移入回收站的对话。",
     deletedSessions: "已删除对话",
@@ -8,10 +9,11 @@ export const sessionDustbinMessages = {
     restore: "恢复",
     remove: "彻底删除",
     deleteConfirm: "确定彻底删除这个对话吗？此操作不可恢复。",
-    deletedAt: "删除于：",
-    createdAt: "创建于：",
+    deletedAt: "删除于",
+    createdAt: "创建于",
   },
   "en-US": {
+    colon: ":\u00a0",
     title: "Session Dustbin",
     description: "Sessions moved to the dustbin in this workspace.",
     deletedSessions: "Deleted Sessions",
@@ -20,7 +22,7 @@ export const sessionDustbinMessages = {
     restore: "Restore",
     remove: "Delete permanently",
     deleteConfirm: "Permanently delete this session? This cannot be undone.",
-    deletedAt: "Deleted at:",
-    createdAt: "Created at:",
+    deletedAt: "Deleted at",
+    createdAt: "Created at",
   },
 }

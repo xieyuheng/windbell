@@ -108,12 +108,16 @@ function requestRemove(): void {
 
     <template #footer>
       <div class="flex flex-col gap-1 text-sm">
-        <p class="truncate">{{ t("sessionCount") }} {{ sessions.length }}</p>
         <p class="truncate">
-          {{ t("deletedAt") }} {{ formatDateTime(workspace.deletedAt) }}
+          {{ t("sessionCount") }}{{ t("colon") }}{{ sessions.length }}
         </p>
         <p class="truncate">
-          {{ t("createdAt") }} {{ formatDateTime(workspace.createdAt) }}
+          {{ t("deletedAt") }}{{ t("colon")
+          }}{{ formatDateTime(workspace.deletedAt) }}
+        </p>
+        <p class="truncate">
+          {{ t("createdAt") }}{{ t("colon")
+          }}{{ formatDateTime(workspace.createdAt) }}
         </p>
       </div>
     </template>

@@ -1,5 +1,6 @@
 export const workspaceDustbinMessages = {
   "zh-CN": {
+    colon: "：",
     title: "工作区回收站",
     deletedWorkspaces: "已删除工作区",
     loading: "加载中...",
@@ -7,13 +8,14 @@ export const workspaceDustbinMessages = {
     restore: "恢复",
     remove: "彻底删除",
     deleteConfirm: "确定彻底删除这个工作区吗？此操作不可恢复。",
-    deletedAt: "删除于：",
-    createdAt: "创建于：",
-    sessionCount: "回收站中对话：",
+    deletedAt: "删除于",
+    createdAt: "创建于",
+    sessionCount: "回收站中对话",
     noSessions: "该工作区下没有对话。",
     restoreHint: "恢复工作区时，随工作区删除的对话会一起恢复。",
   },
   "en-US": {
+    colon: ":\u00a0",
     title: "Workspace Dustbin",
     deletedWorkspaces: "Deleted Workspaces",
     loading: "Loading...",
@@ -21,9 +23,9 @@ export const workspaceDustbinMessages = {
     restore: "Restore",
     remove: "Delete permanently",
     deleteConfirm: "Permanently delete this workspace? This cannot be undone.",
-    deletedAt: "Deleted at:",
-    createdAt: "Created at:",
-    sessionCount: "Dustbin sessions:",
+    deletedAt: "Deleted at",
+    createdAt: "Created at",
+    sessionCount: "Dustbin sessions",
     noSessions: "No sessions in this workspace.",
     restoreHint:
       "Sessions deleted with the workspace will be restored together.",

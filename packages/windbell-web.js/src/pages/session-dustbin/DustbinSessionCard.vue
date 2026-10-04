@@ -79,10 +79,12 @@ function requestRemove(): void {
     <template #footer>
       <div class="flex flex-col gap-1 text-sm">
         <p class="truncate">
-          {{ t("deletedAt") }} {{ formatDateTime(session.deletedAt) }}
+          {{ t("deletedAt") }}{{ t("colon")
+          }}{{ formatDateTime(session.deletedAt) }}
         </p>
         <p class="truncate">
-          {{ t("createdAt") }} {{ formatDateTime(session.createdAt) }}
+          {{ t("createdAt") }}{{ t("colon")
+          }}{{ formatDateTime(session.createdAt) }}
         </p>
       </div>
     </template>

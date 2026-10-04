@@ -27,16 +27,18 @@ const emit = defineEmits<{
 const { t } = useI18n({
   messages: {
     "zh-CN": {
-      updatedAt: "更新于：",
-      createdAt: "创建于：",
+      colon: "：",
+      updatedAt: "更新于",
+      createdAt: "创建于",
       editTitle: "修改标题",
       trash: "移入回收站",
       editTitlePrompt: "输入新的对话标题",
       trashConfirm: "确定将这个对话移入回收站吗？之后可以从回收站恢复。",
     },
     "en-US": {
-      updatedAt: "Updated at:",
-      createdAt: "Created at:",
+      colon: ":\u00a0",
+      updatedAt: "Updated at",
+      createdAt: "Created at",
       editTitle: "Edit title",
       trash: "Move to dustbin",
       editTitlePrompt: "Enter a new session title",
@@ -115,10 +117,12 @@ function requestTrash(): void {
     <template #footer>
       <div class="flex flex-col gap-1 text-sm">
         <p class="truncate">
-          {{ t("updatedAt") }} {{ formatDateTime(session.updatedAt) }}
+          {{ t("updatedAt") }}{{ t("colon")
+          }}{{ formatDateTime(session.updatedAt) }}
         </p>
         <p class="truncate">
-          {{ t("createdAt") }} {{ formatDateTime(session.createdAt) }}
+          {{ t("createdAt") }}{{ t("colon")
+          }}{{ formatDateTime(session.createdAt) }}
         </p>
       </div>
     </template>

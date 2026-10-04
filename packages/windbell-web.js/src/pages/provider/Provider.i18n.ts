@@ -35,7 +35,7 @@ export const providerMessages = {
   },
   "en-US": {
     title: "Provider",
-    colon: ": ",
+    colon: ":\u00a0",
     loading: "Loading...",
     defaultProvider: "Default provider",
     apiKey: "API Key",

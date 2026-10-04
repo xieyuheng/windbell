@@ -131,12 +131,16 @@ function requestTrash(): void {
 
     <template #footer>
       <div class="flex flex-col gap-1 text-sm">
-        <p class="truncate">{{ t("sessionCount") }} {{ sessions.length }}</p>
         <p class="truncate">
-          {{ t("updatedAt") }} {{ formatDateTime(workspace.updatedAt) }}
+          {{ t("sessionCount") }}{{ t("colon") }}{{ sessions.length }}
         </p>
         <p class="truncate">
-          {{ t("createdAt") }} {{ formatDateTime(workspace.createdAt) }}
+          {{ t("updatedAt") }}{{ t("colon")
+          }}{{ formatDateTime(workspace.updatedAt) }}
+        </p>
+        <p class="truncate">
+          {{ t("createdAt") }}{{ t("colon")
+          }}{{ formatDateTime(workspace.createdAt) }}
         </p>
       </div>
     </template>
