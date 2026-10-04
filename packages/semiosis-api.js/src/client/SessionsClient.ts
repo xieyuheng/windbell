@@ -1,6 +1,10 @@
 import type * as S from "@xieyuheng/semiosis.js"
+import {
+  requestJson,
+  requestJsonOptional,
+  requestNdjson,
+} from "@xieyuheng/http.js"
 import type { SemiosisClientConfig } from "./SemiosisClientConfig.ts"
-import { call, callOptional, streamCall, withQuery } from "./http.ts"
 
 export type MakeSessionOptions = {
   workspaceId: S.WorkspaceId
@@ -45,45 +49,56 @@ export function makeSessionsClient(
         query.set("workspaceId", options.workspaceId)
       }
 
-      return call(config.baseUrl, "GET", withQuery("/sessions", query))
+      return requestJson<Array<S.SessionIndex>>({
+        baseUrl: config.baseUrl,
+        method: "GET",
+        path: "/sessions",
+        query,
+      })
     },
 
-    make: (options) => call(config.baseUrl, "POST", "/sessions", options),
+    make: (options) =>
+      requestJson<S.Session>({
+        baseUrl: config.baseUrl,
+        method: "POST",
+        path: "/sessions",
+        body: options,
+      }),
 
     get: (id) =>
-      callOptional(
-        config.baseUrl,
-        "GET",
-        `/sessions/${encodeURIComponent(id)}`,
-      ),
+      requestJsonOptional<S.Session>({
+        baseUrl: config.baseUrl,
+        method: "GET",
+        path: `/sessions/${encodeURIComponent(id)}`,
+      }),
 
     put: async (session) => {
-      await call(
-        config.baseUrl,
-        "PUT",
-        `/sessions/${encodeURIComponent(session.id)}`,
-        session,
-      )
+      await requestJson({
+        baseUrl: config.baseUrl,
+        method: "PUT",
+        path: `/sessions/${encodeURIComponent(session.id)}`,
+        body: session,
+      })
     },
 
     generateTitle: async (id, options) => {
-      const result = await call<{ title: string }>(
-        config.baseUrl,
-        "POST",
-        `/sessions/${encodeURIComponent(id)}/title`,
-        options,
-      )
+      const result = await requestJson<{ title: string }>({
+        baseUrl: config.baseUrl,
+        method: "POST",
+        path: `/sessions/${encodeURIComponent(id)}/title`,
+        body: options,
+      })
 
       return result.title
     },
 
     async *interpret(id, options) {
-      for await (const event of streamCall<InterpretEvent>(
-        config.baseUrl,
-        "POST",
-        `/sessions/${encodeURIComponent(id)}/interpret`,
-        options,
-      )) {
+      for await (const event of requestNdjson<InterpretEvent>({
+        baseUrl: config.baseUrl,
+        method: "POST",
+        path: `/sessions/${encodeURIComponent(id)}/interpret`,
+        body: options,
+      })) {
         if (event.type === "sign") {
           yield event.sign
         } else if (event.type === "error") {
@@ -95,11 +110,11 @@ export function makeSessionsClient(
     },
 
     remove: async (id) => {
-      await call(
-        config.baseUrl,
-        "DELETE",
-        `/sessions/${encodeURIComponent(id)}`,
-      )
+      await requestJson({
+        baseUrl: config.baseUrl,
+        method: "DELETE",
+        path: `/sessions/${encodeURIComponent(id)}`,
+      })
     },
   }
 }

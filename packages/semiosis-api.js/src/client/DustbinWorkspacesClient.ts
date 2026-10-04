@@ -1,6 +1,6 @@
 import type * as S from "@xieyuheng/semiosis.js"
+import { requestJson, requestJsonOptional } from "@xieyuheng/http.js"
 import type { SemiosisClientConfig } from "./SemiosisClientConfig.ts"
-import { call, callOptional } from "./http.ts"
 
 export type DustbinWorkspacesClient = {
   list(): Promise<Array<S.DustbinWorkspace>>
@@ -14,35 +14,43 @@ export function makeDustbinWorkspacesClient(
   config: SemiosisClientConfig,
 ): DustbinWorkspacesClient {
   return {
-    list: () => call(config.baseUrl, "GET", "/dustbin/workspaces"),
+    list: () =>
+      requestJson<Array<S.DustbinWorkspace>>({
+        baseUrl: config.baseUrl,
+        method: "GET",
+        path: "/dustbin/workspaces",
+      }),
 
     get: (id) =>
-      callOptional(
-        config.baseUrl,
-        "GET",
-        `/dustbin/workspaces/${encodeURIComponent(id)}`,
-      ),
+      requestJsonOptional<S.DustbinWorkspace>({
+        baseUrl: config.baseUrl,
+        method: "GET",
+        path: `/dustbin/workspaces/${encodeURIComponent(id)}`,
+      }),
 
     trash: async (id) => {
-      await call(config.baseUrl, "POST", "/dustbin/workspaces", {
-        workspaceId: id,
+      await requestJson({
+        baseUrl: config.baseUrl,
+        method: "POST",
+        path: "/dustbin/workspaces",
+        body: { workspaceId: id },
       })
     },
 
     restore: async (id) => {
-      await call(
-        config.baseUrl,
-        "POST",
-        `/dustbin/workspaces/${encodeURIComponent(id)}/restore`,
-      )
+      await requestJson({
+        baseUrl: config.baseUrl,
+        method: "POST",
+        path: `/dustbin/workspaces/${encodeURIComponent(id)}/restore`,
+      })
     },
 
     remove: async (id) => {
-      await call(
-        config.baseUrl,
-        "DELETE",
-        `/dustbin/workspaces/${encodeURIComponent(id)}`,
-      )
+      await requestJson({
+        baseUrl: config.baseUrl,
+        method: "DELETE",
+        path: `/dustbin/workspaces/${encodeURIComponent(id)}`,
+      })
     },
   }
 }

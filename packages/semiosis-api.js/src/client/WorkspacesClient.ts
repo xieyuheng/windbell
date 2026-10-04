@@ -1,6 +1,6 @@
 import type * as S from "@xieyuheng/semiosis.js"
+import { requestJson, requestJsonOptional } from "@xieyuheng/http.js"
 import type { SemiosisClientConfig } from "./SemiosisClientConfig.ts"
-import { call, callOptional } from "./http.ts"
 
 export type EnsureWorkspaceOptions = {
   name: string
@@ -19,33 +19,43 @@ export function makeWorkspacesClient(
   config: SemiosisClientConfig,
 ): WorkspacesClient {
   return {
-    list: () => call(config.baseUrl, "GET", "/workspaces"),
+    list: () =>
+      requestJson<Array<S.Workspace>>({
+        baseUrl: config.baseUrl,
+        method: "GET",
+        path: "/workspaces",
+      }),
 
     ensure: (options) =>
-      call(config.baseUrl, "POST", "/workspaces/ensure", options),
+      requestJson<S.Workspace>({
+        baseUrl: config.baseUrl,
+        method: "POST",
+        path: "/workspaces/ensure",
+        body: options,
+      }),
 
     get: (id) =>
-      callOptional(
-        config.baseUrl,
-        "GET",
-        `/workspaces/${encodeURIComponent(id)}`,
-      ),
+      requestJsonOptional<S.Workspace>({
+        baseUrl: config.baseUrl,
+        method: "GET",
+        path: `/workspaces/${encodeURIComponent(id)}`,
+      }),
 
     put: async (workspace) => {
-      await call(
-        config.baseUrl,
-        "PUT",
-        `/workspaces/${encodeURIComponent(workspace.id)}`,
-        workspace,
-      )
+      await requestJson({
+        baseUrl: config.baseUrl,
+        method: "PUT",
+        path: `/workspaces/${encodeURIComponent(workspace.id)}`,
+        body: workspace,
+      })
     },
 
     remove: async (id) => {
-      await call(
-        config.baseUrl,
-        "DELETE",
-        `/workspaces/${encodeURIComponent(id)}`,
-      )
+      await requestJson({
+        baseUrl: config.baseUrl,
+        method: "DELETE",
+        path: `/workspaces/${encodeURIComponent(id)}`,
+      })
     },
   }
 }

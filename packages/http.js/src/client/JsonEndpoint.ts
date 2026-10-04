@@ -1,6 +1,6 @@
 import type { z } from "zod"
-
-export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
+import { HttpRequestError } from "./HttpRequestError.ts"
+import { type HttpMethod, makeUrl, requestJson } from "./request.ts"
 
 export type HttpClientConfig = {
   baseUrl: string
@@ -28,66 +28,50 @@ export function makeJsonEndpoint<Input, Output>(
         ? options.path(input as Input)
         : options.path
 
+    const query = options.query?.(input as Input)
     const body = options.body?.(input as Input)
-    const url = makeUrl(config.baseUrl, path, options.query?.(input as Input))
-
     const endpointHeaders =
       typeof options.headers === "function"
         ? options.headers(input as Input)
         : options.headers
 
-    const headers = mergeHeaders(
-      new Headers({
-        Accept: "application/json",
-      }),
-      endpointHeaders,
-    )
-
-    if (body !== undefined && !headers.has("Content-Type")) {
-      headers.set("Content-Type", "application/json")
-    }
-
-    const response = await fetch(url, {
-      method: options.method,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
-    })
-
-    const text = await response.text()
     const endpoint = `${options.method} ${path}`
-
-    if (!response.ok) {
-      throw new JsonEndpointError({
-        endpoint,
-        url,
-        status: response.status,
-        detail: text,
-      })
-    }
-
-    let value: unknown
+    const url = makeUrl(config.baseUrl, path, query)
 
     try {
-      value = text === "" ? null : JSON.parse(text)
+      const value = await requestJson<unknown>({
+        baseUrl: config.baseUrl,
+        method: options.method,
+        path,
+        query,
+        body,
+        headers: endpointHeaders,
+      })
+
+      const result = options.output.safeParse(value)
+      if (!result.success) {
+        throw new JsonEndpointError({
+          endpoint,
+          url,
+          detail: `invalid response: ${result.error.message}`,
+        })
+      }
+
+      return result.data
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      throw new JsonEndpointError({
-        endpoint,
-        url,
-        detail: `invalid JSON: ${message}`,
-      })
-    }
+      if (error instanceof JsonEndpointError) throw error
 
-    const result = options.output.safeParse(value)
-    if (!result.success) {
-      throw new JsonEndpointError({
-        endpoint,
-        url,
-        detail: `invalid response: ${result.error.message}`,
-      })
-    }
+      if (error instanceof HttpRequestError) {
+        throw new JsonEndpointError({
+          endpoint,
+          url,
+          status: error.status,
+          detail: error.detail,
+        })
+      }
 
-    return result.data
+      throw error
+    }
   }
 }
 
@@ -98,47 +82,18 @@ export type JsonEndpointErrorOptions = {
   detail: string
 }
 
-export class JsonEndpointError extends Error {
+export class JsonEndpointError extends HttpRequestError {
   endpoint: string
-  url: string
-  status: number | undefined
-  detail: string
 
   constructor(options: JsonEndpointErrorOptions) {
-    const status = options.status === undefined ? "" : ` HTTP ${options.status}`
+    super({
+      operation: options.endpoint,
+      url: options.url,
+      status: options.status,
+      detail: options.detail,
+    })
 
-    super(`${options.endpoint}${status}: ${options.detail}`)
     this.name = "JsonEndpointError"
     this.endpoint = options.endpoint
-    this.url = options.url
-    this.status = options.status
-    this.detail = options.detail
   }
-}
-
-function makeUrl(
-  baseUrl: string,
-  path: string,
-  query: URLSearchParams | undefined,
-): string {
-  const base = baseUrl.replace(/\/+$/, "")
-  const suffix = path.startsWith("/") ? path : `/${path}`
-  const url = `${base}${suffix}`
-  const queryText = query?.toString() ?? ""
-
-  return queryText === "" ? url : `${url}?${queryText}`
-}
-
-function mergeHeaders(...sources: Array<Headers | undefined>): Headers {
-  const headers = new Headers()
-
-  for (const source of sources) {
-    if (source === undefined) continue
-
-    source.forEach((value, key) => {
-      headers.set(key, value)
-    })
-  }
-
-  return headers
 }

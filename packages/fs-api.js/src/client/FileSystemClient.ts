@@ -1,3 +1,9 @@
+import {
+  requestBytes,
+  requestJson,
+  requestServerSentEvents,
+  type ServerSentEvent,
+} from "@xieyuheng/http.js"
 import type {
   FileSystemEntry,
   InspectFileResult,
@@ -50,87 +56,154 @@ export type FileSystemClientConfig = {
 export function makeFileSystemClient(
   config: FileSystemClientConfig,
 ): FileSystemClient {
+  const baseUrl = config.baseUrl
+
   return {
-    home: () => call(config.baseUrl, "home", {}),
-    exists: (path) => call(config.baseUrl, "exists", { path }),
-    isFile: (path) => call(config.baseUrl, "is-file", { path }),
-    isDirectory: (path) => call(config.baseUrl, "is-directory", { path }),
-    read: (path) => call(config.baseUrl, "read", { path }),
-    readBytes: (path) => readBytes(config.baseUrl, path),
+    home: () =>
+      requestJson<string>({
+        baseUrl,
+        method: "POST",
+        path: "/home",
+        body: {},
+      }),
+
+    exists: (path) =>
+      requestJson<boolean>({
+        baseUrl,
+        method: "POST",
+        path: "/exists",
+        body: { path },
+      }),
+
+    isFile: (path) =>
+      requestJson<boolean>({
+        baseUrl,
+        method: "POST",
+        path: "/is-file",
+        body: { path },
+      }),
+
+    isDirectory: (path) =>
+      requestJson<boolean>({
+        baseUrl,
+        method: "POST",
+        path: "/is-directory",
+        body: { path },
+      }),
+
+    read: (path) =>
+      requestJson<string>({
+        baseUrl,
+        method: "POST",
+        path: "/read",
+        body: { path },
+      }),
+
+    readBytes: (path) =>
+      requestBytes({
+        baseUrl,
+        method: "POST",
+        path: "/read-bytes",
+        body: { path },
+      }),
+
     write: async (path, text) => {
-      await call(config.baseUrl, "write", { path, text })
+      await requestJson({
+        baseUrl,
+        method: "POST",
+        path: "/write",
+        body: { path, text },
+      })
     },
-    list: (path) => call(config.baseUrl, "list", { path }),
-    listEntries: (path) => call(config.baseUrl, "list-entries", { path }),
-    listRecursive: (path) => call(config.baseUrl, "list-recursive", { path }),
-    inspectFile: (path) => call(config.baseUrl, "inspect-file", { path }),
+
+    list: (path) =>
+      requestJson<Array<string>>({
+        baseUrl,
+        method: "POST",
+        path: "/list",
+        body: { path },
+      }),
+
+    listEntries: (path) =>
+      requestJson<Array<FileSystemEntry>>({
+        baseUrl,
+        method: "POST",
+        path: "/list-entries",
+        body: { path },
+      }),
+
+    listRecursive: (path) =>
+      requestJson<Array<string>>({
+        baseUrl,
+        method: "POST",
+        path: "/list-recursive",
+        body: { path },
+      }),
+
+    inspectFile: (path) =>
+      requestJson<InspectFileResult>({
+        baseUrl,
+        method: "POST",
+        path: "/inspect-file",
+        body: { path },
+      }),
+
     ensureFile: async (path) => {
-      await call(config.baseUrl, "ensure-file", { path })
+      await requestJson({
+        baseUrl,
+        method: "POST",
+        path: "/ensure-file",
+        body: { path },
+      })
     },
+
     ensureDirectory: async (path) => {
-      await call(config.baseUrl, "ensure-directory", { path })
+      await requestJson({
+        baseUrl,
+        method: "POST",
+        path: "/ensure-directory",
+        body: { path },
+      })
     },
+
     deleteFile: async (path) => {
-      await call(config.baseUrl, "delete-file", { path })
+      await requestJson({
+        baseUrl,
+        method: "POST",
+        path: "/delete-file",
+        body: { path },
+      })
     },
+
     deleteDirectory: async (path) => {
-      await call(config.baseUrl, "delete-directory", { path })
+      await requestJson({
+        baseUrl,
+        method: "POST",
+        path: "/delete-directory",
+        body: { path },
+      })
     },
+
     delete: async (path) => {
-      await call(config.baseUrl, "delete", { path })
+      await requestJson({
+        baseUrl,
+        method: "POST",
+        path: "/delete",
+        body: { path },
+      })
     },
+
     rename: async (path, newPath) => {
-      await call(config.baseUrl, "rename", { path, newPath })
+      await requestJson({
+        baseUrl,
+        method: "POST",
+        path: "/rename",
+        body: { path, newPath },
+      })
     },
-    watch: (path, onEvent, onError) =>
-      watch(config.baseUrl, path, onEvent, onError),
+
+    watch: (path, onEvent, onError) => watch(baseUrl, path, onEvent, onError),
   }
-}
-
-async function readBytes(baseUrl: string, path: string): Promise<Uint8Array> {
-  const response = await fetch(joinUrl(baseUrl, "read-bytes"), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ path }),
-  })
-
-  if (!response.ok) {
-    const text = await response.text()
-    const value = text === "" ? null : parseJsonOrUndefined(text)
-
-    throw new Error(
-      `[FileSystemClient] read-bytes failed with HTTP ${response.status}: ${readErrorMessage(value, text)}`,
-    )
-  }
-
-  return new Uint8Array(await response.arrayBuffer())
-}
-
-async function call<T>(
-  baseUrl: string,
-  method: string,
-  body: Record<string, unknown>,
-): Promise<T> {
-  const response = await fetch(joinUrl(baseUrl, method), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  })
-
-  const text = await response.text()
-  const value = text === "" ? null : parseJson(text)
-
-  if (!response.ok) {
-    throw new Error(
-      `[FileSystemClient] ${method} failed with HTTP ${response.status}: ${readErrorMessage(value, text)}`,
-    )
-  }
-
-  return value as T
 }
 
 function watch(
@@ -176,34 +249,23 @@ function watch(
       controller = new AbortController()
 
       try {
-        const response = await fetch(joinUrl(baseUrl, "watch"), {
+        let connected = false
+
+        for await (const event of requestServerSentEvents({
+          baseUrl,
           method: "POST",
-          headers: {
-            Accept: "text/event-stream",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ path }),
+          path: "/watch",
+          body: { path },
           signal: controller.signal,
-        })
+        })) {
+          if (!connected) {
+            connected = true
+            reconnectDelay = 500
+          }
 
-        if (!response.ok) {
-          const text = await response.text()
-
-          throw new Error(
-            `[FileSystemClient] watch failed with HTTP ${response.status}: ${readErrorMessage(
-              parseJsonOrUndefined(text),
-              text,
-            )}`,
-          )
+          const watchEvent = parseFileSystemWatchEvent(event)
+          if (watchEvent !== undefined) onEvent(watchEvent)
         }
-
-        const body = response.body
-        if (body === null) {
-          throw new Error("[FileSystemClient] watch response body is null")
-        }
-
-        reconnectDelay = 500
-        await readEventStream(body, onEvent)
       } catch (error) {
         if (stopped) return
 
@@ -220,64 +282,13 @@ function watch(
   return stop
 }
 
-async function readEventStream(
-  body: ReadableStream<Uint8Array>,
-  onEvent: FileSystemWatchHandler,
-): Promise<void> {
-  const reader = body.getReader()
-  const decoder = new TextDecoder()
-  let buffer = ""
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-
-      buffer += decoder.decode(value, { stream: true })
-      buffer = buffer.replace(/\r\n/g, "\n").replace(/\r/g, "\n")
-
-      let separatorIndex = buffer.indexOf("\n\n")
-      while (separatorIndex !== -1) {
-        const block = buffer.slice(0, separatorIndex)
-        buffer = buffer.slice(separatorIndex + 2)
-
-        const event = parseEventBlock(block)
-        if (event !== undefined) onEvent(event)
-
-        separatorIndex = buffer.indexOf("\n\n")
-      }
-    }
-  } finally {
-    reader.releaseLock()
-  }
-}
-
-function parseEventBlock(block: string): FileSystemWatchEvent | undefined {
-  let eventName = "message"
-  const dataLines: Array<string> = []
-
-  for (const line of block.split("\n")) {
-    if (line === "" || line.startsWith(":")) continue
-
-    const colonIndex = line.indexOf(":")
-    const field = colonIndex === -1 ? line : line.slice(0, colonIndex)
-    let value = colonIndex === -1 ? "" : line.slice(colonIndex + 1)
-
-    if (value.startsWith(" ")) value = value.slice(1)
-
-    if (field === "event") {
-      eventName = value
-    } else if (field === "data") {
-      dataLines.push(value)
-    }
-  }
-
-  if (dataLines.length === 0) return undefined
-
-  const value = parseJsonOrUndefined(dataLines.join("\n"))
+function parseFileSystemWatchEvent(
+  event: ServerSentEvent,
+): FileSystemWatchEvent | undefined {
+  const value = parseJsonOrUndefined(event.data)
   if (value === undefined) return undefined
 
-  switch (eventName) {
+  switch (event.event) {
     case "ready": {
       const path = readStringField(value, "path")
       return path === undefined ? undefined : { type: "ready", path }
@@ -342,28 +353,4 @@ function parseJsonOrUndefined(text: string): unknown {
 
 function toError(error: unknown): Error {
   return error instanceof Error ? error : new Error(String(error))
-}
-
-function joinUrl(baseUrl: string, method: string): string {
-  return `${baseUrl.replace(/\/+$/, "")}/${method}`
-}
-
-function parseJson(text: string): unknown {
-  try {
-    return JSON.parse(text)
-  } catch {
-    throw new Error(`[FileSystemClient] invalid JSON response: ${text}`)
-  }
-}
-
-function readErrorMessage(value: unknown, fallback: string): string {
-  if (value !== null && typeof value === "object" && "error" in value) {
-    const error = (value as { error?: unknown }).error
-    if (error !== null && typeof error === "object" && "message" in error) {
-      const message = (error as { message?: unknown }).message
-      if (typeof message === "string") return message
-    }
-  }
-
-  return fallback
 }

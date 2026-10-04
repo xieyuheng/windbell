@@ -1,11 +1,3 @@
-# fs-api.js
-
-refactor http client -- try to extract to http.js
-
-# semiosis-api.js
-
-refactor http client -- try to extract to http.js
-
 # windbell-web.js
 
 改善 provider list page 和 provider card 和 model line
