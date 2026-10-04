@@ -1,6 +1,7 @@
 export const themeMessages = {
   "zh-CN": {
     title: "主题",
+    loading: "加载中...",
     newTheme: "新建主题",
     edit: "编辑",
     save: "保存",
@@ -15,6 +16,7 @@ export const themeMessages = {
   },
   "en-US": {
     title: "Themes",
+    loading: "Loading...",
     newTheme: "New Theme",
     edit: "Edit",
     save: "Save",

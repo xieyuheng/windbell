@@ -10,6 +10,7 @@ import {
   isBuiltInTheme,
   setPreviewTheme,
   useTheme,
+  waitForThemeData,
   type Theme,
   type ThemeColorName,
 } from "../../app/theme.ts"
@@ -39,6 +40,7 @@ const existingTheme = computed(() => findThemeById(themeId.value))
 const draft = reactive<Theme>(makeDraft())
 const selectedMode = ref<"light" | "dark">(colorMode.resolved)
 const saving = ref(false)
+const ready = ref(isNew.value)
 const error = ref<string | undefined>(undefined)
 
 const colorGroups: Array<{
@@ -110,6 +112,8 @@ function refreshPreview(): void {
 }
 
 async function handleSave(): Promise<void> {
+  if (!ready.value) return
+
   saving.value = true
   error.value = undefined
 
@@ -139,7 +143,7 @@ async function handleSave(): Promise<void> {
 }
 
 async function handleDelete(): Promise<void> {
-  if (isNew.value || existingTheme.value === undefined) return
+  if (!ready.value || isNew.value || existingTheme.value === undefined) return
   if (!window.confirm(t("confirmDelete", { name: draft.name }))) return
 
   saving.value = true
@@ -156,8 +160,13 @@ async function handleDelete(): Promise<void> {
   }
 }
 
-onMounted(() => {
+let disposed = false
+
+onMounted(async () => {
   if (!isNew.value) {
+    await waitForThemeData()
+    if (disposed) return
+
     if (existingTheme.value === undefined) {
       void router.replace({ name: "theme-list" })
       return
@@ -167,12 +176,17 @@ onMounted(() => {
       void router.replace({ name: "theme-list" })
       return
     }
+
+    // 数据加载完成后，用真实主题覆盖初始化时回退到内置主题的草稿
+    Object.assign(draft, makeDraft())
   }
 
+  ready.value = true
   setPreviewTheme(cloneDraft())
 })
 
 onBeforeUnmount(() => {
+  disposed = true
   setPreviewTheme(undefined)
 })
 
@@ -190,10 +204,14 @@ useHead(() => ({
 
       <div class="flex flex-wrap items-center gap-2">
         <BackButton :to="{ name: 'theme-list' }" />
-        <MediumButton :disabled="saving" @click="handleSave">
+        <MediumButton :disabled="saving || !ready" @click="handleSave">
           {{ t("save") }}
         </MediumButton>
-        <MediumButton v-if="!isNew" :disabled="saving" @click="handleDelete">
+        <MediumButton
+          v-if="!isNew"
+          :disabled="saving || !ready"
+          @click="handleDelete"
+        >
           {{ t("delete") }}
         </MediumButton>
       </div>
@@ -206,70 +224,76 @@ useHead(() => ({
       {{ error }}
     </p>
 
-    <Card as="section">
-      <template #tag>
-        <h2 class="text-ink">{{ t("name") }}</h2>
-      </template>
+    <p v-if="!ready" class="text-sm text-ink">
+      {{ t("loading") }}
+    </p>
 
-      <div class="p-3">
-        <input
-          v-model="draft.name"
-          class="w-full rounded border border-line bg-paper px-3 py-2 text-ink outline-none focus:border-ink"
-          type="text"
-          @input="refreshPreview"
-        />
-      </div>
-    </Card>
+    <template v-else>
+      <Card as="section">
+        <template #tag>
+          <h2 class="text-ink">{{ t("name") }}</h2>
+        </template>
 
-    <Card as="section">
-      <template #tag>
-        <div class="flex items-center gap-4">
-          <button
-            class="text-ink"
-            :class="selectedMode === 'light' ? 'font-bold' : 'opacity-60'"
-            type="button"
-            @click="selectMode('light')"
-          >
-            {{ t("light") }}
-          </button>
-          <button
-            class="text-ink"
-            :class="selectedMode === 'dark' ? 'font-bold' : 'opacity-60'"
-            type="button"
-            @click="selectMode('dark')"
-          >
-            {{ t("dark") }}
-          </button>
+        <div class="p-3">
+          <input
+            v-model="draft.name"
+            class="w-full rounded border border-line bg-paper px-3 py-2 text-ink outline-none focus:border-ink"
+            type="text"
+            @input="refreshPreview"
+          />
         </div>
-      </template>
+      </Card>
 
-      <div class="flex flex-col gap-6 p-3">
-        <section
-          v-for="group in colorGroups"
-          :key="group.labelKey"
-          class="flex flex-col gap-3"
-        >
-          <h3 class="text-sm font-bold text-ink">
-            {{ t(group.labelKey) }}
-          </h3>
-
-          <div class="grid gap-4 md:grid-cols-2">
-            <Card v-for="token in group.tokens" :key="token">
-              <template #tag>
-                <span class="font-mono text-xs text-ink">
-                  --color-{{ token }}
-                </span>
-              </template>
-
-              <ColorPicker
-                class="p-2"
-                :model-value="draft.colors[selectedMode][token]"
-                @update:modelValue="updateColor(selectedMode, token, $event)"
-              />
-            </Card>
+      <Card as="section">
+        <template #tag>
+          <div class="flex items-center gap-4">
+            <button
+              class="text-ink"
+              :class="selectedMode === 'light' ? 'font-bold' : 'opacity-60'"
+              type="button"
+              @click="selectMode('light')"
+            >
+              {{ t("light") }}
+            </button>
+            <button
+              class="text-ink"
+              :class="selectedMode === 'dark' ? 'font-bold' : 'opacity-60'"
+              type="button"
+              @click="selectMode('dark')"
+            >
+              {{ t("dark") }}
+            </button>
           </div>
-        </section>
-      </div>
-    </Card>
+        </template>
+
+        <div class="flex flex-col gap-6 p-3">
+          <section
+            v-for="group in colorGroups"
+            :key="group.labelKey"
+            class="flex flex-col gap-3"
+          >
+            <h3 class="text-sm font-bold text-ink">
+              {{ t(group.labelKey) }}
+            </h3>
+
+            <div class="grid gap-4 md:grid-cols-2">
+              <Card v-for="token in group.tokens" :key="token">
+                <template #tag>
+                  <span class="font-mono text-xs text-ink">
+                    --color-{{ token }}
+                  </span>
+                </template>
+
+                <ColorPicker
+                  class="p-2"
+                  :model-value="draft.colors[selectedMode][token]"
+                  @update:modelValue="updateColor(selectedMode, token, $event)"
+                />
+              </Card>
+            </div>
+          </section>
+        </div>
+      </Card>
+    </template>
   </PageLayout>
 </template>

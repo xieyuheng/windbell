@@ -239,6 +239,7 @@ watch([activeTheme, () => colorMode.resolved], () => applyCurrentTheme(), {
 })
 
 let initializePromise: Promise<void> | undefined
+let themeDataPromise: Promise<void> | undefined
 
 export function ensureThemeReady(): Promise<void> {
   if (initializePromise !== undefined) return initializePromise
@@ -248,13 +249,22 @@ export function ensureThemeReady(): Promise<void> {
   if (cachedTheme !== undefined) {
     applyCachedTheme(cachedTheme)
     state.loading = false
+    themeDataPromise = refreshThemeFromDatabase()
     initializePromise = Promise.resolve()
-    void refreshThemeFromDatabase()
     return initializePromise
   }
 
-  initializePromise = refreshThemeFromDatabase()
+  themeDataPromise = refreshThemeFromDatabase()
+  initializePromise = themeDataPromise
   return initializePromise
+}
+
+export function waitForThemeData(): Promise<void> {
+  if (themeDataPromise === undefined) {
+    void ensureThemeReady()
+  }
+
+  return themeDataPromise ?? Promise.resolve()
 }
 
 async function refreshThemeFromDatabase(): Promise<void> {
