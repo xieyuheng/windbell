@@ -100,16 +100,6 @@ const activeTheme = computed<Theme>(() => {
 const colorMode = useColorMode()
 let previewTheme: Theme | undefined
 
-type ThemeChannelMessage = {
-  type: "theme-selected"
-  themeId: string
-}
-
-const themeChannel =
-  typeof BroadcastChannel === "undefined"
-    ? undefined
-    : new BroadcastChannel("windbell.theme")
-
 export function findThemeById(themeId: string): Theme | undefined {
   return (
     builtInThemes.find((theme) => theme.id === themeId) ??
@@ -121,8 +111,7 @@ export function isBuiltInTheme(themeId: string): boolean {
   return builtInThemes.some((theme) => theme.id === themeId)
 }
 
-const THEME_ID_STORAGE_KEY = "windbell.theme"
-const THEME_CACHE_STORAGE_KEY = "windbell.theme-cache"
+const THEME_CACHE_STORAGE_KEY = "windbell.theme"
 
 function isThemeModeColors(value: unknown): value is ThemeModeColors {
   if (value === null || typeof value !== "object" || value instanceof Array) {
@@ -162,22 +151,16 @@ function isCachedTheme(value: unknown): value is Theme {
 }
 
 function clearCachedTheme(): void {
-  localStorage.removeItem(THEME_ID_STORAGE_KEY)
   localStorage.removeItem(THEME_CACHE_STORAGE_KEY)
 }
 
 function readCachedTheme(): Theme | undefined {
-  const themeId = localStorage.getItem(THEME_ID_STORAGE_KEY)
   const raw = localStorage.getItem(THEME_CACHE_STORAGE_KEY)
-
-  if (themeId === null || raw === null) {
-    clearCachedTheme()
-    return undefined
-  }
+  if (raw === null) return undefined
 
   try {
     const value: unknown = JSON.parse(raw)
-    if (isCachedTheme(value) && value.id === themeId) return value
+    if (isCachedTheme(value)) return value
   } catch {
     // ignore invalid cache
   }
@@ -188,7 +171,6 @@ function readCachedTheme(): Theme | undefined {
 
 function writeCachedTheme(theme: Theme): void {
   try {
-    localStorage.setItem(THEME_ID_STORAGE_KEY, theme.id)
     localStorage.setItem(THEME_CACHE_STORAGE_KEY, JSON.stringify(theme))
   } catch {
     // ignore storage errors
@@ -205,6 +187,35 @@ function applyCachedTheme(theme: Theme): void {
   state.activeThemeId = theme.id
   applyCurrentTheme()
 }
+
+function applyThemeFromStorageEvent(): void {
+  const theme = readCachedTheme()
+  if (theme === undefined) return
+
+  if (!isBuiltInTheme(theme.id)) {
+    const index = state.customThemes.findIndex((item) => item.id === theme.id)
+    if (index === -1) {
+      state.customThemes = [theme, ...state.customThemes]
+    } else {
+      state.customThemes.splice(index, 1, theme)
+    }
+
+    void refreshCustomThemes().catch((error) => {
+      state.error = error instanceof Error ? error.message : String(error)
+    })
+  }
+
+  state.activeThemeId = theme.id
+  state.error = undefined
+  applyCurrentTheme()
+}
+
+window.addEventListener("storage", (event) => {
+  if (event.key !== THEME_CACHE_STORAGE_KEY) return
+  if (event.newValue === null) return
+
+  applyThemeFromStorageEvent()
+})
 
 export function applyTheme(theme: Theme, resolved: ColorMode): void {
   const colors = theme.colors[resolved]
@@ -225,50 +236,6 @@ function applyCurrentTheme(): void {
 
 watch([activeTheme, () => colorMode.resolved], () => applyCurrentTheme(), {
   immediate: true,
-})
-
-function notifyThemeSelected(themeId: string): void {
-  themeChannel?.postMessage({
-    type: "theme-selected",
-    themeId,
-  } satisfies ThemeChannelMessage)
-}
-
-async function applySelectedThemeFromOtherTab(themeId: string): Promise<void> {
-  let theme = findThemeById(themeId)
-
-  if (theme === undefined) {
-    try {
-      await refreshCustomThemes()
-    } catch (error) {
-      state.error = error instanceof Error ? error.message : String(error)
-      return
-    }
-
-    theme = findThemeById(themeId)
-  }
-
-  if (theme === undefined) return
-
-  state.activeThemeId = theme.id
-  writeCachedTheme(theme)
-  state.error = undefined
-  applyCurrentTheme()
-}
-
-themeChannel?.addEventListener("message", (event: MessageEvent<unknown>) => {
-  const data = event.data
-  if (data === null || typeof data !== "object") return
-
-  const message = data as Record<string, unknown>
-  if (
-    message.type !== "theme-selected" ||
-    typeof message.themeId !== "string"
-  ) {
-    return
-  }
-
-  void applySelectedThemeFromOtherTab(message.themeId)
 })
 
 let initializePromise: Promise<void> | undefined
@@ -334,7 +301,6 @@ export async function activateTheme(themeId: string): Promise<void> {
       themeId: theme.id,
     })
     writeCachedTheme(theme)
-    notifyThemeSelected(theme.id)
     state.error = undefined
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
