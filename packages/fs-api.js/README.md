@@ -54,6 +54,6 @@ import { makeFileSystemClient } from "@xieyuheng/fs-api.js"
 
 const fs = makeFileSystemClient({ baseUrl: "http://127.0.0.1:3000/fs" })
 
-await fs.write("/tmp/a.md", "# Hello")
+await fs.write({ path: "/tmp/a.md", text: "# Hello" })
 console.log(await fs.read("/tmp/a.md"))
 ```

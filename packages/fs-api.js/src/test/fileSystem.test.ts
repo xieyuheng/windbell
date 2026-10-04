@@ -171,7 +171,7 @@ test("fileSystem client and server", async (t) => {
   assert.equal(await client.exists(textFile), true)
   assert.equal(await client.isFile(textFile), true)
 
-  await client.write(textFile, "# Hello")
+  await client.write({ path: textFile, text: "# Hello" })
   assert.equal(await client.read(textFile), "# Hello")
   assert.deepEqual(
     await client.readBytes(textFile),
@@ -236,7 +236,7 @@ test("fileSystem client and server", async (t) => {
   )
 
   const renamedFile = Path.join(root, "renamed.md")
-  await client.rename(textFile, renamedFile)
+  await client.rename({ path: textFile, newPath: renamedFile })
   assert.equal(await client.exists(textFile), false)
   assert.equal(await client.read(renamedFile), "# Hello")
 

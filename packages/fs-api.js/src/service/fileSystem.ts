@@ -64,7 +64,7 @@ export type FileTypeKind =
 
 export type InspectFileResult = {
   kind: FileTypeKind
-  mimeType: string | undefined
+  mimeType?: string
   size: number
 }
 

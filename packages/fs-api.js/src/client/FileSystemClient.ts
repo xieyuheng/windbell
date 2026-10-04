@@ -1,6 +1,6 @@
 import {
+  makeJsonEndpoint,
   requestBytes,
-  requestJson,
   requestServerSentEvents,
   type ServerSentEvent,
 } from "@xieyuheng/http.js"
@@ -8,6 +8,14 @@ import type {
   FileSystemEntry,
   InspectFileResult,
 } from "../service/fileSystem.ts"
+import {
+  BooleanSchema,
+  FileSystemEntryListSchema,
+  InspectFileResultSchema,
+  StringListSchema,
+  StringSchema,
+  VoidSchema,
+} from "./schemas.ts"
 
 export type FileSystemWatchEvent =
   | { type: "ready"; path: string }
@@ -24,6 +32,16 @@ export type FileSystemWatchHandler = (event: FileSystemWatchEvent) => void
 
 export type FileSystemWatchErrorHandler = (error: Error) => void
 
+export type WriteFileOptions = {
+  path: string
+  text: string
+}
+
+export type RenameFileOptions = {
+  path: string
+  newPath: string
+}
+
 export type FileSystemClient = {
   home(): Promise<string>
   exists(path: string): Promise<boolean>
@@ -31,7 +49,7 @@ export type FileSystemClient = {
   isDirectory(path: string): Promise<boolean>
   read(path: string): Promise<string>
   readBytes(path: string): Promise<Uint8Array>
-  write(path: string, text: string): Promise<void>
+  write(options: WriteFileOptions): Promise<void>
   list(path: string): Promise<Array<string>>
   listEntries(path: string): Promise<Array<FileSystemEntry>>
   listRecursive(path: string): Promise<Array<string>>
@@ -41,7 +59,7 @@ export type FileSystemClient = {
   deleteFile(path: string): Promise<void>
   deleteDirectory(path: string): Promise<void>
   delete(path: string): Promise<void>
-  rename(path: string, newPath: string): Promise<void>
+  rename(options: RenameFileOptions): Promise<void>
   watch(
     path: string,
     onEvent: FileSystemWatchHandler,
@@ -56,153 +74,129 @@ export type FileSystemClientConfig = {
 export function makeFileSystemClient(
   config: FileSystemClientConfig,
 ): FileSystemClient {
-  const baseUrl = config.baseUrl
-
   return {
-    home: () =>
-      requestJson<string>({
-        baseUrl,
-        method: "POST",
-        path: "/home",
-        body: {},
-      }),
+    home: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/home",
+      body: () => ({}),
+      output: StringSchema,
+    }),
 
-    exists: (path) =>
-      requestJson<boolean>({
-        baseUrl,
-        method: "POST",
-        path: "/exists",
-        body: { path },
-      }),
+    exists: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/exists",
+      body: (path: string) => ({ path }),
+      output: BooleanSchema,
+    }),
 
-    isFile: (path) =>
-      requestJson<boolean>({
-        baseUrl,
-        method: "POST",
-        path: "/is-file",
-        body: { path },
-      }),
+    isFile: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/is-file",
+      body: (path: string) => ({ path }),
+      output: BooleanSchema,
+    }),
 
-    isDirectory: (path) =>
-      requestJson<boolean>({
-        baseUrl,
-        method: "POST",
-        path: "/is-directory",
-        body: { path },
-      }),
+    isDirectory: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/is-directory",
+      body: (path: string) => ({ path }),
+      output: BooleanSchema,
+    }),
 
-    read: (path) =>
-      requestJson<string>({
-        baseUrl,
-        method: "POST",
-        path: "/read",
-        body: { path },
-      }),
+    read: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/read",
+      body: (path: string) => ({ path }),
+      output: StringSchema,
+    }),
 
     readBytes: (path) =>
       requestBytes({
-        baseUrl,
+        baseUrl: config.baseUrl,
         method: "POST",
         path: "/read-bytes",
         body: { path },
       }),
 
-    write: async (path, text) => {
-      await requestJson({
-        baseUrl,
-        method: "POST",
-        path: "/write",
-        body: { path, text },
-      })
-    },
+    write: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/write",
+      body: (options: WriteFileOptions) => options,
+      output: VoidSchema,
+    }),
 
-    list: (path) =>
-      requestJson<Array<string>>({
-        baseUrl,
-        method: "POST",
-        path: "/list",
-        body: { path },
-      }),
+    list: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/list",
+      body: (path: string) => ({ path }),
+      output: StringListSchema,
+    }),
 
-    listEntries: (path) =>
-      requestJson<Array<FileSystemEntry>>({
-        baseUrl,
-        method: "POST",
-        path: "/list-entries",
-        body: { path },
-      }),
+    listEntries: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/list-entries",
+      body: (path: string) => ({ path }),
+      output: FileSystemEntryListSchema,
+    }),
 
-    listRecursive: (path) =>
-      requestJson<Array<string>>({
-        baseUrl,
-        method: "POST",
-        path: "/list-recursive",
-        body: { path },
-      }),
+    listRecursive: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/list-recursive",
+      body: (path: string) => ({ path }),
+      output: StringListSchema,
+    }),
 
-    inspectFile: (path) =>
-      requestJson<InspectFileResult>({
-        baseUrl,
-        method: "POST",
-        path: "/inspect-file",
-        body: { path },
-      }),
+    inspectFile: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/inspect-file",
+      body: (path: string) => ({ path }),
+      output: InspectFileResultSchema,
+    }),
 
-    ensureFile: async (path) => {
-      await requestJson({
-        baseUrl,
-        method: "POST",
-        path: "/ensure-file",
-        body: { path },
-      })
-    },
+    ensureFile: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/ensure-file",
+      body: (path: string) => ({ path }),
+      output: VoidSchema,
+    }),
 
-    ensureDirectory: async (path) => {
-      await requestJson({
-        baseUrl,
-        method: "POST",
-        path: "/ensure-directory",
-        body: { path },
-      })
-    },
+    ensureDirectory: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/ensure-directory",
+      body: (path: string) => ({ path }),
+      output: VoidSchema,
+    }),
 
-    deleteFile: async (path) => {
-      await requestJson({
-        baseUrl,
-        method: "POST",
-        path: "/delete-file",
-        body: { path },
-      })
-    },
+    deleteFile: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/delete-file",
+      body: (path: string) => ({ path }),
+      output: VoidSchema,
+    }),
 
-    deleteDirectory: async (path) => {
-      await requestJson({
-        baseUrl,
-        method: "POST",
-        path: "/delete-directory",
-        body: { path },
-      })
-    },
+    deleteDirectory: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/delete-directory",
+      body: (path: string) => ({ path }),
+      output: VoidSchema,
+    }),
 
-    delete: async (path) => {
-      await requestJson({
-        baseUrl,
-        method: "POST",
-        path: "/delete",
-        body: { path },
-      })
-    },
+    delete: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/delete",
+      body: (path: string) => ({ path }),
+      output: VoidSchema,
+    }),
 
-    rename: async (path, newPath) => {
-      await requestJson({
-        baseUrl,
-        method: "POST",
-        path: "/rename",
-        body: { path, newPath },
-      })
-    },
+    rename: makeJsonEndpoint(config, {
+      method: "POST",
+      path: "/rename",
+      body: (options: RenameFileOptions) => options,
+      output: VoidSchema,
+    }),
 
-    watch: (path, onEvent, onError) => watch(baseUrl, path, onEvent, onError),
+    watch: (path, onEvent, onError) =>
+      watch(config.baseUrl, path, onEvent, onError),
   }
 }
 
