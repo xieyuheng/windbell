@@ -21,7 +21,7 @@ const href = computed(() => safeUrl(definition.value?.url))
     v-if="href !== undefined"
     :href="href"
     :title="definition?.title ?? undefined"
-    class="text-info underline underline-offset-2"
+    class="underline underline-offset-2"
     target="_blank"
     rel="noopener noreferrer"
   >

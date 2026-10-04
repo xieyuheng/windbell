@@ -18,7 +18,7 @@ const href = computed(() => safeUrl(props.node.url))
     v-if="href !== undefined"
     :href="href"
     :title="node.title ?? undefined"
-    class="text-info underline underline-offset-2"
+    class="underline underline-offset-2"
     target="_blank"
     rel="noopener noreferrer"
   >

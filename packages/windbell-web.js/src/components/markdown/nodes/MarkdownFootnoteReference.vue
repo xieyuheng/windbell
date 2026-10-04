@@ -18,7 +18,7 @@ const number = computed(() =>
     <a
       :id="`markdown-footnote-ref-${node.identifier}`"
       :href="`#markdown-footnote-${node.identifier}`"
-      class="text-info no-underline"
+      class="underline underline-offset-2"
     >
       {{ number ?? "?" }}
     </a>

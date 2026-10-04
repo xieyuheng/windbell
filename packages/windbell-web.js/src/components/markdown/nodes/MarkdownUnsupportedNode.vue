@@ -9,7 +9,7 @@ defineProps<{
 </script>
 
 <template>
-  <span class="rounded bg-warning/10 px-1 font-mono text-warning">
+  <span class="rounded bg-sign-error/10 px-1 font-mono text-sign-error">
     unsupported: {{ node.type }}
   </span>
 </template>

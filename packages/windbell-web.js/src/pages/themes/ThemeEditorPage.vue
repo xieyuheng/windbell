@@ -50,10 +50,6 @@ const colorGroups: Array<{
     tokens: ["paper", "ink", "line"],
   },
   {
-    labelKey: "semanticColors",
-    tokens: ["accent", "warning", "info", "interactive"],
-  },
-  {
     labelKey: "signColors",
     tokens: [
       "sign-persona",
