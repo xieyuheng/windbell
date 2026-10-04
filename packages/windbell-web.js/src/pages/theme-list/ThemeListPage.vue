@@ -10,10 +10,10 @@ import MediumButton from "../../components/buttons/MediumButton.vue"
 import SmallButton from "../../components/buttons/SmallButton.vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
 import ThemeCard from "./ThemeCard.vue"
-import { themesMessages } from "./Themes.i18n.ts"
+import { themeListMessages } from "./ThemeList.i18n.ts"
 
 const { t } = useI18n({
-  messages: themesMessages,
+  messages: themeListMessages,
   useScope: "local",
 })
 const router = useRouter()
@@ -51,7 +51,7 @@ async function handleDuplicate(theme: Theme): Promise<void> {
     })
 
     await router.push({
-      name: "theme-editor",
+      name: "theme",
       params: { themeId: created.id },
     })
   } catch (caught) {
@@ -156,9 +156,7 @@ useHead(() => ({
               {{ t("duplicate") }}
             </SmallButton>
 
-            <SmallButton
-              :to="{ name: 'theme-editor', params: { themeId: theme.id } }"
-            >
+            <SmallButton :to="{ name: 'theme', params: { themeId: theme.id } }">
               {{ t("edit") }}
             </SmallButton>
 

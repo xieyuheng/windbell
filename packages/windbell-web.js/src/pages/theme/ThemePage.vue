@@ -19,10 +19,10 @@ import MediumButton from "../../components/buttons/MediumButton.vue"
 import SmallButton from "../../components/buttons/SmallButton.vue"
 import Card from "../../components/card/Card.vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
-import { themesMessages } from "./Themes.i18n.ts"
+import { themeMessages } from "./Theme.i18n.ts"
 
 const { t } = useI18n({
-  messages: themesMessages,
+  messages: themeMessages,
   useScope: "local",
 })
 const route = useRoute()
@@ -127,7 +127,7 @@ async function handleSave(): Promise<void> {
 
     if (isNew.value) {
       await router.replace({
-        name: "theme-editor",
+        name: "theme",
         params: { themeId: saved.id },
       })
     }
@@ -148,7 +148,7 @@ async function handleDelete(): Promise<void> {
   try {
     setPreviewTheme(undefined)
     await themes.deleteCustomTheme(draft.id)
-    await router.push({ name: "themes" })
+    await router.push({ name: "theme-list" })
   } catch (caught) {
     error.value = caught instanceof Error ? caught.message : String(caught)
   } finally {
@@ -159,12 +159,12 @@ async function handleDelete(): Promise<void> {
 onMounted(() => {
   if (!isNew.value) {
     if (existingTheme.value === undefined) {
-      void router.replace({ name: "themes" })
+      void router.replace({ name: "theme-list" })
       return
     }
 
     if (isBuiltInTheme(existingTheme.value.id)) {
-      void router.replace({ name: "themes" })
+      void router.replace({ name: "theme-list" })
       return
     }
   }
@@ -189,7 +189,7 @@ useHead(() => ({
       </h1>
 
       <div class="flex flex-wrap items-center gap-2">
-        <BackButton :to="{ name: 'themes' }" />
+        <BackButton :to="{ name: 'theme-list' }" />
         <MediumButton :disabled="saving" @click="handleSave">
           {{ t("save") }}
         </MediumButton>

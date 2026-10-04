@@ -1,4 +1,4 @@
-export const themesMessages = {
+export const themeListMessages = {
   "zh-CN": {
     title: "主题",
     builtInThemes: "内置主题列表",
@@ -9,13 +9,8 @@ export const themesMessages = {
     edit: "编辑",
     duplicate: "复制",
     delete: "删除",
-    name: "名称",
-    save: "保存",
-    cancel: "取消",
     light: "浅色",
     dark: "深色",
-    baseColors: "基础色",
-    signColors: "Sign 颜色",
     noCustomThemes: "还没有自定义主题。",
     confirmDelete: "确定删除主题「{name}」吗？",
     sourceBuiltIn: "内置",
@@ -31,13 +26,8 @@ export const themesMessages = {
     edit: "Edit",
     duplicate: "Duplicate",
     delete: "Delete",
-    name: "Name",
-    save: "Save",
-    cancel: "Cancel",
     light: "Light",
     dark: "Dark",
-    baseColors: "Base Colors",
-    signColors: "Sign Colors",
     noCustomThemes: "No custom themes yet.",
     confirmDelete: 'Delete theme "{name}"?',
     sourceBuiltIn: "Built-in",

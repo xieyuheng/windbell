@@ -2,14 +2,14 @@
 import { useI18n } from "vue-i18n"
 import { themeColorTokens, type Theme } from "../../app/theme.ts"
 import Card from "../../components/card/Card.vue"
-import { themesMessages } from "./Themes.i18n.ts"
+import { themeListMessages } from "./ThemeList.i18n.ts"
 
 const props = defineProps<{
   theme: Theme
 }>()
 
 const { t } = useI18n({
-  messages: themesMessages,
+  messages: themeListMessages,
   useScope: "local",
 })
 
