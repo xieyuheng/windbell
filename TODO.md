@@ -1,9 +1,5 @@
 # windbell-web.js
 
-下面我想设计一种 theme 机制，配色可配置。
-
-# windbell-web.js
-
 改善 provider page 和 model card
 
 - 「启用模型/禁用模型」设计为 toggle 的形式。
