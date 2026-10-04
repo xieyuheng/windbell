@@ -91,6 +91,11 @@ function cloneDraft(): Theme {
   }
 }
 
+function selectMode(mode: "light" | "dark"): void {
+  colorMode.setPreference(mode)
+  selectedMode.value = mode
+}
+
 function updateColor(
   mode: "light" | "dark",
   token: ThemeColorName,
@@ -223,7 +228,7 @@ useHead(() => ({
             class="text-ink"
             :class="selectedMode === 'light' ? 'font-bold' : 'opacity-60'"
             type="button"
-            @click="selectedMode = 'light'"
+            @click="selectMode('light')"
           >
             {{ t("light") }}
           </button>
@@ -231,7 +236,7 @@ useHead(() => ({
             class="text-ink"
             :class="selectedMode === 'dark' ? 'font-bold' : 'opacity-60'"
             type="button"
-            @click="selectedMode = 'dark'"
+            @click="selectMode('dark')"
           >
             {{ t("dark") }}
           </button>
