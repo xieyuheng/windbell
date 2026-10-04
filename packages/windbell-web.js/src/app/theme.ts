@@ -1,0 +1,360 @@
+import { makeSemiosisClient } from "@xieyuheng/semiosis-api.js/client"
+import { computed, reactive, watch } from "vue"
+import { useColorMode, type ColorMode } from "./color-mode.ts"
+
+export const defaultThemeId = "builtin-default"
+
+export const themeColorTokens = [
+  "paper",
+  "paper-deep",
+  "ink",
+  "ink-muted",
+  "line",
+  "accent",
+  "warning",
+  "info",
+  "danger",
+  "interactive",
+  "sign-persona",
+  "sign-user",
+  "sign-reasoning",
+  "sign-assistant",
+  "sign-provider-data",
+  "sign-tool-call",
+  "sign-tool",
+  "sign-tool-output",
+  "sign-error",
+] as const
+
+export type ThemeColorName = (typeof themeColorTokens)[number]
+export type ThemeModeColors = Record<ThemeColorName, string>
+
+export type Theme = {
+  id: string
+  name: string
+  colors: {
+    light: ThemeModeColors
+    dark: ThemeModeColors
+  }
+  createdAt?: number
+  updatedAt?: number
+}
+
+export type ThemeInput = {
+  name: string
+  colors: Theme["colors"]
+}
+
+export const builtInThemes: Array<Theme> = [
+  {
+    id: defaultThemeId,
+    name: "Default",
+    colors: {
+      light: {
+        paper: "#fafaf9",
+        "paper-deep": "#e2e2e0",
+        ink: "#1f1f1e",
+        "ink-muted": "#6b6b68",
+        line: "#e4e4e1",
+        accent: "#5f8f84",
+        warning: "#a66a1f",
+        info: "#4f7f99",
+        danger: "#b4514b",
+        interactive: "oklch(0.92 0.04 213)",
+        "sign-persona": "oklch(0.92 0.04 310)",
+        "sign-user": "oklch(0.92 0.04 213)",
+        "sign-reasoning": "oklch(0.92 0.04 294)",
+        "sign-assistant": "oklch(0.92 0.04 153)",
+        "sign-provider-data": "oklch(0.92 0.04 273)",
+        "sign-tool-call": "oklch(0.92 0.04 96)",
+        "sign-tool": "oklch(0.92 0.04 253)",
+        "sign-tool-output": "oklch(0.92 0.04 83)",
+        "sign-error": "oklch(0.92 0.04 17)",
+      },
+      dark: {
+        paper: "#181818",
+        "paper-deep": "#323232",
+        ink: "#f2f2f1",
+        "ink-muted": "#a6a6a3",
+        line: "#343434",
+        accent: "#86b8ab",
+        warning: "#d0a04e",
+        info: "#7fa8bf",
+        danger: "#d98c82",
+        interactive: "oklch(0.4 0.2 213)",
+        "sign-persona": "oklch(0.4 0.2 310)",
+        "sign-user": "oklch(0.4 0.2 213)",
+        "sign-reasoning": "oklch(0.4 0.2 294)",
+        "sign-assistant": "oklch(0.4 0.2 153)",
+        "sign-provider-data": "oklch(0.4 0.2 273)",
+        "sign-tool-call": "oklch(0.4 0.2 96)",
+        "sign-tool": "oklch(0.4 0.2 253)",
+        "sign-tool-output": "oklch(0.4 0.2 83)",
+        "sign-error": "oklch(0.4 0.2 17)",
+      },
+    },
+  },
+]
+
+export type ThemeState = {
+  customThemes: Array<Theme>
+  activeThemeId: string
+  loading: boolean
+  error: string | undefined
+}
+
+const semiosis = makeSemiosisClient({
+  baseUrl: "/api/semiosis",
+})
+
+const state = reactive<ThemeState>({
+  customThemes: [],
+  activeThemeId: defaultThemeId,
+  loading: true,
+  error: undefined,
+})
+
+const activeTheme = computed<Theme>(() => {
+  return findThemeById(state.activeThemeId) ?? builtInThemes[0]!
+})
+
+const colorMode = useColorMode()
+let previewTheme: Theme | undefined
+
+export function findThemeById(themeId: string): Theme | undefined {
+  return (
+    builtInThemes.find((theme) => theme.id === themeId) ??
+    state.customThemes.find((theme) => theme.id === themeId)
+  )
+}
+
+export function isBuiltInTheme(themeId: string): boolean {
+  return builtInThemes.some((theme) => theme.id === themeId)
+}
+
+export function applyTheme(theme: Theme, resolved: ColorMode): void {
+  const colors = theme.colors[resolved]
+
+  for (const token of themeColorTokens) {
+    const value = colors[token]
+    if (typeof value !== "string" || value.trim() === "") continue
+
+    document.documentElement.style.setProperty(`--color-${token}`, value)
+  }
+
+  document.documentElement.dataset.theme = theme.id
+}
+
+function applyCurrentTheme(): void {
+  applyTheme(previewTheme ?? activeTheme.value, colorMode.resolved)
+}
+
+watch([activeTheme, () => colorMode.resolved], () => applyCurrentTheme(), {
+  immediate: true,
+})
+
+let initializePromise: Promise<void> | undefined
+
+export function ensureThemeReady(): Promise<void> {
+  initializePromise ??= initializeTheme()
+  return initializePromise
+}
+
+async function initializeTheme(): Promise<void> {
+  state.loading = true
+  state.error = undefined
+
+  try {
+    const [settings, customThemes] = await Promise.all([
+      semiosis.settings.get(),
+      listCustomThemes(),
+    ])
+
+    state.customThemes = customThemes
+    const selectedThemeId = settings.themeId ?? defaultThemeId
+    state.activeThemeId = findThemeById(selectedThemeId)?.id ?? defaultThemeId
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+    state.activeThemeId = defaultThemeId
+  } finally {
+    state.loading = false
+  }
+
+  applyCurrentTheme()
+}
+
+export async function activateTheme(themeId: string): Promise<void> {
+  const theme = findThemeById(themeId)
+  if (theme === undefined) {
+    throw new Error(`theme not found: ${themeId}`)
+  }
+
+  state.activeThemeId = theme.id
+  applyCurrentTheme()
+
+  try {
+    const settings = await semiosis.settings.get()
+    await semiosis.settings.put({
+      ...settings,
+      themeId: theme.id,
+    })
+    state.error = undefined
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+    throw error
+  }
+}
+
+export async function refreshCustomThemes(): Promise<void> {
+  state.customThemes = await listCustomThemes()
+}
+
+export async function createCustomTheme(input: ThemeInput): Promise<Theme> {
+  assertThemeInput(input)
+  const theme = await createTheme(input)
+  state.customThemes = [...state.customThemes, theme]
+  return theme
+}
+
+export async function updateCustomTheme(theme: Theme): Promise<Theme> {
+  if (isBuiltInTheme(theme.id)) {
+    throw new Error("built-in theme cannot be modified")
+  }
+
+  assertThemeInput({ name: theme.name, colors: theme.colors })
+  const updated = await putTheme(theme)
+  const index = state.customThemes.findIndex((item) => item.id === theme.id)
+
+  if (index === -1) {
+    state.customThemes = [...state.customThemes, updated]
+  } else {
+    state.customThemes.splice(index, 1, updated)
+  }
+
+  return updated
+}
+
+export async function deleteCustomTheme(themeId: string): Promise<void> {
+  if (isBuiltInTheme(themeId)) {
+    throw new Error("built-in theme cannot be deleted")
+  }
+
+  await removeTheme(themeId)
+  state.customThemes = state.customThemes.filter(
+    (theme) => theme.id !== themeId,
+  )
+
+  if (state.activeThemeId === themeId) {
+    await activateTheme(defaultThemeId)
+  }
+}
+
+export function setPreviewTheme(theme: Theme | undefined): void {
+  previewTheme = theme
+  applyCurrentTheme()
+}
+
+function assertThemeInput(input: ThemeInput): void {
+  if (input.name.trim() === "") {
+    throw new Error("theme name is empty")
+  }
+
+  assertThemeColors(input.colors.light, "light")
+  assertThemeColors(input.colors.dark, "dark")
+}
+
+function assertThemeColors(colors: ThemeModeColors, mode: string): void {
+  for (const token of themeColorTokens) {
+    const value = colors[token]
+    if (typeof value !== "string" || value.trim() === "") {
+      throw new Error(`theme color is empty: ${mode}.${token}`)
+    }
+
+    if (typeof CSS !== "undefined" && CSS.supports("color", value) === false) {
+      throw new Error(`invalid theme color: ${mode}.${token} = ${value}`)
+    }
+  }
+}
+
+type ThemesApiInput = {
+  name: string
+  colors: Theme["colors"]
+}
+
+async function listCustomThemes(): Promise<Array<Theme>> {
+  return requestJson<Array<Theme>>("/api/themes")
+}
+
+async function createTheme(input: ThemesApiInput): Promise<Theme> {
+  return requestJson<Theme>("/api/themes", {
+    method: "POST",
+    body: JSON.stringify(input),
+  })
+}
+
+async function putTheme(theme: Theme): Promise<Theme> {
+  return requestJson<Theme>(`/api/themes/${encodeURIComponent(theme.id)}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      name: theme.name,
+      colors: theme.colors,
+    } satisfies ThemesApiInput),
+  })
+}
+
+async function removeTheme(themeId: string): Promise<void> {
+  await requestJson<void>(`/api/themes/${encodeURIComponent(themeId)}`, {
+    method: "DELETE",
+  })
+}
+
+async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(path, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...init?.headers,
+    },
+  })
+
+  const text = await response.text()
+
+  if (!response.ok) {
+    throw new Error(readErrorMessage(response.status, text))
+  }
+
+  if (text.trim() === "") {
+    return undefined as T
+  }
+
+  return JSON.parse(text) as T
+}
+
+function readErrorMessage(status: number, text: string): string {
+  try {
+    const value = JSON.parse(text) as {
+      error?: { message?: unknown }
+    }
+    if (typeof value.error?.message === "string") {
+      return value.error.message
+    }
+  } catch {
+    // ignore JSON parse errors
+  }
+
+  return text.trim() === "" ? `HTTP ${status}` : text
+}
+
+export function useTheme() {
+  return {
+    state,
+    activeTheme,
+    builtInThemes,
+    activateTheme,
+    createCustomTheme,
+    updateCustomTheme,
+    deleteCustomTheme,
+    refreshCustomThemes,
+    setPreviewTheme,
+  }
+}

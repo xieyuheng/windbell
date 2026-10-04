@@ -167,6 +167,7 @@ export const ProviderModelEntryListSchema: z.ZodType<
 
 export const SettingsSchema: z.ZodType<S.Settings> = z.object({
   defaultProvider: z.string().nullable(),
+  themeId: z.string().nullable(),
 })
 
 const WorkspaceFields = {

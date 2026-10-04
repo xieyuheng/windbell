@@ -18,6 +18,7 @@ test("setDefaultProvider writes settings.defaultProvider", async () => {
 
     assert.deepEqual(await database.settings.get(), {
       defaultProvider: "deepseek",
+      themeId: null,
     })
   } finally {
     await fs.rm(root, { recursive: true, force: true })

@@ -8,6 +8,8 @@ import SessionDustbinPage from "./session-dustbin/SessionDustbinPage.vue"
 import WorkspaceDustbinPage from "./workspace-dustbin/WorkspaceDustbinPage.vue"
 import SessionPage from "./session/SessionPage.vue"
 import SettingsPage from "./settings/SettingsPage.vue"
+import ThemeEditorPage from "./themes/ThemeEditorPage.vue"
+import ThemesPage from "./themes/ThemesPage.vue"
 import WorkspacePage from "./workspace/WorkspacePage.vue"
 
 export const routes: Array<RouteRecordRaw> = [
@@ -63,6 +65,21 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/settings",
     name: "settings",
     component: SettingsPage,
+  },
+  {
+    path: "/themes",
+    name: "themes",
+    component: ThemesPage,
+  },
+  {
+    path: "/themes/new",
+    name: "theme-new",
+    component: ThemeEditorPage,
+  },
+  {
+    path: "/themes/:themeId",
+    name: "theme-editor",
+    component: ThemeEditorPage,
   },
   {
     path: "/markdown",

@@ -2,8 +2,10 @@ import { makeFileSystemRouter } from "@xieyuheng/fs-api.js"
 import { makeSemiosisRouter } from "@xieyuheng/semiosis-api.js"
 import { Hono } from "hono"
 import { cors } from "hono/cors"
+import Path from "node:path"
 import { health } from "../service/index.ts"
 import type { WindbellRouterOptions } from "./WindbellRouterOptions.ts"
+import { makeThemesRouter } from "./makeThemesRouter.ts"
 
 export function makeWindbellRouter(options: WindbellRouterOptions): Hono {
   const app = new Hono()
@@ -22,6 +24,13 @@ export function makeWindbellRouter(options: WindbellRouterOptions): Hono {
     "/api/semiosis",
     makeSemiosisRouter({
       database: options.database,
+    }),
+  )
+
+  app.route(
+    "/api/themes",
+    makeThemesRouter({
+      root: Path.join(options.database.root, "themes"),
     }),
   )
 

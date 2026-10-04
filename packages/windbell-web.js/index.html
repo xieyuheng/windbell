@@ -7,6 +7,40 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <title>风铃 Windbell</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: Canvas;
+        color: CanvasText;
+      }
+
+      #app-loading {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: grid;
+        place-items: center;
+        background: Canvas;
+        color: CanvasText;
+      }
+
+      #app-loading-spinner {
+        width: 2rem;
+        height: 2rem;
+        border: 2px solid color-mix(in oklab, currentColor 20%, transparent);
+        border-top-color: currentColor;
+        border-radius: 999px;
+        animation: app-loading-spin 0.8s linear infinite;
+      }
+
+      @keyframes app-loading-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
     <script>
       const colorMode = localStorage.getItem("windbell.color-mode") || "system"
       const dark =
@@ -28,7 +62,11 @@
     </script>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div id="app-loading" aria-label="Loading Windbell">
+        <div id="app-loading-spinner"></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

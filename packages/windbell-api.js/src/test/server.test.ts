@@ -52,6 +52,72 @@ test("windbell router", async (t) => {
   }
 
   {
+    const createResponse = await app.request("/api/themes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: "Test Theme",
+        colors: {
+          light: {
+            paper: "#ffffff",
+          },
+          dark: {
+            paper: "#000000",
+          },
+        },
+      }),
+    })
+
+    assert.equal(createResponse.status, 201)
+    const created = (await createResponse.json()) as {
+      id: string
+      name: string
+    }
+    assert.equal(created.name, "Test Theme")
+    assert.match(created.id, /^theme-/)
+
+    const listResponse = await app.request("/api/themes")
+    assert.equal(listResponse.status, 200)
+    const themes = (await listResponse.json()) as Array<{ id: string }>
+    assert.equal(themes.length, 1)
+
+    const updateResponse = await app.request(`/api/themes/${created.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: "Updated Theme",
+        colors: {
+          light: {
+            paper: "#fafaf9",
+          },
+          dark: {
+            paper: "#181818",
+          },
+        },
+      }),
+    })
+
+    assert.equal(updateResponse.status, 200)
+    assert.equal(
+      ((await updateResponse.json()) as { name: string }).name,
+      "Updated Theme",
+    )
+
+    const deleteResponse = await app.request(`/api/themes/${created.id}`, {
+      method: "DELETE",
+    })
+    assert.equal(deleteResponse.status, 204)
+
+    const emptyListResponse = await app.request("/api/themes")
+    assert.equal(emptyListResponse.status, 200)
+    assert.deepEqual(await emptyListResponse.json(), [])
+  }
+
+  {
     const response = await app.request("/api/semiosis/workspaces/ensure", {
       method: "POST",
       headers: {

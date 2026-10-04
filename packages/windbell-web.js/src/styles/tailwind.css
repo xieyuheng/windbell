@@ -13,57 +13,34 @@
 }
 
 @theme {
-  --color-paper: #fafaf9;
-  --color-paper-deep: #e2e2e0;
+  /* Colors are provided at runtime by src/app/theme.ts.
+     The transparent values only let Tailwind generate color utilities. */
+  --color-paper: transparent;
+  --color-paper-deep: transparent;
 
-  --color-ink: #1f1f1e;
-  --color-ink-muted: #6b6b68;
+  --color-ink: transparent;
+  --color-ink-muted: transparent;
 
-  --color-line: #e4e4e1;
+  --color-line: transparent;
 
-  --color-accent: #5f8f84;
-  --color-warning: #a66a1f;
-  --color-info: #4f7f99;
-  --color-danger: #b4514b;
-  --color-interactive: oklch(0.92 0.04 213);
+  --color-accent: transparent;
+  --color-warning: transparent;
+  --color-info: transparent;
+  --color-danger: transparent;
+  --color-interactive: transparent;
 
-  --color-sign-persona:     oklch(0.92 0.04 310);
-  --color-sign-user:        oklch(0.92 0.04 213);
-  --color-sign-reasoning:   oklch(0.92 0.04 294);
-  --color-sign-assistant:   oklch(0.92 0.04 153);
-  --color-sign-provider-data: oklch(0.92 0.04 273);
-  --color-sign-tool-call:   oklch(0.92 0.04 96);
-  --color-sign-tool:        oklch(0.92 0.04 253);
-  --color-sign-tool-output: oklch(0.92 0.04 83);
-  --color-sign-error:       oklch(0.92 0.04 17);
+  --color-sign-persona: transparent;
+  --color-sign-user: transparent;
+  --color-sign-reasoning: transparent;
+  --color-sign-assistant: transparent;
+  --color-sign-provider-data: transparent;
+  --color-sign-tool-call: transparent;
+  --color-sign-tool: transparent;
+  --color-sign-tool-output: transparent;
+  --color-sign-error: transparent;
 }
 
 
-.dark {
-  --color-paper: #181818;
-  --color-paper-deep: #323232;
-
-  --color-ink: #f2f2f1;
-  --color-ink-muted: #a6a6a3;
-
-  --color-line: #343434;
-
-  --color-accent: #86b8ab;
-  --color-warning: #d0a04e;
-  --color-info: #7fa8bf;
-  --color-danger: #d98c82;
-  --color-interactive: oklch(0.4 0.2 213);
-
-  --color-sign-persona:      oklch(0.4 0.2 310);
-  --color-sign-user:         oklch(0.4 0.2 213);
-  --color-sign-reasoning:    oklch(0.4 0.2 294);
-  --color-sign-assistant:    oklch(0.4 0.2 153);
-  --color-sign-provider-data: oklch(0.4 0.2 273);
-  --color-sign-tool-call:    oklch(0.4 0.2 96);
-  --color-sign-tool:         oklch(0.4 0.2 253);
-  --color-sign-tool-output:  oklch(0.4 0.2 83);
-  --color-sign-error:        oklch(0.4 0.2 17);
-}
 
 :root {
   --font-app: "Unifont", sans-serif;

@@ -119,7 +119,7 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
   app.get("/settings", async () => {
     const settings = await options.database.settings.get()
 
-    return sendJson(200, settings ?? { defaultProvider: null })
+    return sendJson(200, settings ?? { defaultProvider: null, themeId: null })
   })
 
   app.put("/settings", async (c) => {
@@ -532,13 +532,21 @@ function readSession(body: unknown): S.Session {
 }
 
 function readSettings(body: Record<string, unknown>): S.Settings {
+  const defaultProvider = readSettingsDefaultProvider(body)
+  const themeId = readSettingsThemeId(body)
+
+  return {
+    defaultProvider,
+    themeId,
+  }
+}
+
+function readSettingsDefaultProvider(
+  body: Record<string, unknown>,
+): string | null {
   const value = body["defaultProvider"]
 
-  if (value === null) {
-    return {
-      defaultProvider: null,
-    }
-  }
+  if (value === null) return null
 
   if (typeof value !== "string" || value === "") {
     throw new HTTPException(400, {
@@ -546,9 +554,21 @@ function readSettings(body: Record<string, unknown>): S.Settings {
     })
   }
 
-  return {
-    defaultProvider: value,
+  return value
+}
+
+function readSettingsThemeId(body: Record<string, unknown>): string | null {
+  const value = body["themeId"]
+
+  if (value === undefined || value === null) return null
+
+  if (typeof value !== "string" || value === "") {
+    throw new HTTPException(400, {
+      message: "field `themeId` must be a non-empty string or null",
+    })
   }
+
+  return value
 }
 
 function readModel(body: Record<string, unknown>, name: string): S.ModelRef {

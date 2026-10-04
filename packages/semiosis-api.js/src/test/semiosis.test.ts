@@ -82,14 +82,17 @@ test("semiosis client and server", async (t) => {
 
   assert.deepEqual(await client.settings.get(), {
     defaultProvider: null,
+    themeId: null,
   })
 
   await client.settings.put({
     defaultProvider: "deepseek",
+    themeId: "builtin-default",
   })
 
   assert.deepEqual(await client.settings.get(), {
     defaultProvider: "deepseek",
+    themeId: "builtin-default",
   })
 
   const workspaceRoot = Path.join(root, "workspace")

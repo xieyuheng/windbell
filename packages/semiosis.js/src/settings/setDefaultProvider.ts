@@ -12,7 +12,7 @@ export async function setDefaultProvider(
   const settings = await database.settings.get()
 
   await database.settings.put({
-    ...(settings ?? { defaultProvider: null }),
+    ...(settings ?? { defaultProvider: null, themeId: null }),
     defaultProvider: providerName,
   })
 }

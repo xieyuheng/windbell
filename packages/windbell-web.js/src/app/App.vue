@@ -3,9 +3,11 @@ import { useHead } from "@unhead/vue"
 import { useI18n } from "vue-i18n"
 import { RouterView } from "vue-router"
 import { useColorMode } from "./color-mode.ts"
+import { useTheme } from "./theme.ts"
 
 const { locale } = useI18n()
 const colorMode = useColorMode()
+const { activeTheme } = useTheme()
 
 useHead(() => ({
   htmlAttrs: {
@@ -14,7 +16,7 @@ useHead(() => ({
   meta: [
     {
       name: "theme-color",
-      content: colorMode.resolved === "dark" ? "#181818" : "#fafaf9",
+      content: activeTheme.value.colors[colorMode.resolved].paper,
     },
   ],
 }))

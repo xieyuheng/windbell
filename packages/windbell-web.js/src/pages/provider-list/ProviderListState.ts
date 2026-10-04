@@ -78,7 +78,9 @@ export async function selectDefaultProvider(
   state: ProviderListState,
   providerName: string,
 ): Promise<void> {
+  const settings = await semiosis.settings.get()
   await semiosis.settings.put({
+    ...settings,
     defaultProvider: providerName,
   })
 

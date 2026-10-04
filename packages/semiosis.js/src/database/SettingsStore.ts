@@ -20,7 +20,23 @@ export function makeSettingsStore(
   return {
     async get() {
       const value = await readJsonFile(path)
-      return value as Settings | undefined
+      if (value === undefined) return undefined
+      if (
+        value === null ||
+        typeof value !== "object" ||
+        value instanceof Array
+      ) {
+        return undefined
+      }
+
+      const record = value as Record<string, unknown>
+      return {
+        defaultProvider:
+          typeof record.defaultProvider === "string"
+            ? record.defaultProvider
+            : null,
+        themeId: typeof record.themeId === "string" ? record.themeId : null,
+      }
     },
 
     async put(settings) {

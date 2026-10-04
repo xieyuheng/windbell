@@ -3,6 +3,7 @@ import { createApp } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import App from "./app/App.vue"
 import { i18n } from "./app/i18n.ts"
+import { ensureThemeReady } from "./app/theme.ts"
 import { routes } from "./pages/routes.ts"
 import "./styles/index.css"
 
@@ -19,6 +20,6 @@ app.use(router)
 
 document.documentElement.lang = i18n.global.locale.value
 
-router.isReady().then(() => {
+Promise.all([router.isReady(), ensureThemeReady()]).then(() => {
   app.mount("#app")
 })
