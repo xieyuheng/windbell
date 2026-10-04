@@ -33,7 +33,7 @@ const themeModes = ["light", "dark"] as const
           :key="mode"
           class="flex items-center gap-2"
         >
-          <span class="w-10 shrink-0 text-xs text-ink-muted">
+          <span class="w-10 shrink-0 text-xs text-ink">
             {{ t(mode) }}
           </span>
 

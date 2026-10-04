@@ -63,7 +63,7 @@ function copyCommand(): void {
 
 <template>
   <div class="flex flex-col gap-2">
-    <div class="font-mono text-ink-muted">
+    <div class="font-mono text-ink">
       {{ sign.name }}
     </div>
 

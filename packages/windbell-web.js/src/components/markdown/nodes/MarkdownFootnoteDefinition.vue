@@ -15,10 +15,7 @@ const number = computed(() =>
 </script>
 
 <template>
-  <section
-    :id="`markdown-footnote-${node.identifier}`"
-    class="my-3 text-ink-muted"
-  >
+  <section :id="`markdown-footnote-${node.identifier}`" class="my-3 text-ink">
     <div class="flex gap-2">
       <span class="shrink-0">{{ number ?? "?" }}.</span>
       <div class="min-w-0 flex-1">

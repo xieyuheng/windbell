@@ -31,9 +31,7 @@ const prefix = computed(() =>
     class="mb-3 mt-6 font-semibold first:mt-0"
     :class="sizeClass"
   >
-    <span class="text-ink-muted" aria-hidden="true">
-      {{ prefix }}{{ " " }}
-    </span>
+    <span class="text-ink" aria-hidden="true"> {{ prefix }}{{ " " }} </span>
     <MarkdownNode
       v-for="(child, index) in node.children"
       :key="index"

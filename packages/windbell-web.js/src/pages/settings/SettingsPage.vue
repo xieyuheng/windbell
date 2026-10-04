@@ -127,7 +127,7 @@ useHead(() => ({
           <label
             v-for="item in supportedLocales"
             :key="item.value"
-            class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-ink transition-colors hover:bg-paper-deep"
+            class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-ink transition-colors hover:bg-line"
           >
             <input
               class="accent-ink"
@@ -153,7 +153,7 @@ useHead(() => ({
           <label
             v-for="item in colorModeOptions"
             :key="item.value"
-            class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-ink transition-colors hover:bg-paper-deep"
+            class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-ink transition-colors hover:bg-line"
           >
             <input
               class="accent-ink"
@@ -179,7 +179,7 @@ useHead(() => ({
           <label
             v-for="item in fontOptions"
             :key="item.value"
-            class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-ink transition-colors hover:bg-paper-deep"
+            class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-ink transition-colors hover:bg-line"
           >
             <input
               class="accent-ink"
@@ -202,7 +202,7 @@ useHead(() => ({
         </template>
 
         <div class="flex flex-col gap-3 p-2">
-          <p class="px-2 text-sm text-ink-muted">
+          <p class="px-2 text-sm text-ink">
             {{ t("browserDataDescription") }}
           </p>
 
@@ -211,7 +211,7 @@ useHead(() => ({
           </p>
 
           <template v-else>
-            <p class="px-2 text-sm text-ink-muted">
+            <p class="px-2 text-sm text-ink">
               {{
                 t("storageSummary", {
                   count: storageEntries.length,
@@ -227,7 +227,7 @@ useHead(() => ({
                 class="flex items-center justify-between gap-3 text-sm"
               >
                 <dt class="text-ink">{{ t(group.labelKey) }}</dt>
-                <dd class="text-ink-muted">
+                <dd class="text-ink">
                   {{ group.count }} · {{ formatStorageBytes(group.bytes) }}
                 </dd>
               </div>
@@ -235,7 +235,7 @@ useHead(() => ({
 
             <details class="px-2">
               <summary
-                class="cursor-pointer text-sm text-ink-muted transition-colors hover:text-ink"
+                class="cursor-pointer text-sm text-ink transition-colors hover:text-ink"
               >
                 {{ t("showRawStorage") }}
               </summary>
@@ -251,7 +251,7 @@ useHead(() => ({
                   <code class="break-all font-mono text-xs text-ink">
                     {{ entry.key }}
                   </code>
-                  <code class="break-all font-mono text-xs text-ink-muted">
+                  <code class="break-all font-mono text-xs text-ink">
                     {{ entry.value }}
                   </code>
                 </li>

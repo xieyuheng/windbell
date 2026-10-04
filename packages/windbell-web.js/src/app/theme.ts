@@ -6,9 +6,7 @@ export const defaultThemeId = "builtin-default"
 
 export const themeColorTokens = [
   "paper",
-  "paper-deep",
   "ink",
-  "ink-muted",
   "line",
   "accent",
   "warning",
@@ -52,9 +50,7 @@ export const builtInThemes: Array<Theme> = [
     colors: {
       light: {
         paper: "#fafaf9",
-        "paper-deep": "#e2e2e0",
         ink: "#1f1f1e",
-        "ink-muted": "#6b6b68",
         line: "#e4e4e1",
         accent: "#5f8f84",
         warning: "#a66a1f",
@@ -73,9 +69,7 @@ export const builtInThemes: Array<Theme> = [
       },
       dark: {
         paper: "#181818",
-        "paper-deep": "#323232",
         ink: "#f2f2f1",
-        "ink-muted": "#a6a6a3",
         line: "#343434",
         accent: "#86b8ab",
         warning: "#d0a04e",

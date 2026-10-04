@@ -9,7 +9,5 @@ defineProps<{
 </script>
 
 <template>
-  <span class="whitespace-pre-wrap font-mono text-ink-muted">{{
-    node.value
-  }}</span>
+  <span class="whitespace-pre-wrap font-mono text-ink">{{ node.value }}</span>
 </template>

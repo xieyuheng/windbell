@@ -73,7 +73,7 @@ function updateFromHex(value: string): void {
       />
     </div>
 
-    <label class="flex items-center gap-2 text-xs text-ink-muted">
+    <label class="flex items-center gap-2 text-xs text-ink">
       <span class="w-3">L</span>
       <input
         v-model.number="draft.l"
@@ -89,7 +89,7 @@ function updateFromHex(value: string): void {
       </span>
     </label>
 
-    <label class="flex items-center gap-2 text-xs text-ink-muted">
+    <label class="flex items-center gap-2 text-xs text-ink">
       <span class="w-3">C</span>
       <input
         v-model.number="draft.c"
@@ -105,7 +105,7 @@ function updateFromHex(value: string): void {
       </span>
     </label>
 
-    <label class="flex items-center gap-2 text-xs text-ink-muted">
+    <label class="flex items-center gap-2 text-xs text-ink">
       <span class="w-3">H</span>
       <input
         v-model.number="draft.h"

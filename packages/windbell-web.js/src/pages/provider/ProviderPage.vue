@@ -93,12 +93,12 @@ useHead(() => ({
         <div class="flex flex-wrap items-center gap-2">
           <span
             v-if="state.isDefaultProvider"
-            class="rounded bg-paper-deep px-2 py-0.5 text-ink"
+            class="rounded bg-line px-2 py-0.5 text-ink"
           >
             {{ t("defaultProvider") }}
           </span>
 
-          <span class="rounded bg-paper-deep px-2 py-0.5 text-ink">
+          <span class="rounded bg-line px-2 py-0.5 text-ink">
             {{ t("apiKey") }}:
             {{
               state.apiKeyConfigured
@@ -109,7 +109,7 @@ useHead(() => ({
         </div>
       </section>
 
-      <p v-if="state.warning !== undefined" class="text-sm text-ink-muted">
+      <p v-if="state.warning !== undefined" class="text-sm text-ink">
         {{ t("warning") }}: {{ state.warning }}
       </p>
 
@@ -118,7 +118,7 @@ useHead(() => ({
           {{ t("models") }}
         </h2>
 
-        <p v-if="state.models.length === 0" class="text-sm text-ink-muted">
+        <p v-if="state.models.length === 0" class="text-sm text-ink">
           {{ t("noModels") }}
         </p>
 

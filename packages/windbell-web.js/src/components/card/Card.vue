@@ -8,7 +8,7 @@ const props = withDefaults(
   }>(),
   {
     as: "div",
-    color: "var(--color-paper-deep)",
+    color: "var(--color-line)",
   },
 )
 </script>

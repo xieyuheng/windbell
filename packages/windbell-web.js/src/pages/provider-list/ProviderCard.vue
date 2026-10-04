@@ -114,7 +114,7 @@ function requestDeleteApiKey(): void {
           {{ t("models") }}
         </h3>
 
-        <p v-if="enabledModels.length === 0" class="text-sm text-ink-muted">
+        <p v-if="enabledModels.length === 0" class="text-sm text-ink">
           {{ t("noModels") }}
         </p>
 
@@ -122,7 +122,7 @@ function requestDeleteApiKey(): void {
           <li
             v-for="model in enabledModels"
             :key="model.name"
-            class="rounded bg-paper-deep px-2 py-1.5"
+            class="rounded bg-line px-2 py-1.5"
           >
             <RouterLink class="block" :to="providerRoute">
               <ModelLine :name="model.name" :is-default="model.isDefault" />

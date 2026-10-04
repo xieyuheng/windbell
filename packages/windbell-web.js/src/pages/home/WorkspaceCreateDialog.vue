@@ -277,10 +277,10 @@ function parentDirectory(path: string): string {
     @click.self="!props.creating && emit('close')"
   >
     <form
-      class="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-lg border-x-3 border-b-3 border-paper-deep bg-paper text-ink"
+      class="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-lg border-x-3 border-b-3 border-line bg-paper text-ink"
       @submit.prevent="submit"
     >
-      <header class="shrink-0 bg-paper-deep px-3 py-2">
+      <header class="shrink-0 bg-line px-3 py-2">
         <div>
           <h2 class="text-base">
             {{ t("createWorkspace") }}
@@ -296,7 +296,7 @@ function parentDirectory(path: string): string {
           class="grid h-64 shrink-0 grid-cols-2 overflow-hidden rounded border border-line"
         >
           <div class="thin-scrollbar h-full overflow-y-auto">
-            <p v-if="loading" class="px-3 py-2 text-ink-muted">
+            <p v-if="loading" class="px-3 py-2 text-ink">
               {{ t("loading") }}
             </p>
 
@@ -307,10 +307,7 @@ function parentDirectory(path: string): string {
               {{ loadError }}
             </p>
 
-            <p
-              v-else-if="entries.length === 0"
-              class="px-3 py-2 text-ink-muted"
-            >
+            <p v-else-if="entries.length === 0" class="px-3 py-2 text-ink">
               {{ t("emptyDirectory") }}
             </p>
 
@@ -321,7 +318,7 @@ function parentDirectory(path: string): string {
                   :class="
                     index === selectedIndex
                       ? 'bg-ink/15 text-ink'
-                      : 'hover:bg-paper-deep'
+                      : 'hover:bg-line'
                   "
                   type="button"
                   @click="selectEntry(index)"
@@ -336,14 +333,11 @@ function parentDirectory(path: string): string {
           <div
             class="thin-scrollbar h-full overflow-y-auto border-l border-line"
           >
-            <p
-              v-if="selectedEntry === undefined"
-              class="px-3 py-2 text-ink-muted"
-            >
+            <p v-if="selectedEntry === undefined" class="px-3 py-2 text-ink">
               {{ t("noSelection") }}
             </p>
 
-            <p v-else-if="previewLoading" class="px-3 py-2 text-ink-muted">
+            <p v-else-if="previewLoading" class="px-3 py-2 text-ink">
               {{ t("loading") }}
             </p>
 
@@ -356,7 +350,7 @@ function parentDirectory(path: string): string {
 
             <p
               v-else-if="previewEntries.length === 0"
-              class="px-3 py-2 text-ink-muted"
+              class="px-3 py-2 text-ink"
             >
               {{ t("emptyDirectory") }}
             </p>
@@ -386,7 +380,7 @@ function parentDirectory(path: string): string {
             <span class="text-ink">{{ t("nameEditable") }}</span>
             <input
               v-model="name"
-              class="w-full rounded border border-line bg-transparent px-2 py-1.5 text-ink outline-none placeholder:text-ink-muted disabled:opacity-50"
+              class="w-full rounded border border-line bg-transparent px-2 py-1.5 text-ink outline-none placeholder:text-ink disabled:opacity-50"
               type="text"
               :disabled="selectedEntry === undefined"
             />

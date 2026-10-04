@@ -21,31 +21,31 @@ const { t } = useI18n({
 
     <dl class="flex flex-col gap-1">
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("ownedBy") }}</dt>
+        <dt class="text-ink">{{ t("ownedBy") }}</dt>
         <dd class="font-mono text-ink">{{ entry.info.owned_by }}</dd>
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("contextWindow") }}</dt>
+        <dt class="text-ink">{{ t("contextWindow") }}</dt>
         <dd class="font-mono text-ink">{{ entry.info.context_window }}</dd>
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("maxOutputTokens") }}</dt>
+        <dt class="text-ink">{{ t("maxOutputTokens") }}</dt>
         <dd class="font-mono text-ink">
           {{ entry.info.max_output_tokens }}
         </dd>
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("inputModalities") }}</dt>
+        <dt class="text-ink">{{ t("inputModalities") }}</dt>
         <dd class="font-mono text-ink">
           {{ entry.info.input_modalities.join(", ") }}
         </dd>
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("outputModalities") }}</dt>
+        <dt class="text-ink">{{ t("outputModalities") }}</dt>
         <dd class="font-mono text-ink">
           {{ entry.info.output_modalities.join(", ") }}
         </dd>
@@ -60,12 +60,12 @@ const { t } = useI18n({
 
     <dl class="flex flex-col gap-1">
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("thinking") }}</dt>
+        <dt class="text-ink">{{ t("thinking") }}</dt>
         <dd class="font-mono text-ink">{{ entry.config.thinking }}</dd>
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("reasoningEffort") }}</dt>
+        <dt class="text-ink">{{ t("reasoningEffort") }}</dt>
         <dd class="font-mono text-ink">
           {{ entry.config.reasoningEffort }}
         </dd>

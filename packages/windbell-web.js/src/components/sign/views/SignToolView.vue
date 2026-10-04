@@ -16,7 +16,7 @@ const parametersText = computed(() =>
 
 <template>
   <div class="flex flex-col gap-3">
-    <div class="font-mono text-ink-muted">
+    <div class="font-mono text-ink">
       {{ sign.name }}
     </div>
 

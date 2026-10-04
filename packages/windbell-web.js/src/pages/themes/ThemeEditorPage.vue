@@ -46,7 +46,7 @@ const colorGroups: Array<{
 }> = [
   {
     labelKey: "baseColors",
-    tokens: ["paper", "paper-deep", "ink", "ink-muted", "line"],
+    tokens: ["paper", "ink", "line"],
   },
   {
     labelKey: "semanticColors",
@@ -264,7 +264,7 @@ useHead(() => ({
           :key="group.labelKey"
           class="flex flex-col gap-3"
         >
-          <h3 class="text-sm font-bold text-ink-muted">
+          <h3 class="text-sm font-bold text-ink">
             {{ t(group.labelKey) }}
           </h3>
 
@@ -274,7 +274,7 @@ useHead(() => ({
               :key="token"
               class="flex min-w-0 flex-col gap-1 rounded border border-line p-2"
             >
-              <span class="font-mono text-xs text-ink-muted">
+              <span class="font-mono text-xs text-ink">
                 --color-{{ token }}
               </span>
               <ColorPicker

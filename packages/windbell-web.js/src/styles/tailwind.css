@@ -16,10 +16,8 @@
   /* Colors are provided at runtime by src/app/theme.ts.
      The transparent values only let Tailwind generate color utilities. */
   --color-paper: transparent;
-  --color-paper-deep: transparent;
 
   --color-ink: transparent;
-  --color-ink-muted: transparent;
 
   --color-line: transparent;
 
@@ -47,12 +45,12 @@
   --font-mono-family: "Unifont", monospace;
   --scrollbar-thumb: color-mix(
     in oklab,
-    var(--color-ink-muted) 35%,
+    var(--color-ink) 35%,
     transparent
   );
   --scrollbar-thumb-hover: color-mix(
     in oklab,
-    var(--color-ink-muted) 55%,
+    var(--color-ink) 55%,
     transparent
   );
 }
@@ -70,7 +68,7 @@ body {
 
 .dark select,
 .dark option {
-  background-color: var(--color-paper-deep);
+  background-color: var(--color-line);
   color: var(--color-ink);
 }
 
@@ -83,7 +81,7 @@ body {
   margin-left: calc(var(--marker-size, 2ch) * -1);
   white-space: pre;
   font-family: var(--font-mono-family);
-  color: var(--color-ink-muted);
+  color: var(--color-ink);
   user-select: text;
 }
 

@@ -25,35 +25,35 @@ function json(value: unknown): string {
 
     <dl class="flex flex-col gap-1">
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("contextLength") }}</dt>
+        <dt class="text-ink">{{ t("contextLength") }}</dt>
         <dd class="font-mono text-ink">
           {{ entry.info.context_length }}
         </dd>
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("modality") }}</dt>
+        <dt class="text-ink">{{ t("modality") }}</dt>
         <dd class="font-mono text-ink">
           {{ entry.info.architecture.modality ?? t("none") }}
         </dd>
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("inputModalities") }}</dt>
+        <dt class="text-ink">{{ t("inputModalities") }}</dt>
         <dd class="font-mono text-ink">
           {{ entry.info.architecture.input_modalities.join(", ") }}
         </dd>
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("outputModalities") }}</dt>
+        <dt class="text-ink">{{ t("outputModalities") }}</dt>
         <dd class="font-mono text-ink">
           {{ entry.info.architecture.output_modalities.join(", ") }}
         </dd>
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("supportedParameters") }}</dt>
+        <dt class="text-ink">{{ t("supportedParameters") }}</dt>
         <dd class="break-all font-mono text-ink">
           {{ entry.info.supported_parameters.join(", ") }}
         </dd>
@@ -68,10 +68,10 @@ function json(value: unknown): string {
 
     <dl class="flex flex-col gap-1">
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("reasoning") }}</dt>
+        <dt class="text-ink">{{ t("reasoning") }}</dt>
         <dd>
           <pre
-            class="overflow-auto rounded bg-paper-deep p-2 font-mono text-xs text-ink"
+            class="overflow-auto rounded bg-line p-2 font-mono text-xs text-ink"
             >{{
               entry.config.reasoning ? json(entry.config.reasoning) : t("none")
             }}</pre>
@@ -79,10 +79,10 @@ function json(value: unknown): string {
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("provider") }}</dt>
+        <dt class="text-ink">{{ t("provider") }}</dt>
         <dd>
           <pre
-            class="overflow-auto rounded bg-paper-deep p-2 font-mono text-xs text-ink"
+            class="overflow-auto rounded bg-line p-2 font-mono text-xs text-ink"
             >{{
               entry.config.provider ? json(entry.config.provider) : t("none")
             }}</pre>
@@ -90,10 +90,10 @@ function json(value: unknown): string {
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <dt class="text-ink-muted">{{ t("extraBody") }}</dt>
+        <dt class="text-ink">{{ t("extraBody") }}</dt>
         <dd>
           <pre
-            class="overflow-auto rounded bg-paper-deep p-2 font-mono text-xs text-ink"
+            class="overflow-auto rounded bg-line p-2 font-mono text-xs text-ink"
             >{{
               entry.config.extraBody ? json(entry.config.extraBody) : t("none")
             }}</pre>

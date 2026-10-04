@@ -34,7 +34,7 @@ function submit(): void {
   >
     <input
       v-model="content"
-      class="min-w-0 flex-1 bg-transparent px-3 py-2 text-ink outline-none placeholder:text-ink-muted"
+      class="min-w-0 flex-1 bg-transparent px-3 py-2 text-ink outline-none placeholder:text-ink"
       :disabled="props.creating"
       :placeholder="t('newSessionPlaceholder')"
       type="text"

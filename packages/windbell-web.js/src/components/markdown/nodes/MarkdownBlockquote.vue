@@ -10,7 +10,7 @@ defineProps<{
 </script>
 
 <template>
-  <blockquote class="my-3 border-l-4 border-line pl-4 text-ink-muted">
+  <blockquote class="my-3 border-l-4 border-line pl-4 text-ink">
     <MarkdownNode
       v-for="(child, index) in node.children"
       :key="index"

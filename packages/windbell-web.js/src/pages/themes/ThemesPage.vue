@@ -137,7 +137,7 @@ useHead(() => ({
       </MediumButton>
     </div>
 
-    <p v-if="state.customThemes.length === 0" class="text-sm text-ink-muted">
+    <p v-if="state.customThemes.length === 0" class="text-sm text-ink">
       {{ t("noCustomThemes") }}
     </p>
 

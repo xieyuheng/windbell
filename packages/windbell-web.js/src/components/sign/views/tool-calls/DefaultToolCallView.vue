@@ -14,7 +14,7 @@ const argumentsText = computed(() => JSON.stringify(props.args, null, 2) ?? "")
 
 <template>
   <div class="flex flex-col gap-2">
-    <div class="font-mono text-ink-muted">
+    <div class="font-mono text-ink">
       {{ sign.name }}
     </div>
 
