@@ -203,14 +203,14 @@ useHead(() => ({
         <MediumButton :disabled="saving" @click="handleSave">
           {{ t("save") }}
         </MediumButton>
-        <SmallButton
+        <MediumButton
           v-if="!isNew"
           :disabled="saving"
           tone="danger"
           @click="handleDelete"
         >
           {{ t("delete") }}
-        </SmallButton>
+        </MediumButton>
       </div>
     </header>
 
