@@ -1,8 +1,8 @@
 export const themesMessages = {
   "zh-CN": {
     title: "主题",
-    builtInThemes: "内置主题",
-    customThemes: "自定义主题",
+    builtInThemes: "内置主题列表",
+    customThemes: "自定义主题列表",
     newTheme: "新建主题",
     use: "使用",
     active: "当前主题",

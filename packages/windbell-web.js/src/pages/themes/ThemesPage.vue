@@ -4,12 +4,12 @@ import { useHead } from "@unhead/vue"
 import { ref } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRouter } from "vue-router"
-import { useTheme, type Theme, type ThemeColorName } from "../../app/theme.ts"
+import { useTheme, type Theme } from "../../app/theme.ts"
 import BackButton from "../../components/buttons/BackButton.vue"
 import MediumButton from "../../components/buttons/MediumButton.vue"
 import SmallButton from "../../components/buttons/SmallButton.vue"
-import Card from "../../components/card/Card.vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
+import ThemeCard from "./ThemeCard.vue"
 import { themesMessages } from "./Themes.i18n.ts"
 
 const { t } = useI18n({
@@ -27,15 +27,6 @@ const {
 } = useTheme()
 
 const error = ref<string | undefined>(undefined)
-const swatchTokens: Array<ThemeColorName> = [
-  "paper",
-  "paper-deep",
-  "ink",
-  "accent",
-  "danger",
-]
-
-const themeModes = ["light", "dark"] as const
 
 async function handleActivate(theme: Theme): Promise<void> {
   error.value = undefined
@@ -82,8 +73,7 @@ async function handleDelete(theme: Theme): Promise<void> {
 
 function openNewTheme(): void {
   void router.push({
-    name: "theme-editor",
-    params: { themeId: "new" },
+    name: "theme-new",
   })
 }
 
@@ -101,10 +91,6 @@ useHead(() => ({
 
       <div class="flex flex-wrap items-center gap-2">
         <BackButton :to="{ name: 'settings' }" />
-        <MediumButton @click="openNewTheme">
-          <Plus class="h-4 w-4" />
-          <span>{{ t("newTheme") }}</span>
-        </MediumButton>
       </div>
     </header>
 
@@ -115,132 +101,69 @@ useHead(() => ({
       {{ error }}
     </p>
 
-    <Card as="section">
-      <template #tag>
-        <h2 class="text-ink">{{ t("builtInThemes") }}</h2>
-      </template>
+    <div class="flex flex-col gap-2">
+      <h2 class="text-base text-ink">
+        {{ t("builtInThemes") }}
+      </h2>
+    </div>
 
-      <div class="flex flex-col gap-3 p-3">
-        <article
-          v-for="theme in builtInThemes"
-          :key="theme.id"
-          class="flex flex-col gap-3 rounded border border-line p-3"
-        >
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-              <span class="text-ink">{{ theme.name }}</span>
-              <span
-                class="rounded border border-line px-1 text-xs text-ink-muted"
-              >
-                {{ t("sourceBuiltIn") }}
-              </span>
-              <span
-                v-if="activeTheme.id === theme.id"
-                class="rounded bg-ink px-1 text-xs text-paper"
-              >
-                {{ t("active") }}
-              </span>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-2">
-              <MediumButton
-                :disabled="activeTheme.id === theme.id"
-                @click="handleActivate(theme)"
-              >
-                {{ t("use") }}
-              </MediumButton>
-              <SmallButton @click="handleDuplicate(theme)">
-                {{ t("duplicate") }}
-              </SmallButton>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <div
-              v-for="mode in themeModes"
-              :key="mode"
-              class="flex overflow-hidden rounded border border-line"
+    <ul class="flex flex-col gap-4">
+      <li v-for="theme in builtInThemes" :key="theme.id">
+        <ThemeCard :theme="theme">
+          <template #toolbar>
+            <MediumButton
+              :disabled="activeTheme.id === theme.id"
+              @click="handleActivate(theme)"
             >
-              <span
-                v-for="token in swatchTokens"
-                :key="token"
-                class="h-6 flex-1"
-                :style="{ backgroundColor: theme.colors[mode][token] }"
-              />
-            </div>
-          </div>
-        </article>
-      </div>
-    </Card>
+              {{ activeTheme.id === theme.id ? t("active") : t("use") }}
+            </MediumButton>
 
-    <Card as="section">
-      <template #tag>
-        <h2 class="text-ink">{{ t("customThemes") }}</h2>
-      </template>
+            <SmallButton @click="handleDuplicate(theme)">
+              {{ t("duplicate") }}
+            </SmallButton>
+          </template>
+        </ThemeCard>
+      </li>
+    </ul>
 
-      <div class="flex flex-col gap-3 p-3">
-        <p
-          v-if="state.customThemes.length === 0"
-          class="text-sm text-ink-muted"
-        >
-          {{ t("noCustomThemes") }}
-        </p>
+    <div class="flex flex-col gap-2">
+      <h2 class="text-base text-ink">
+        {{ t("customThemes") }}
+      </h2>
 
-        <article
-          v-for="theme in state.customThemes"
-          :key="theme.id"
-          class="flex flex-col gap-3 rounded border border-line p-3"
-        >
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-              <span class="text-ink">{{ theme.name }}</span>
-              <span
-                class="rounded border border-line px-1 text-xs text-ink-muted"
-              >
-                {{ t("sourceCustom") }}
-              </span>
-              <span
-                v-if="activeTheme.id === theme.id"
-                class="rounded bg-ink px-1 text-xs text-paper"
-              >
-                {{ t("active") }}
-              </span>
-            </div>
+      <MediumButton class="self-start" @click="openNewTheme">
+        <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
+        <span>{{ t("newTheme") }}</span>
+      </MediumButton>
+    </div>
 
-            <div class="flex flex-wrap items-center gap-2">
-              <MediumButton
-                :disabled="activeTheme.id === theme.id"
-                @click="handleActivate(theme)"
-              >
-                {{ t("use") }}
-              </MediumButton>
-              <MediumButton
-                :to="{ name: 'theme-editor', params: { themeId: theme.id } }"
-              >
-                {{ t("edit") }}
-              </MediumButton>
-              <SmallButton tone="danger" @click="handleDelete(theme)">
-                {{ t("delete") }}
-              </SmallButton>
-            </div>
-          </div>
+    <p v-if="state.customThemes.length === 0" class="text-sm text-ink-muted">
+      {{ t("noCustomThemes") }}
+    </p>
 
-          <div class="grid grid-cols-2 gap-2">
-            <div
-              v-for="mode in themeModes"
-              :key="mode"
-              class="flex overflow-hidden rounded border border-line"
+    <ul v-else class="flex flex-col gap-4">
+      <li v-for="theme in state.customThemes" :key="theme.id">
+        <ThemeCard :theme="theme">
+          <template #toolbar>
+            <MediumButton
+              :disabled="activeTheme.id === theme.id"
+              @click="handleActivate(theme)"
             >
-              <span
-                v-for="token in swatchTokens"
-                :key="token"
-                class="h-6 flex-1"
-                :style="{ backgroundColor: theme.colors[mode][token] }"
-              />
-            </div>
-          </div>
-        </article>
-      </div>
-    </Card>
+              {{ activeTheme.id === theme.id ? t("active") : t("use") }}
+            </MediumButton>
+
+            <MediumButton
+              :to="{ name: 'theme-editor', params: { themeId: theme.id } }"
+            >
+              {{ t("edit") }}
+            </MediumButton>
+
+            <SmallButton tone="danger" @click="handleDelete(theme)">
+              {{ t("delete") }}
+            </SmallButton>
+          </template>
+        </ThemeCard>
+      </li>
+    </ul>
   </PageLayout>
 </template>
