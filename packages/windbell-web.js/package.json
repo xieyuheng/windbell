@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "dependencies": {
-    "@lucide/vue": "1.51.0",
+    "@lucide/vue": "1.52.0",
     "@unhead/vue": "3.4.2",
     "@xieyuheng/fs-api.js": "workspace:*",
     "@xieyuheng/semiosis-api.js": "workspace:*",
