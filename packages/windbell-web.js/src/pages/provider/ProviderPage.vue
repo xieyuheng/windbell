@@ -1,17 +1,22 @@
 <script setup lang="ts">
+import { Check, KeyRound, Trash2 } from "@lucide/vue"
 import { useHead } from "@unhead/vue"
 import { onMounted } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
 import BackButton from "../../components/buttons/BackButton.vue"
+import MediumButton from "../../components/buttons/MediumButton.vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
 import ModelCard from "./ModelCard.vue"
 import { providerMessages } from "./Provider.i18n.ts"
 import {
+  deleteProviderApiKey,
   disableProviderModel,
   enableProviderModel,
   loadProviderState,
   makeProviderState,
+  putProviderApiKey,
+  selectDefaultProvider,
   setDefaultProviderModel,
 } from "./ProviderState.ts"
 
@@ -53,6 +58,40 @@ async function handleSetDefaultModel(modelName: string): Promise<void> {
   }
 }
 
+async function handleSetDefaultProvider(): Promise<void> {
+  if (state.isDefaultProvider) return
+
+  try {
+    await selectDefaultProvider(state)
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+  }
+}
+
+async function handlePutApiKey(): Promise<void> {
+  const key = window.prompt(t("apiKeyPrompt"), "")
+  if (key === null) return
+
+  const value = key.trim()
+  if (value === "") return
+
+  try {
+    await putProviderApiKey(state, value)
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+  }
+}
+
+async function handleDeleteApiKey(): Promise<void> {
+  if (!window.confirm(t("deleteApiKeyConfirm"))) return
+
+  try {
+    await deleteProviderApiKey(state)
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+  }
+}
+
 useHead(() => ({
   title: state.providerConfig?.name ?? providerName,
 }))
@@ -77,6 +116,40 @@ useHead(() => ({
 
       <div class="flex flex-wrap items-center gap-2">
         <BackButton :to="{ name: 'provider-list' }" />
+
+        <template v-if="state.providerConfig">
+          <MediumButton
+            type="button"
+            :disabled="state.isDefaultProvider"
+            @click="handleSetDefaultProvider"
+          >
+            <Check :size="16" :stroke-width="1.5" aria-hidden="true" />
+            <span>
+              {{
+                state.isDefaultProvider
+                  ? t("defaultProvider")
+                  : t("setAsDefault")
+              }}
+            </span>
+          </MediumButton>
+
+          <template v-if="state.apiKeyConfigured">
+            <MediumButton type="button" @click="handlePutApiKey">
+              <KeyRound :size="16" :stroke-width="1.5" aria-hidden="true" />
+              <span>{{ t("updateApiKey") }}</span>
+            </MediumButton>
+
+            <MediumButton type="button" @click="handleDeleteApiKey">
+              <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
+              <span>{{ t("deleteApiKey") }}</span>
+            </MediumButton>
+          </template>
+
+          <MediumButton v-else type="button" @click="handlePutApiKey">
+            <KeyRound :size="16" :stroke-width="1.5" aria-hidden="true" />
+            <span>{{ t("configureApiKey") }}</span>
+          </MediumButton>
+        </template>
       </div>
     </header>
 
@@ -89,26 +162,6 @@ useHead(() => ({
     </p>
 
     <template v-else>
-      <section class="flex flex-col gap-2 text-sm">
-        <div class="flex flex-wrap items-center gap-2">
-          <span
-            v-if="state.isDefaultProvider"
-            class="rounded bg-line px-2 py-0.5 text-ink"
-          >
-            {{ t("defaultProvider") }}
-          </span>
-
-          <span class="rounded bg-line px-2 py-0.5 text-ink">
-            {{ t("apiKey") }}{{ t("colon")
-            }}{{
-              state.apiKeyConfigured
-                ? t("apiKeyConfigured")
-                : t("apiKeyNotConfigured")
-            }}
-          </span>
-        </div>
-      </section>
-
       <p v-if="state.warning !== undefined" class="text-sm text-ink">
         {{ t("warning") }}{{ t("colon") }}{{ state.warning }}
       </p>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Trash2 } from "@lucide/vue"
+import { Pencil, Trash2 } from "@lucide/vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
@@ -17,7 +17,9 @@ import {
   makeSession,
   makeWorkspaceState,
   trashSession,
+  trashWorkspace,
   updateSessionTitle,
+  updateWorkspaceTitle,
 } from "./WorkspaceState.ts"
 
 const route = useRoute()
@@ -76,6 +78,34 @@ async function editSessionTitle(
   }
 }
 
+async function requestEditWorkspaceTitle(): Promise<void> {
+  const workspace = state.workspace
+  if (workspace === undefined) return
+
+  const nextTitle = window.prompt(t("editTitlePrompt"), workspace.name)
+  if (nextTitle === null) return
+
+  const value = nextTitle.trim()
+  if (value === "" || value === workspace.name) return
+
+  try {
+    await updateWorkspaceTitle(state, value)
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+  }
+}
+
+async function requestTrashWorkspace(): Promise<void> {
+  if (!window.confirm(t("trashWorkspaceConfirm"))) return
+
+  try {
+    await trashWorkspace(state)
+    await router.push({ name: "home" })
+  } catch (error) {
+    state.error = error instanceof Error ? error.message : String(error)
+  }
+}
+
 onMounted(async () => {
   await loadWorkspaceState(state)
 })
@@ -117,13 +147,21 @@ useHead(() => ({
         <BackButton :to="{ name: 'home' }" />
 
         <MediumButton
-          :to="{
-            name: 'session-dustbin',
-            params: { workspaceId },
-          }"
+          v-if="state.workspace"
+          type="button"
+          @click="requestEditWorkspaceTitle"
+        >
+          <Pencil :size="16" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("editTitle") }}</span>
+        </MediumButton>
+
+        <MediumButton
+          v-if="state.workspace"
+          type="button"
+          @click="requestTrashWorkspace"
         >
           <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
-          <span>{{ t("sessionDustbin") }}</span>
+          <span>{{ t("trashWorkspace") }}</span>
         </MediumButton>
       </div>
     </header>
@@ -132,6 +170,17 @@ useHead(() => ({
       <h2 class="text-base text-ink">
         {{ t("sessions") }}
       </h2>
+
+      <MediumButton
+        class="self-start"
+        :to="{
+          name: 'session-dustbin',
+          params: { workspaceId },
+        }"
+      >
+        <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
+        <span>{{ t("sessionDustbin") }}</span>
+      </MediumButton>
     </div>
 
     <SessionStartComposer :creating="creatingSession" @create="createSession" />

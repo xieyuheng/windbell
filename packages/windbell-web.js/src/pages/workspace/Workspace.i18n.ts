@@ -8,6 +8,11 @@ export const workspaceMessages = {
     untitled: "未命名",
     loading: "加载中...",
     sessionDustbin: "对话回收站",
+    editTitle: "修改标题",
+    editTitlePrompt: "输入新的工作区名称",
+    trashWorkspace: "移入工作区回收站",
+    trashWorkspaceConfirm:
+      "确定将这个工作区移入回收站吗？之后可以从回收站恢复。",
     newSessionPlaceholder: "输入消息，开始一个新对话...",
     startSession: "开始对话",
     startingSession: "正在开始...",
@@ -21,6 +26,11 @@ export const workspaceMessages = {
     untitled: "Untitled",
     loading: "Loading...",
     sessionDustbin: "Session Dustbin",
+    editTitle: "Edit title",
+    editTitlePrompt: "Enter a new workspace name",
+    trashWorkspace: "Move workspace to dustbin",
+    trashWorkspaceConfirm:
+      "Move this workspace to the dustbin? You can restore it later.",
     newSessionPlaceholder: "Type a message to start a new session...",
     startSession: "Start session",
     startingSession: "Starting...",

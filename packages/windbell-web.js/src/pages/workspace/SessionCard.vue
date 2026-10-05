@@ -31,7 +31,7 @@ const { t } = useI18n({
       updatedAt: "更新于",
       createdAt: "创建于",
       editTitle: "修改标题",
-      trash: "移入回收站",
+      trash: "移入对话回收站",
       editTitlePrompt: "输入新的对话标题",
       trashConfirm: "确定将这个对话移入回收站吗？之后可以从回收站恢复。",
     },
@@ -40,7 +40,7 @@ const { t } = useI18n({
       updatedAt: "Updated at",
       createdAt: "Created at",
       editTitle: "Edit title",
-      trash: "Move to dustbin",
+      trash: "Move session to dustbin",
       editTitlePrompt: "Enter a new session title",
       trashConfirm:
         "Move this session to the dustbin? You can restore it later.",

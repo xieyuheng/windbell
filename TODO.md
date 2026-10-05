@@ -1,12 +1,3 @@
-# windbell-web.js
-
-明确卡片与页面的关系，
-明确卡片工具栏与页面工具栏的关系，
-让 APP 的结构更规则。
-
-- tag + card 有点像是 tag + sexp
-  - 学习使用缩进而不用扩号的 sexp 语法设计
-
 # windbell-desktop.js
 
 [windbell-desktop.js] 打包 windows electron app

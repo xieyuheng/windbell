@@ -24,7 +24,7 @@ export const homeMessages = {
     sessionCount: "对话数",
     noSessions: "还没有对话。",
     editTitle: "修改标题",
-    trash: "移入回收站",
+    trash: "移入工作区回收站",
     editTitlePrompt: "输入新的工作区名称",
     trashConfirm: "确定将这个工作区移入回收站吗？之后可以从回收站恢复。",
   },
@@ -53,7 +53,7 @@ export const homeMessages = {
     sessionCount: "Sessions",
     noSessions: "No sessions yet.",
     editTitle: "Edit title",
-    trash: "Move to dustbin",
+    trash: "Move workspace to dustbin",
     editTitlePrompt: "Enter a new workspace name",
     trashConfirm:
       "Move this workspace to the dustbin? You can restore it later.",

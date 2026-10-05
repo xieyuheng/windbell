@@ -101,3 +101,26 @@ export async function updateSessionTitle(
   state.sessions[index] = session
   sortSessionsByUpdatedAt(state.sessions)
 }
+
+export async function updateWorkspaceTitle(
+  state: WorkspaceState,
+  title: string,
+): Promise<void> {
+  const current = state.workspace
+  if (current === undefined) return
+
+  const workspace: S.Workspace = {
+    ...current,
+    name: title,
+    updatedAt: Date.now(),
+  }
+
+  await semiosis.workspaces.put(workspace)
+  state.workspace = workspace
+}
+
+export async function trashWorkspace(state: WorkspaceState): Promise<void> {
+  await semiosis.dustbin.workspaces.trash(state.workspaceId)
+  state.workspace = undefined
+  state.sessions = []
+}

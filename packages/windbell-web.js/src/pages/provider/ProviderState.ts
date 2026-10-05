@@ -158,3 +158,34 @@ async function refreshProviderModels(state: ProviderState): Promise<void> {
     state.warning = error instanceof Error ? error.message : String(error)
   }
 }
+
+export async function selectDefaultProvider(
+  state: ProviderState,
+): Promise<void> {
+  const settings = await semiosis.settings.get()
+  await semiosis.settings.put({
+    ...settings,
+    defaultProvider: state.providerName,
+  })
+
+  state.isDefaultProvider = true
+}
+
+export async function putProviderApiKey(
+  state: ProviderState,
+  key: string,
+): Promise<void> {
+  await semiosis.providers.putApiKey({
+    providerName: state.providerName,
+    key,
+  })
+
+  state.apiKeyConfigured = true
+}
+
+export async function deleteProviderApiKey(
+  state: ProviderState,
+): Promise<void> {
+  await semiosis.providers.deleteApiKey(state.providerName)
+  state.apiKeyConfigured = false
+}

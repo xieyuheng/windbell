@@ -138,11 +138,6 @@ useHead(() => ({
           <span>{{ t("app.settings") }}</span>
         </MediumButton>
 
-        <MediumButton :to="{ name: 'workspace-dustbin' }">
-          <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
-          <span>{{ t("workspaceDustbin") }}</span>
-        </MediumButton>
-
         <MediumButton type="button" @click="openMarkdownFilePicker">
           <FileText :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("markdownPreview") }}</span>
@@ -163,10 +158,17 @@ useHead(() => ({
         {{ t("workspaces") }}
       </h2>
 
-      <MediumButton class="self-start" type="button" @click="openCreateDialog">
-        <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
-        <span>{{ t("newWorkspace") }}</span>
-      </MediumButton>
+      <div class="flex flex-wrap items-center gap-2">
+        <MediumButton type="button" @click="openCreateDialog">
+          <Plus :size="16" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("newWorkspace") }}</span>
+        </MediumButton>
+
+        <MediumButton :to="{ name: 'workspace-dustbin' }">
+          <Trash2 :size="16" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("workspaceDustbin") }}</span>
+        </MediumButton>
+      </div>
     </div>
 
     <p v-if="state.loading" class="text-ink">

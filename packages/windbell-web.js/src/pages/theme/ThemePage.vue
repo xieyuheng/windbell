@@ -30,6 +30,7 @@ const route = useRoute()
 const router = useRouter()
 const colorMode = useColorMode()
 const themes = useTheme()
+const activeTheme = themes.activeTheme
 
 const themeId = computed(() => String(route.params.themeId ?? ""))
 const isNew = computed(
@@ -143,6 +144,47 @@ async function handleSave(): Promise<void> {
   }
 }
 
+async function handleActivate(): Promise<void> {
+  if (isNew.value || existingTheme.value === undefined) return
+  if (activeTheme.value.id === draft.id) return
+
+  saving.value = true
+  error.value = undefined
+
+  try {
+    await themes.activateTheme(draft.id)
+  } catch (caught) {
+    error.value = caught instanceof Error ? caught.message : String(caught)
+  } finally {
+    saving.value = false
+  }
+}
+
+async function handleDuplicate(): Promise<void> {
+  if (isNew.value || existingTheme.value === undefined) return
+
+  saving.value = true
+  error.value = undefined
+
+  try {
+    const created = await themes.createCustomTheme({
+      name: `${draft.name} Copy`,
+      colors: cloneDraft().colors,
+    })
+
+    await router.push({
+      name: "theme",
+      params: { themeId: created.id },
+    })
+    Object.assign(draft, makeDraft())
+    setPreviewTheme(cloneDraft())
+  } catch (caught) {
+    error.value = caught instanceof Error ? caught.message : String(caught)
+  } finally {
+    saving.value = false
+  }
+}
+
 async function handleDelete(): Promise<void> {
   if (
     !ready.value ||
@@ -207,6 +249,23 @@ useHead(() => ({
 
       <div class="flex flex-wrap items-center gap-2">
         <BackButton :to="{ name: 'theme-list' }" />
+
+        <MediumButton
+          v-if="!isNew && ready"
+          :disabled="saving || activeTheme.id === draft.id"
+          @click="handleActivate"
+        >
+          {{ activeTheme.id === draft.id ? t("active") : t("use") }}
+        </MediumButton>
+
+        <MediumButton
+          v-if="!isNew && ready"
+          :disabled="saving"
+          @click="handleDuplicate"
+        >
+          {{ t("duplicate") }}
+        </MediumButton>
+
         <MediumButton
           v-if="!isBuiltIn"
           :disabled="saving || !ready"
