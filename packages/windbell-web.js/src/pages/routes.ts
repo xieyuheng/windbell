@@ -8,6 +8,7 @@ import SessionDustbinPage from "./session-dustbin/SessionDustbinPage.vue"
 import WorkspaceDustbinPage from "./workspace-dustbin/WorkspaceDustbinPage.vue"
 import SessionPage from "./session/SessionPage.vue"
 import SettingsPage from "./settings/SettingsPage.vue"
+import ToolboxPage from "./toolbox/ToolboxPage.vue"
 import ThemeListPage from "./theme-list/ThemeListPage.vue"
 import ThemePage from "./theme/ThemePage.vue"
 import WorkspacePage from "./workspace/WorkspacePage.vue"
@@ -65,6 +66,11 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/settings",
     name: "settings",
     component: SettingsPage,
+  },
+  {
+    path: "/toolbox",
+    name: "toolbox",
+    component: ToolboxPage,
   },
   {
     path: "/themes",
