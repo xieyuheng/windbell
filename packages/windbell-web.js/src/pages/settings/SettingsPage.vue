@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Palette, ServerCog } from "@lucide/vue"
 import { useHead } from "@unhead/vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
 import { computed, ref } from "vue"
@@ -109,8 +110,15 @@ useHead(() => ({
 
       <div class="flex flex-wrap items-center gap-2">
         <BackButton :to="{ name: 'home' }" />
+
+        <MediumButton :to="{ name: 'provider-list' }">
+          <ServerCog :size="16" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("providerList") }}</span>
+        </MediumButton>
+
         <MediumButton :to="{ name: 'theme-list' }">
-          {{ t("themes") }}
+          <Palette :size="16" :stroke-width="1.5" aria-hidden="true" />
+          <span>{{ t("themes") }}</span>
         </MediumButton>
       </div>
     </header>

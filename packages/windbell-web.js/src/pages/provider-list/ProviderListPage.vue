@@ -71,7 +71,7 @@ useHead(() => ({
       </h1>
 
       <div class="flex flex-wrap items-center gap-2">
-        <BackButton :to="{ name: 'home' }" />
+        <BackButton :to="{ name: 'settings' }" />
       </div>
     </header>
 

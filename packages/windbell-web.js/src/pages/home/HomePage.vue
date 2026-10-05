@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FileText, Plus, ServerCog, Settings, Trash2 } from "@lucide/vue"
+import { FileText, Plus, Settings, Trash2 } from "@lucide/vue"
 import type * as S from "@xieyuheng/semiosis.js"
 import { useHead } from "@unhead/vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
@@ -128,11 +128,6 @@ useHead(() => ({
       </h1>
 
       <div class="flex flex-wrap items-center gap-2">
-        <MediumButton :to="{ name: 'provider-list' }">
-          <ServerCog :size="16" :stroke-width="1.5" aria-hidden="true" />
-          <span>{{ t("providerList") }}</span>
-        </MediumButton>
-
         <MediumButton :to="{ name: 'settings' }">
           <Settings :size="16" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ t("app.settings") }}</span>
