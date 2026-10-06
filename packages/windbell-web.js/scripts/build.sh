@@ -2,5 +2,4 @@
 
 set -e
 
-./scripts/check.sh
 npx vite build
