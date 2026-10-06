@@ -3,7 +3,7 @@ import { Plus, Settings, Trash2, Wrench } from "@lucide/vue"
 import type * as S from "@windbell/semiosis.js"
 import { useHead } from "@unhead/vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
-import { onMounted, ref } from "vue"
+import { ref } from "vue"
 import { useI18n } from "vue-i18n"
 import MediumButton from "../../components/buttons/MediumButton.vue"
 import WorkspaceCard from "./WorkspaceCard.vue"
@@ -11,8 +11,7 @@ import WorkspaceCreateDialog from "./WorkspaceCreateDialog.vue"
 import { homeMessages } from "./Home.i18n.ts"
 import {
   ensureWorkspace,
-  loadHomeState,
-  makeHomeState,
+  getHomeState,
   trashWorkspace,
   updateWorkspaceTitle,
 } from "./HomeState.ts"
@@ -21,14 +20,10 @@ const { t } = useI18n({
   messages: homeMessages,
   useScope: "local",
 })
-const state = makeHomeState()
+const state = getHomeState()
 const createDialogOpen = ref(false)
 const creating = ref(false)
 const createError = ref<string | undefined>(undefined)
-
-onMounted(async () => {
-  await loadHomeState(state)
-})
 
 function openCreateDialog(): void {
   createError.value = undefined
@@ -126,15 +121,30 @@ useHead(() => ({
       </div>
     </div>
 
-    <p v-if="state.loading" class="text-ink">
-      {{ t("loading") }}
-    </p>
-
-    <p v-else-if="state.error !== undefined" class="text-sign-error">
+    <p
+      v-if="state.error !== undefined && state.hasLoaded"
+      class="text-sign-error"
+    >
       {{ state.error }}
     </p>
 
-    <ul v-else class="flex flex-col gap-4">
+    <p v-if="state.isLoading" class="text-ink">
+      {{ t("loading") }}
+    </p>
+
+    <p
+      v-else-if="state.error !== undefined && !state.hasLoaded"
+      class="text-sign-error"
+    >
+      {{ state.error }}
+    </p>
+
+    <ul
+      v-else
+      class="flex flex-col gap-4"
+      :class="{ 'opacity-60': state.isPending }"
+      :aria-busy="state.isPending"
+    >
       <li v-for="workspace in state.workspaces" :key="workspace.id">
         <WorkspaceCard
           :workspace="workspace"

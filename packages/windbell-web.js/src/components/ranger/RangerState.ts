@@ -19,7 +19,10 @@ export type RangerState = {
   selectedIndex: number
   selectedEntry: FileSystemEntry | undefined
   focus: RangerFocus
-  loading: boolean
+  hasLoaded: boolean
+  isLoading: boolean
+  isPending: boolean
+  requestId: number
   error: string | undefined
 }
 
@@ -39,7 +42,10 @@ export function makeRangerState(
     selectedIndex: -1,
     selectedEntry: undefined,
     focus: "sidebar",
-    loading: false,
+    hasLoaded: false,
+    isLoading: true,
+    isPending: false,
+    requestId: 0,
     error: undefined,
   })
 }
@@ -52,39 +58,33 @@ function persistLocation(state: RangerState): void {
 }
 
 export async function loadRanger(state: RangerState): Promise<void> {
-  state.loading = true
-  state.error = undefined
-  state.currentDirectory = ""
-  state.entries = []
-  state.selectedIndex = -1
-  state.selectedEntry = undefined
-
   if (state.root === "") {
-    state.loading = false
+    state.currentDirectory = ""
+    state.entries = []
+    state.selectedIndex = -1
+    state.selectedEntry = undefined
+    state.hasLoaded = false
+    state.isLoading = false
+    state.isPending = false
+    state.error = undefined
     return
   }
 
-  try {
-    const storedLocation = readStoredRangerLocation(state.locationStorageKey)
+  const storedLocation = readStoredRangerLocation(state.locationStorageKey)
 
-    if (storedLocation !== undefined) {
-      const restored = await loadDirectory(
-        state,
-        storedLocation.currentDirectory,
-        {
-          selectPath: storedLocation.selectedPath ?? undefined,
-        },
-      )
+  if (storedLocation !== undefined) {
+    const restored = await loadDirectory(
+      state,
+      storedLocation.currentDirectory,
+      {
+        selectPath: storedLocation.selectedPath ?? undefined,
+      },
+    )
 
-      if (restored) return
-    }
-
-    await loadDirectory(state, state.root)
-  } catch (error) {
-    state.error = error instanceof Error ? error.message : String(error)
-  } finally {
-    state.loading = false
+    if (restored) return
   }
+
+  await loadDirectory(state, state.root)
 }
 
 export type LoadDirectoryOptions = {
@@ -96,14 +96,20 @@ export async function loadDirectory(
   path: string,
   options: LoadDirectoryOptions = {},
 ): Promise<boolean> {
-  state.loading = true
+  const requestId = ++state.requestId
+
+  if (state.hasLoaded) {
+    state.isPending = true
+  } else {
+    state.isLoading = true
+  }
+
   state.error = undefined
 
   try {
     const entries = await fileSystem.listEntries(path)
 
-    state.entries = entries
-    state.currentDirectory = path
+    if (requestId !== state.requestId) return false
 
     const selectedIndex =
       options.selectPath === undefined
@@ -111,16 +117,24 @@ export async function loadDirectory(
         : entries.findIndex((entry) => entry.path === options.selectPath)
     const index = selectedIndex === -1 ? 0 : selectedIndex
 
+    state.entries = entries
+    state.currentDirectory = path
     state.selectedIndex = entries.length > 0 ? index : -1
     state.selectedEntry = entries[index]
+    state.hasLoaded = true
 
     persistLocation(state)
     return true
   } catch (error) {
+    if (requestId !== state.requestId) return false
+
     state.error = error instanceof Error ? error.message : String(error)
     return false
   } finally {
-    state.loading = false
+    if (requestId === state.requestId) {
+      state.isLoading = false
+      state.isPending = false
+    }
   }
 }
 
@@ -132,7 +146,13 @@ export async function refreshRanger(state: RangerState): Promise<void> {
   try {
     const entries = await fileSystem.listEntries(directory)
 
-    if (state.loading || directory !== state.currentDirectory) return
+    if (
+      state.isLoading ||
+      state.isPending ||
+      directory !== state.currentDirectory
+    ) {
+      return
+    }
 
     const selectedPath = state.selectedEntry?.path
     const selectedIndex =
@@ -148,7 +168,13 @@ export async function refreshRanger(state: RangerState): Promise<void> {
 
     persistLocation(state)
   } catch (error) {
-    if (state.loading || directory !== state.currentDirectory) return
+    if (
+      state.isLoading ||
+      state.isPending ||
+      directory !== state.currentDirectory
+    ) {
+      return
+    }
 
     if (!isSamePath(directory, state.root)) {
       await loadDirectory(state, state.root)
@@ -189,7 +215,7 @@ export function watchRanger(
       refreshTimer = setTimeout(() => {
         refreshTimer = undefined
 
-        if (!state.loading) {
+        if (!state.isLoading && !state.isPending) {
           void refreshRanger(state)
         }
       }, 150)

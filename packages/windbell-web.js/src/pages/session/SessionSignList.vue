@@ -17,7 +17,9 @@ const { t } = useI18n({
 const scroller = ref<HTMLElement | null>(null)
 const bottomAnchor = ref<HTMLElement | null>(null)
 const bottomAnchorVisible = ref(true)
-const title = computed(() => props.state.title || t("notFound"))
+const title = computed(() =>
+  props.state.hasLoaded ? props.state.title || t("notFound") : "",
+)
 
 let bottomObserver: IntersectionObserver | undefined
 
@@ -78,15 +80,30 @@ defineExpose({ scrollToBottom })
         {{ title }}
       </h1>
 
-      <p v-if="props.state.loading" class="text-ink">
-        {{ t("loading") }}
-      </p>
-
-      <p v-else-if="props.state.error !== undefined" class="text-sign-error">
+      <p
+        v-if="props.state.error !== undefined && props.state.hasLoaded"
+        class="text-sign-error"
+      >
         {{ props.state.error }}
       </p>
 
-      <ol v-else class="flex flex-col gap-4">
+      <p v-if="props.state.isLoading" class="text-ink">
+        {{ t("loading") }}
+      </p>
+
+      <p
+        v-else-if="props.state.error !== undefined && !props.state.hasLoaded"
+        class="text-sign-error"
+      >
+        {{ props.state.error }}
+      </p>
+
+      <ol
+        v-else
+        class="flex flex-col gap-4"
+        :class="{ 'opacity-60': props.state.isPending }"
+        :aria-busy="props.state.isPending"
+      >
         <SignCard
           v-for="(sign, index) in props.state.context"
           :key="index"

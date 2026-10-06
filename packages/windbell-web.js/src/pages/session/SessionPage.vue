@@ -12,9 +12,8 @@ import Ranger from "../../components/ranger/Ranger.vue"
 import { sessionMessages } from "./Session.i18n.ts"
 import {
   generateSessionTitle,
+  getSessionState,
   interpretSession,
-  loadSessionState,
-  makeSessionState,
 } from "./SessionState.ts"
 import { receiveSessionMessages, type SessionMessage } from "./SessionInbox.ts"
 
@@ -64,7 +63,7 @@ const sessionDividerOptions = {
   maxRatio: 0.6,
 }
 
-const state = makeSessionState(sessionId.value)
+const state = getSessionState(sessionId.value)
 const rangerOpen = ref(readStoredRangerOpen(sessionId.value))
 const sessionDivider = ref(
   makeDividerState({
@@ -76,9 +75,11 @@ const locationStorageKey = computed(() =>
   sessionRangerLocationStorageKey(sessionId.value),
 )
 const signList = ref<InstanceType<typeof SessionSignList> | null>(null)
-const title = computed(() => state.title || t("notFound"))
+const title = computed(() =>
+  state.hasLoaded ? state.title || t("notFound") : t("loading"),
+)
 const rangerPaneVisible = computed(
-  () => rangerOpen.value && state.workspaceRoot !== "" && !state.loading,
+  () => rangerOpen.value && state.workspaceRoot !== "" && !state.isLoading,
 )
 const sessionPaneWidth = computed(() =>
   rangerPaneVisible.value ? `${sessionDivider.value.ratio * 100}%` : "100%",
@@ -99,6 +100,8 @@ function goBack(): void {
 }
 
 async function send(): Promise<void> {
+  if (state.isLoading || state.isPending) return
+
   const content = input.value.trim()
   if (content === "" || state.interpreting) return
 
@@ -130,8 +133,6 @@ async function receiveInbox(value: string): Promise<void> {
 }
 
 async function loadSession(value: string): Promise<void> {
-  await loadSessionState(state, value)
-
   if (state.error !== undefined) return
 
   await receiveInbox(value)
@@ -140,16 +141,6 @@ async function loadSession(value: string): Promise<void> {
 
 onMounted(async () => {
   await loadSession(sessionId.value)
-})
-
-watch(sessionId, async (value) => {
-  rangerOpen.value = readStoredRangerOpen(value)
-  sessionDivider.value = makeDividerState({
-    ...sessionDividerOptions,
-    storageKey: sessionWidthRatioStorageKey(value),
-  })
-
-  await loadSession(value)
 })
 
 watch(rangerOpen, (value) => {

@@ -3,7 +3,7 @@ import { Pencil, Trash2 } from "@lucide/vue"
 import type * as S from "@windbell/semiosis.js"
 import { useHead } from "@unhead/vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute, useRouter } from "vue-router"
 import BackButton from "../../components/buttons/BackButton.vue"
@@ -13,9 +13,8 @@ import SessionCard from "./SessionCard.vue"
 import SessionStartComposer from "./SessionStartComposer.vue"
 import { workspaceMessages } from "./Workspace.i18n.ts"
 import {
-  loadWorkspaceState,
+  getWorkspaceState,
   makeSession,
-  makeWorkspaceState,
   trashSession,
   trashWorkspace,
   updateSessionTitle,
@@ -31,7 +30,7 @@ const { t } = useI18n({
 })
 
 const workspaceId = computed(() => String(route.params.workspaceId ?? ""))
-const state = makeWorkspaceState(workspaceId.value)
+const state = getWorkspaceState(workspaceId.value)
 const title = computed(() => state.workspace?.name ?? t("title"))
 const creatingSession = ref(false)
 
@@ -106,15 +105,6 @@ async function requestTrashWorkspace(): Promise<void> {
   }
 }
 
-onMounted(async () => {
-  await loadWorkspaceState(state)
-})
-
-watch(workspaceId, async (value) => {
-  state.workspaceId = value
-  await loadWorkspaceState(state)
-})
-
 useHead(() => ({
   title: title.value,
   meta: [
@@ -185,17 +175,29 @@ useHead(() => ({
 
     <SessionStartComposer :creating="creatingSession" @create="createSession" />
 
-    <p v-if="state.loading" class="text-ink">
+    <p
+      v-if="state.error !== undefined && state.hasLoaded"
+      class="text-sign-error"
+    >
+      {{ state.error }}
+    </p>
+
+    <p v-if="state.isLoading" class="text-ink">
       {{ t("loading") }}
     </p>
 
-    <p v-else-if="state.error !== undefined" class="text-sign-error">
+    <p
+      v-else-if="state.error !== undefined && !state.hasLoaded"
+      class="text-sign-error"
+    >
       {{ state.error }}
     </p>
 
     <ol
       v-else-if="state.sessions.length > 0"
       class="flex flex-1 flex-col gap-4"
+      :class="{ 'opacity-60': state.isPending }"
+      :aria-busy="state.isPending"
     >
       <li v-for="session in state.sessions" :key="session.id">
         <SessionCard

@@ -2,14 +2,13 @@
 import type * as S from "@windbell/semiosis.js"
 import { useHead } from "@unhead/vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
-import { onMounted, ref } from "vue"
+import { ref } from "vue"
 import { useI18n } from "vue-i18n"
 import BackButton from "../../components/buttons/BackButton.vue"
 import DustbinWorkspaceCard from "./DustbinWorkspaceCard.vue"
 import { workspaceDustbinMessages } from "./WorkspaceDustbin.i18n.ts"
 import {
-  loadWorkspaceDustbin,
-  makeWorkspaceDustbinState,
+  getWorkspaceDustbinState,
   removeWorkspace,
   restoreWorkspace,
 } from "./WorkspaceDustbinState.ts"
@@ -19,7 +18,7 @@ const { t } = useI18n({
   useScope: "local",
 })
 
-const state = makeWorkspaceDustbinState()
+const state = getWorkspaceDustbinState()
 const sessionPreviewLimit = 3
 const busyWorkspaceId = ref<string | undefined>(undefined)
 
@@ -49,10 +48,6 @@ async function remove(workspace: S.DustbinWorkspace): Promise<void> {
   }
 }
 
-onMounted(async () => {
-  await loadWorkspaceDustbin(state)
-})
-
 useHead(() => ({
   title: t("title"),
 }))
@@ -74,17 +69,29 @@ useHead(() => ({
       {{ t("deletedWorkspaces") }}
     </h2>
 
-    <p v-if="state.loading" class="text-ink">
+    <p
+      v-if="state.error !== undefined && state.hasLoaded"
+      class="text-sign-error"
+    >
+      {{ state.error }}
+    </p>
+
+    <p v-if="state.isLoading" class="text-ink">
       {{ t("loading") }}
     </p>
 
-    <p v-else-if="state.error !== undefined" class="text-sign-error">
+    <p
+      v-else-if="state.error !== undefined && !state.hasLoaded"
+      class="text-sign-error"
+    >
       {{ state.error }}
     </p>
 
     <ol
       v-else-if="state.workspaces.length > 0"
       class="flex flex-1 flex-col gap-4"
+      :class="{ 'opacity-60': state.isPending }"
+      :aria-busy="state.isPending"
     >
       <li v-for="workspace in state.workspaces" :key="workspace.id">
         <DustbinWorkspaceCard

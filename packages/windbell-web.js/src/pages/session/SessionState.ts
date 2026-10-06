@@ -9,7 +9,10 @@ export type SessionState = {
   title: string
   context: Array<S.Sign>
   modelRef: S.ModelRef | undefined
-  loading: boolean
+  hasLoaded: boolean
+  isLoading: boolean
+  isPending: boolean
+  requestId: number
   interpreting: boolean
   error: string | undefined
 }
@@ -26,49 +29,81 @@ export function makeSessionState(sessionId: S.SessionId): SessionState {
     title: "",
     context: [],
     modelRef: undefined,
-    loading: false,
+    hasLoaded: false,
+    isLoading: true,
+    isPending: false,
+    requestId: 0,
     interpreting: false,
     error: undefined,
   })
+}
+
+const sessionStates = new Map<S.SessionId, SessionState>()
+
+export function getSessionState(sessionId: S.SessionId): SessionState {
+  let state = sessionStates.get(sessionId)
+
+  if (state === undefined) {
+    state = makeSessionState(sessionId)
+    sessionStates.set(sessionId, state)
+  }
+
+  return state
 }
 
 export async function loadSessionState(
   state: SessionState,
   sessionId: S.SessionId,
 ): Promise<void> {
+  const requestId = ++state.requestId
   state.sessionId = sessionId
-  state.workspaceId = ""
-  state.workspaceRoot = ""
-  state.modelRef = undefined
-  state.loading = true
+
+  if (state.hasLoaded) {
+    state.isPending = true
+  } else {
+    state.isLoading = true
+  }
+
   state.error = undefined
 
   try {
     const session = await semiosis.sessions.get(sessionId)
 
+    if (requestId !== state.requestId) return
+
     if (session === undefined) {
       state.title = ""
       state.context = []
+      state.workspaceId = ""
+      state.workspaceRoot = ""
+      state.modelRef = undefined
       state.error = `session not found: ${sessionId}`
       return
     }
 
-    state.workspaceId = session.workspaceId
-    state.title = session.title
-    state.context = session.context
-
     const workspace = await semiosis.workspaces.get(session.workspaceId)
+
+    if (requestId !== state.requestId) return
 
     if (workspace === undefined) {
       state.error = `workspace not found: ${session.workspaceId}`
       return
     }
 
+    state.workspaceId = session.workspaceId
+    state.title = session.title
+    state.context = session.context
     state.workspaceRoot = workspace.root
+    state.hasLoaded = true
   } catch (error) {
+    if (requestId !== state.requestId) return
+
     state.error = error instanceof Error ? error.message : String(error)
   } finally {
-    state.loading = false
+    if (requestId === state.requestId) {
+      state.isLoading = false
+      state.isPending = false
+    }
   }
 }
 

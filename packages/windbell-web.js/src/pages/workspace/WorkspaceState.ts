@@ -6,7 +6,10 @@ export type WorkspaceState = {
   workspaceId: S.WorkspaceId
   workspace: S.Workspace | undefined
   sessions: Array<S.Session>
-  loading: boolean
+  hasLoaded: boolean
+  isLoading: boolean
+  isPending: boolean
+  requestId: number
   error: string | undefined
 }
 
@@ -25,13 +28,36 @@ export function makeWorkspaceState(workspaceId: S.WorkspaceId): WorkspaceState {
     workspaceId,
     workspace: undefined,
     sessions: [],
-    loading: false,
+    hasLoaded: false,
+    isLoading: true,
+    isPending: false,
+    requestId: 0,
     error: undefined,
   })
 }
 
+const workspaceStates = new Map<S.WorkspaceId, WorkspaceState>()
+
+export function getWorkspaceState(workspaceId: S.WorkspaceId): WorkspaceState {
+  let state = workspaceStates.get(workspaceId)
+
+  if (state === undefined) {
+    state = makeWorkspaceState(workspaceId)
+    workspaceStates.set(workspaceId, state)
+  }
+
+  return state
+}
+
 export async function loadWorkspaceState(state: WorkspaceState): Promise<void> {
-  state.loading = true
+  const requestId = ++state.requestId
+
+  if (state.hasLoaded) {
+    state.isPending = true
+  } else {
+    state.isLoading = true
+  }
+
   state.error = undefined
 
   try {
@@ -42,7 +68,7 @@ export async function loadWorkspaceState(state: WorkspaceState): Promise<void> {
       }),
     ])
 
-    state.workspace = workspace
+    if (requestId !== state.requestId) return
 
     const loadedSessions = (
       await Promise.all(
@@ -50,12 +76,21 @@ export async function loadWorkspaceState(state: WorkspaceState): Promise<void> {
       )
     ).filter((session): session is S.Session => session !== undefined)
 
+    if (requestId !== state.requestId) return
+
     sortSessionsByUpdatedAt(loadedSessions)
+    state.workspace = workspace
     state.sessions = loadedSessions
+    state.hasLoaded = true
   } catch (error) {
+    if (requestId !== state.requestId) return
+
     state.error = error instanceof Error ? error.message : String(error)
   } finally {
-    state.loading = false
+    if (requestId === state.requestId) {
+      state.isLoading = false
+      state.isPending = false
+    }
   }
 }
 

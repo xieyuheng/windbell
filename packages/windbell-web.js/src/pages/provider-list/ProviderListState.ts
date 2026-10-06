@@ -21,23 +21,42 @@ export type ProviderSummary = {
 }
 
 export type ProviderListState = {
-  loading: boolean
+  hasLoaded: boolean
+  isLoading: boolean
+  isPending: boolean
+  requestId: number
   error: string | undefined
   providers: Array<ProviderSummary>
 }
 
 export function makeProviderListState(): ProviderListState {
   return reactive<ProviderListState>({
-    loading: false,
+    hasLoaded: false,
+    isLoading: true,
+    isPending: false,
+    requestId: 0,
     error: undefined,
     providers: [],
   })
 }
 
+const providerListState = makeProviderListState()
+
+export function getProviderListState(): ProviderListState {
+  return providerListState
+}
+
 export async function loadProviderListState(
   state: ProviderListState,
 ): Promise<void> {
-  state.loading = true
+  const requestId = ++state.requestId
+
+  if (state.hasLoaded) {
+    state.isPending = true
+  } else {
+    state.isLoading = true
+  }
+
   state.error = undefined
 
   try {
@@ -46,7 +65,9 @@ export async function loadProviderListState(
       semiosis.settings.get(),
     ])
 
-    state.providers = await Promise.all(
+    if (requestId !== state.requestId) return
+
+    const providers = await Promise.all(
       providerConfigs.map(async (providerConfig) => {
         const [apiKeyStatus, models] = await Promise.all([
           semiosis.providers.getApiKeyStatus(providerConfig.name),
@@ -67,10 +88,20 @@ export async function loadProviderListState(
         }
       }),
     )
+
+    if (requestId !== state.requestId) return
+
+    state.providers = providers
+    state.hasLoaded = true
   } catch (error) {
+    if (requestId !== state.requestId) return
+
     state.error = error instanceof Error ? error.message : String(error)
   } finally {
-    state.loading = false
+    if (requestId === state.requestId) {
+      state.isLoading = false
+      state.isPending = false
+    }
   }
 }
 

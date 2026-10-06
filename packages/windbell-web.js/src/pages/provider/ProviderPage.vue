@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Check, KeyRound, Trash2 } from "@lucide/vue"
 import { useHead } from "@unhead/vue"
-import { onMounted } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
 import BackButton from "../../components/buttons/BackButton.vue"
@@ -11,8 +10,7 @@ import ModelCard from "./ModelCard.vue"
 import { providerMessages } from "./Provider.i18n.ts"
 import {
   deleteProviderApiKey,
-  loadProviderState,
-  makeProviderState,
+  getProviderState,
   pinProviderModel,
   putProviderApiKey,
   selectDefaultProvider,
@@ -28,11 +26,7 @@ const { t } = useI18n({
   useScope: "local",
 })
 
-const state = makeProviderState(providerName)
-
-onMounted(async () => {
-  await loadProviderState(state)
-})
+const state = getProviderState(providerName)
 
 async function handlePinModel(modelName: string): Promise<void> {
   try {
@@ -153,15 +147,30 @@ useHead(() => ({
       </div>
     </header>
 
-    <p v-if="state.loading" class="text-ink">
-      {{ t("loading") }}
-    </p>
-
-    <p v-else-if="state.error !== undefined" class="text-sign-error">
+    <p
+      v-if="state.error !== undefined && state.hasLoaded"
+      class="text-sign-error"
+    >
       {{ state.error }}
     </p>
 
-    <template v-else>
+    <p v-if="state.isLoading" class="text-ink">
+      {{ t("loading") }}
+    </p>
+
+    <p
+      v-else-if="state.error !== undefined && !state.hasLoaded"
+      class="text-sign-error"
+    >
+      {{ state.error }}
+    </p>
+
+    <div
+      v-else
+      class="flex flex-col gap-4"
+      :class="{ 'opacity-60': state.isPending }"
+      :aria-busy="state.isPending"
+    >
       <p v-if="state.warning !== undefined" class="text-sm text-ink">
         {{ t("warning") }}{{ t("colon") }}{{ state.warning }}
       </p>
@@ -187,6 +196,6 @@ useHead(() => ({
           </li>
         </ul>
       </section>
-    </template>
+    </div>
   </PageLayout>
 </template>

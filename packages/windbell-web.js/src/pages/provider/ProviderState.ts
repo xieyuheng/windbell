@@ -8,7 +8,10 @@ const semiosis = makeSemiosisClient({
 
 export type ProviderState = {
   providerName: string
-  loading: boolean
+  hasLoaded: boolean
+  isLoading: boolean
+  isPending: boolean
+  requestId: number
   error: string | undefined
   warning: string | undefined
   providerConfig: S.ProviderConfig | undefined
@@ -21,7 +24,10 @@ export type ProviderState = {
 export function makeProviderState(providerName: string): ProviderState {
   return reactive<ProviderState>({
     providerName,
-    loading: false,
+    hasLoaded: false,
+    isLoading: true,
+    isPending: false,
+    requestId: 0,
     error: undefined,
     warning: undefined,
     providerConfig: undefined,
@@ -32,8 +38,28 @@ export function makeProviderState(providerName: string): ProviderState {
   })
 }
 
+const providerStates = new Map<string, ProviderState>()
+
+export function getProviderState(providerName: string): ProviderState {
+  let state = providerStates.get(providerName)
+
+  if (state === undefined) {
+    state = makeProviderState(providerName)
+    providerStates.set(providerName, state)
+  }
+
+  return state
+}
+
 export async function loadProviderState(state: ProviderState): Promise<void> {
-  state.loading = true
+  const requestId = ++state.requestId
+
+  if (state.hasLoaded) {
+    state.isPending = true
+  } else {
+    state.isLoading = true
+  }
+
   state.error = undefined
   state.warning = undefined
 
@@ -46,6 +72,8 @@ export async function loadProviderState(state: ProviderState): Promise<void> {
         semiosis.providers.listModels({ providerName: state.providerName }),
       ])
 
+    if (requestId !== state.requestId) return
+
     const providerConfig = providerConfigs.find(
       (providerConfig) => providerConfig.name === state.providerName,
     )
@@ -54,27 +82,41 @@ export async function loadProviderState(state: ProviderState): Promise<void> {
       throw new Error(`provider not found: ${state.providerName}`)
     }
 
-    state.providerConfig = providerConfig
-    state.apiKeyConfigured = apiKeyStatus.configured
-    state.isDefaultProvider = settings.defaultProvider === state.providerName
-    state.models = localModels
+    let models = localModels
+    let warning: string | undefined = undefined
 
     if (apiKeyStatus.configured) {
       try {
-        state.models = await semiosis.providers.listModels({
+        models = await semiosis.providers.listModels({
           providerName: state.providerName,
           all: true,
         })
+
+        if (requestId !== state.requestId) return
       } catch (error) {
-        state.warning = error instanceof Error ? error.message : String(error)
+        warning = error instanceof Error ? error.message : String(error)
       }
     } else {
-      state.warning = "api key is not configured; showing local models only"
+      warning = "api key is not configured; showing local models only"
     }
+
+    if (requestId !== state.requestId) return
+
+    state.providerConfig = providerConfig
+    state.apiKeyConfigured = apiKeyStatus.configured
+    state.isDefaultProvider = settings.defaultProvider === state.providerName
+    state.models = models
+    state.warning = warning
+    state.hasLoaded = true
   } catch (error) {
+    if (requestId !== state.requestId) return
+
     state.error = error instanceof Error ? error.message : String(error)
   } finally {
-    state.loading = false
+    if (requestId === state.requestId) {
+      state.isLoading = false
+      state.isPending = false
+    }
   }
 }
 

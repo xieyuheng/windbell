@@ -42,7 +42,7 @@ const isBuiltIn = computed(() => isBuiltInTheme(themeId.value))
 const draft = reactive<Theme>(makeDraft())
 const selectedMode = ref<"light" | "dark">(colorMode.resolved)
 const saving = ref(false)
-const ready = ref(isNew.value)
+const ready = ref(isNew.value || existingTheme.value !== undefined)
 const error = ref<string | undefined>(undefined)
 
 const colorGroups: Array<{

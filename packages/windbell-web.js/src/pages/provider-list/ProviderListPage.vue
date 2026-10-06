@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
-import { onMounted } from "vue"
 import { useI18n } from "vue-i18n"
 import BackButton from "../../components/buttons/BackButton.vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
 import ProviderCard from "./ProviderCard.vue"
 import { providerListMessages } from "./ProviderList.i18n.ts"
 import {
-  loadProviderListState,
-  makeProviderListState,
+  getProviderListState,
   deleteProviderApiKey,
   putProviderApiKey,
   selectDefaultProvider,
@@ -19,11 +17,7 @@ const { t } = useI18n({
   useScope: "local",
 })
 
-const state = makeProviderListState()
-
-onMounted(async () => {
-  await loadProviderListState(state)
-})
+const state = getProviderListState()
 
 async function handleSetDefaultProvider(providerName: string): Promise<void> {
   try {
@@ -81,15 +75,30 @@ useHead(() => ({
       </h2>
     </div>
 
-    <p v-if="state.loading" class="text-ink">
-      {{ t("loading") }}
-    </p>
-
-    <p v-else-if="state.error !== undefined" class="text-sign-error">
+    <p
+      v-if="state.error !== undefined && state.hasLoaded"
+      class="text-sign-error"
+    >
       {{ state.error }}
     </p>
 
-    <ul v-else class="flex flex-col gap-4">
+    <p v-if="state.isLoading" class="text-ink">
+      {{ t("loading") }}
+    </p>
+
+    <p
+      v-else-if="state.error !== undefined && !state.hasLoaded"
+      class="text-sign-error"
+    >
+      {{ state.error }}
+    </p>
+
+    <ul
+      v-else
+      class="flex flex-col gap-4"
+      :class="{ 'opacity-60': state.isPending }"
+      :aria-busy="state.isPending"
+    >
       <li v-for="provider in state.providers" :key="provider.name">
         <ProviderCard
           :provider="provider"

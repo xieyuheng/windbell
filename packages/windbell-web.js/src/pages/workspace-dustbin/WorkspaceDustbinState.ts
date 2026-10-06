@@ -5,7 +5,10 @@ import { reactive } from "vue"
 export type WorkspaceDustbinState = {
   workspaces: Array<S.DustbinWorkspace>
   sessionsByWorkspaceId: Record<S.WorkspaceId, Array<S.DustbinSessionIndex>>
-  loading: boolean
+  hasLoaded: boolean
+  isLoading: boolean
+  isPending: boolean
+  requestId: number
   error: string | undefined
 }
 
@@ -17,9 +20,18 @@ export function makeWorkspaceDustbinState(): WorkspaceDustbinState {
   return reactive<WorkspaceDustbinState>({
     workspaces: [],
     sessionsByWorkspaceId: {},
-    loading: false,
+    hasLoaded: false,
+    isLoading: true,
+    isPending: false,
+    requestId: 0,
     error: undefined,
   })
+}
+
+const workspaceDustbinState = makeWorkspaceDustbinState()
+
+export function getWorkspaceDustbinState(): WorkspaceDustbinState {
+  return workspaceDustbinState
 }
 
 function groupSessionsByWorkspace(
@@ -39,7 +51,14 @@ function groupSessionsByWorkspace(
 export async function loadWorkspaceDustbin(
   state: WorkspaceDustbinState,
 ): Promise<void> {
-  state.loading = true
+  const requestId = ++state.requestId
+
+  if (state.hasLoaded) {
+    state.isPending = true
+  } else {
+    state.isLoading = true
+  }
+
   state.error = undefined
 
   try {
@@ -48,12 +67,20 @@ export async function loadWorkspaceDustbin(
       semiosis.dustbin.sessions.list({ workspaceId: undefined }),
     ])
 
+    if (requestId !== state.requestId) return
+
     state.workspaces = workspaces
     state.sessionsByWorkspaceId = groupSessionsByWorkspace(sessions)
+    state.hasLoaded = true
   } catch (error) {
+    if (requestId !== state.requestId) return
+
     state.error = error instanceof Error ? error.message : String(error)
   } finally {
-    state.loading = false
+    if (requestId === state.requestId) {
+      state.isLoading = false
+      state.isPending = false
+    }
   }
 }
 

@@ -1,6 +1,7 @@
 import { createHead } from "@unhead/vue/client"
 import { createApp } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
+import { DataLoaderPlugin } from "vue-router/experimental"
 import App from "./app/App.vue"
 import { i18n } from "./app/i18n.ts"
 import { ensureThemeReady } from "./app/theme.ts"
@@ -14,6 +15,8 @@ const router = createRouter({
 
 const app = createApp(App)
 
+// DataLoaderPlugin 必须在 router 之前注册。
+app.use(DataLoaderPlugin, { router })
 app.use(i18n)
 app.use(createHead())
 app.use(router)

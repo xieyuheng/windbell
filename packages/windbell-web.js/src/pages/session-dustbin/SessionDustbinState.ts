@@ -9,7 +9,10 @@ export type SessionDustbinListItem = S.DustbinSessionIndex & {
 export type SessionDustbinState = {
   workspaceId: S.WorkspaceId
   sessions: Array<SessionDustbinListItem>
-  loading: boolean
+  hasLoaded: boolean
+  isLoading: boolean
+  isPending: boolean
+  requestId: number
   error: string | undefined
 }
 
@@ -23,15 +26,40 @@ export function makeSessionDustbinState(
   return reactive<SessionDustbinState>({
     workspaceId,
     sessions: [],
-    loading: false,
+    hasLoaded: false,
+    isLoading: true,
+    isPending: false,
+    requestId: 0,
     error: undefined,
   })
+}
+
+const sessionDustbinStates = new Map<S.WorkspaceId, SessionDustbinState>()
+
+export function getSessionDustbinState(
+  workspaceId: S.WorkspaceId,
+): SessionDustbinState {
+  let state = sessionDustbinStates.get(workspaceId)
+
+  if (state === undefined) {
+    state = makeSessionDustbinState(workspaceId)
+    sessionDustbinStates.set(workspaceId, state)
+  }
+
+  return state
 }
 
 export async function loadSessionDustbin(
   state: SessionDustbinState,
 ): Promise<void> {
-  state.loading = true
+  const requestId = ++state.requestId
+
+  if (state.hasLoaded) {
+    state.isPending = true
+  } else {
+    state.isLoading = true
+  }
+
   state.error = undefined
 
   try {
@@ -39,7 +67,9 @@ export async function loadSessionDustbin(
       workspaceId: state.workspaceId,
     })
 
-    state.sessions = await Promise.all(
+    if (requestId !== state.requestId) return
+
+    const loaded = await Promise.all(
       sessions.map(async (session) => {
         const detail = await semiosis.dustbin.sessions.get(session.id)
         return {
@@ -48,10 +78,20 @@ export async function loadSessionDustbin(
         }
       }),
     )
+
+    if (requestId !== state.requestId) return
+
+    state.sessions = loaded
+    state.hasLoaded = true
   } catch (error) {
+    if (requestId !== state.requestId) return
+
     state.error = error instanceof Error ? error.message : String(error)
   } finally {
-    state.loading = false
+    if (requestId === state.requestId) {
+      state.isLoading = false
+      state.isPending = false
+    }
   }
 }
 

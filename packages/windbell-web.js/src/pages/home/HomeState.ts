@@ -5,7 +5,10 @@ import { reactive } from "vue"
 export type HomeState = {
   workspaces: Array<S.Workspace>
   sessionsByWorkspaceId: Record<S.WorkspaceId, Array<S.SessionIndex>>
-  loading: boolean
+  hasLoaded: boolean
+  isLoading: boolean
+  isPending: boolean
+  requestId: number
   error: string | undefined
 }
 
@@ -17,9 +20,18 @@ export function makeHomeState(): HomeState {
   return reactive<HomeState>({
     workspaces: [],
     sessionsByWorkspaceId: {},
-    loading: false,
+    hasLoaded: false,
+    isLoading: true,
+    isPending: false,
+    requestId: 0,
     error: undefined,
   })
+}
+
+const homeState = makeHomeState()
+
+export function getHomeState(): HomeState {
+  return homeState
 }
 
 function sortWorkspacesByUpdatedAt(workspaces: Array<S.Workspace>): void {
@@ -43,7 +55,14 @@ function groupSessionsByWorkspace(
 }
 
 export async function loadHomeState(state: HomeState): Promise<void> {
-  state.loading = true
+  const requestId = ++state.requestId
+
+  if (state.hasLoaded) {
+    state.isPending = true
+  } else {
+    state.isLoading = true
+  }
+
   state.error = undefined
 
   try {
@@ -52,13 +71,21 @@ export async function loadHomeState(state: HomeState): Promise<void> {
       semiosis.sessions.list({ workspaceId: undefined }),
     ])
 
+    if (requestId !== state.requestId) return
+
     sortWorkspacesByUpdatedAt(workspaces)
     state.workspaces = workspaces
     state.sessionsByWorkspaceId = groupSessionsByWorkspace(sessions)
+    state.hasLoaded = true
   } catch (error) {
+    if (requestId !== state.requestId) return
+
     state.error = error instanceof Error ? error.message : String(error)
   } finally {
-    state.loading = false
+    if (requestId === state.requestId) {
+      state.isLoading = false
+      state.isPending = false
+    }
   }
 }
 

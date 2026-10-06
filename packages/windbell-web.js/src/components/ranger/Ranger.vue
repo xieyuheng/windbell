@@ -169,7 +169,7 @@ onBeforeUnmount(() => {
     <ResizeDivider :state="sidebarDivider" />
 
     <section
-      v-if="state.loading"
+      v-if="state.isLoading"
       class="flex min-w-0 flex-1 items-start px-4 py-3"
     >
       <p class="text-ink">
@@ -178,7 +178,7 @@ onBeforeUnmount(() => {
     </section>
 
     <section
-      v-else-if="state.error !== undefined"
+      v-else-if="state.error !== undefined && !state.hasLoaded"
       class="flex min-w-0 flex-1 items-start px-4 py-3"
     >
       <p class="text-sign-error">
@@ -186,6 +186,16 @@ onBeforeUnmount(() => {
       </p>
     </section>
 
-    <RangerView v-else class="min-w-0 flex-1" :entry="state.selectedEntry" />
+    <section v-else class="flex min-w-0 flex-1 flex-col">
+      <p v-if="state.error !== undefined" class="px-4 py-3 text-sign-error">
+        {{ state.error }}
+      </p>
+
+      <RangerView
+        class="min-w-0 flex-1"
+        :class="{ 'opacity-60': state.isPending }"
+        :entry="state.selectedEntry"
+      />
+    </section>
   </main>
 </template>
