@@ -8,7 +8,7 @@ import { listProviderModelEntries } from "./listProviderModelEntries.ts"
 import { pinModel } from "./pinModel.ts"
 import { unpinModel } from "./unpinModel.ts"
 
-test("listProviderModelEntries returns provider model entries", async () => {
+test("listProviderModelEntries sorts pinned models before unpinned models", async () => {
   const root = await fs.mkdtemp(
     Path.join(Os.tmpdir(), "windbell-list-provider-model-entries-"),
   )
@@ -16,29 +16,33 @@ test("listProviderModelEntries returns provider model entries", async () => {
   try {
     const database = makeDatabase({ root })
 
-    await pinModel(database, "deepseek", "deepseek-flash")
+    await pinModel(database, "deepseek", "deepseek-model-a")
+    await unpinModel(database, "deepseek", "deepseek-model-a")
+    await pinModel(database, "deepseek", "deepseek-model-z")
 
     assert.deepEqual(await summary(database), [
       {
         providerName: "deepseek",
-        name: "deepseek-flash",
+        name: "deepseek-model-z",
         pinned: true,
-        isDefault: true,
+        isDefault: false,
         configPinned: true,
       },
-    ])
-
-    await unpinModel(database, "deepseek", "deepseek-flash")
-
-    assert.deepEqual(await summary(database), [
       {
         providerName: "deepseek",
-        name: "deepseek-flash",
+        name: "deepseek-model-a",
         pinned: false,
-        isDefault: true,
+        isDefault: false,
         configPinned: false,
       },
     ])
+
+    await pinModel(database, "deepseek", "deepseek-model-a")
+
+    assert.deepEqual(
+      (await summary(database)).map((entry) => entry.name),
+      ["deepseek-model-a", "deepseek-model-z"],
+    )
   } finally {
     await fs.rm(root, { recursive: true, force: true })
   }

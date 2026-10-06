@@ -39,9 +39,8 @@ async function listDeepSeekEntries(
   const providerConfig = await readProviderConfig(database, "deepseek")
   const configs = await DeepSeek.readModelConfigs(database)
 
-  const entries: Array<DeepSeekProviderModelEntry> = Object.keys(configs)
-    .sort()
-    .map((name) => {
+  const entries: Array<DeepSeekProviderModelEntry> = Object.keys(configs).map(
+    (name) => {
       const config = DeepSeek.parseModelConfig(name, configs[name])
 
       return {
@@ -52,7 +51,9 @@ async function listDeepSeekEntries(
         config,
         info: null,
       }
-    })
+    },
+  )
+  entries.sort(compareModelEntries)
 
   if (options.all === true) {
     const infos = await DeepSeek.listAvailableModels(database)
@@ -73,9 +74,8 @@ async function listOpenRouterEntries(
   const providerConfig = await readProviderConfig(database, "openrouter")
   const configs = await OpenRouter.readModelConfigs(database)
 
-  const entries: Array<OpenRouterProviderModelEntry> = Object.keys(configs)
-    .sort()
-    .map((name) => {
+  const entries: Array<OpenRouterProviderModelEntry> = Object.keys(configs).map(
+    (name) => {
       const config = OpenRouter.parseModelConfig(name, configs[name])
 
       return {
@@ -86,7 +86,9 @@ async function listOpenRouterEntries(
         config,
         info: null,
       }
-    })
+    },
+  )
+  entries.sort(compareModelEntries)
 
   if (options.all === true) {
     const infos = await OpenRouter.listAvailableModels(database)
@@ -139,5 +141,14 @@ function mergeInfoEntries<Info extends { id: string }>(
     })
   }
 
-  entries.sort((a, b) => a.name.localeCompare(b.name))
+  entries.sort(compareModelEntries)
+}
+
+function compareModelEntries(
+  a: { name: string; pinned: boolean },
+  b: { name: string; pinned: boolean },
+): number {
+  if (a.pinned !== b.pinned) return a.pinned ? -1 : 1
+
+  return a.name.localeCompare(b.name)
 }

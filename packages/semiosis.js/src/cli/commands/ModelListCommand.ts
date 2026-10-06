@@ -43,21 +43,29 @@ export function makeModelListHandler(options: ModelListCommandOptions) {
         }
 
         const models = await listAvailableModels(options.database, providerName)
+        const entries = await Promise.all(
+          models.map(async (model) => ({
+            name: model.id,
+            pinned: await isModelPinned(
+              options.database,
+              providerName,
+              model.id,
+            ),
+          })),
+        )
+        entries.sort((a, b) => {
+          if (a.pinned !== b.pinned) return a.pinned ? -1 : 1
 
-        for (const model of models) {
-          const modelName = model.id
-          const pinned = await isModelPinned(
-            options.database,
-            providerName,
-            modelName,
-          )
+          return a.name.localeCompare(b.name)
+        })
 
+        for (const { name, pinned } of entries) {
           const tags: Array<string> = []
           if (pinned) tags.push("pinned")
-          if (modelName === defaultModel) tags.push("default")
+          if (name === defaultModel) tags.push("default")
           const suffix = tags.length === 0 ? "" : ` (${tags.join(", ")})`
 
-          console.log(`${providerName} ${modelName}${suffix}`)
+          console.log(`${providerName} ${name}${suffix}`)
         }
       } catch (error) {
         console.error(`[${providerName}] ${errorMessage(error)}`)

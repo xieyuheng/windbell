@@ -99,7 +99,7 @@ function json(value: unknown): string {
             <dt class="text-ink">{{ t("reasoning") }}{{ t("colon") }}</dt>
             <dd>
               <pre
-                class="overflow-auto rounded bg-line p-2 font-mono text-xs text-ink"
+                class="overflow-auto font-mono"
                 >{{
                   entry.config.reasoning
                     ? json(entry.config.reasoning)
@@ -112,7 +112,7 @@ function json(value: unknown): string {
             <dt class="text-ink">{{ t("provider") }}{{ t("colon") }}</dt>
             <dd>
               <pre
-                class="overflow-auto rounded bg-line p-2 font-mono text-xs text-ink"
+                class="overflow-auto font-mono"
                 >{{
                   entry.config.provider
                     ? json(entry.config.provider)
@@ -125,7 +125,7 @@ function json(value: unknown): string {
             <dt class="text-ink">{{ t("extraBody") }}{{ t("colon") }}</dt>
             <dd>
               <pre
-                class="overflow-auto rounded bg-line p-2 font-mono text-xs text-ink"
+                class="overflow-auto font-mono"
                 >{{
                   entry.config.extraBody
                     ? json(entry.config.extraBody)
