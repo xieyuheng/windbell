@@ -4,7 +4,7 @@ import Os from "node:os"
 import Path from "node:path"
 import { test } from "node:test"
 import { makeDatabase } from "../database/index.ts"
-import { enableModel } from "./enableModel.ts"
+import { pinModel } from "./pinModel.ts"
 import { setDefaultModel } from "./setDefaultModel.ts"
 
 test("setDefaultModel writes provider defaultModel", async () => {
@@ -15,7 +15,12 @@ test("setDefaultModel writes provider defaultModel", async () => {
   try {
     const database = makeDatabase({ root })
 
-    await enableModel(database, "deepseek", "deepseek-flash")
+    await database.providers.put("deepseek", {
+      name: "deepseek",
+      baseUrl: "https://api.deepseek.com",
+      defaultModel: null,
+    })
+    await pinModel(database, "deepseek", "deepseek-flash")
     await setDefaultModel(database, "deepseek", "deepseek-flash")
 
     assert.deepEqual(await database.providers.get("deepseek"), {
@@ -28,7 +33,7 @@ test("setDefaultModel writes provider defaultModel", async () => {
   }
 })
 
-test("setDefaultModel rejects model that is not enabled", async () => {
+test("setDefaultModel accepts model that is not pinned", async () => {
   const root = await fs.mkdtemp(
     Path.join(Os.tmpdir(), "windbell-set-default-model-"),
   )
@@ -36,10 +41,18 @@ test("setDefaultModel rejects model that is not enabled", async () => {
   try {
     const database = makeDatabase({ root })
 
-    await assert.rejects(
-      () => setDefaultModel(database, "deepseek", "deepseek-flash"),
-      /model is not enabled/,
-    )
+    await database.providers.put("deepseek", {
+      name: "deepseek",
+      baseUrl: "https://api.deepseek.com",
+      defaultModel: null,
+    })
+    await setDefaultModel(database, "deepseek", "deepseek-flash")
+
+    assert.deepEqual(await database.providers.get("deepseek"), {
+      name: "deepseek",
+      baseUrl: "https://api.deepseek.com",
+      defaultModel: "deepseek-flash",
+    })
   } finally {
     await fs.rm(root, { recursive: true, force: true })
   }

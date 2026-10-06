@@ -9,8 +9,8 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  enable: []
-  disable: []
+  pin: []
+  unpin: []
   setDefault: []
 }>()
 </script>
@@ -20,8 +20,8 @@ const emit = defineEmits<{
     v-if="entry.providerName === 'deepseek'"
     :entry="entry"
     :busy="busy"
-    @enable="emit('enable')"
-    @disable="emit('disable')"
+    @pin="emit('pin')"
+    @unpin="emit('unpin')"
     @set-default="emit('setDefault')"
   />
 
@@ -29,8 +29,8 @@ const emit = defineEmits<{
     v-else-if="entry.providerName === 'openrouter'"
     :entry="entry"
     :busy="busy"
-    @enable="emit('enable')"
-    @disable="emit('disable')"
+    @pin="emit('pin')"
+    @unpin="emit('unpin')"
     @set-default="emit('setDefault')"
   />
 </template>

@@ -61,7 +61,7 @@ test("semiosis client and server", async (t) => {
     [],
   )
 
-  await client.providers.enableModel({
+  await client.providers.pinModel({
     providerName: "deepseek",
     modelName: "deepseek-flash",
   })
@@ -69,16 +69,21 @@ test("semiosis client and server", async (t) => {
   const models = await client.providers.listModels({ providerName: "deepseek" })
   assert.equal(models.length, 1)
   assert.equal(models[0]?.name, "deepseek-flash")
-  assert.equal(models[0]?.enabled, true)
+  assert.equal(models[0]?.pinned, true)
 
   await client.providers.setDefaultModel({
     providerName: "deepseek",
     modelName: "deepseek-flash",
   })
-  await client.providers.disableModel({
+  await client.providers.unpinModel({
     providerName: "deepseek",
     modelName: "deepseek-flash",
   })
+
+  assert.equal(
+    (await client.providers.get("deepseek"))?.defaultModel,
+    "deepseek-flash",
+  )
 
   assert.deepEqual(await client.settings.get(), {
     defaultProvider: null,

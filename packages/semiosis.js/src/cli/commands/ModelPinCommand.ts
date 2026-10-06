@@ -1,18 +1,18 @@
 import type * as Cli from "@xieyuheng/cli.js"
 import type { Database } from "../../database/index.ts"
-import { enableModel } from "../../models/index.ts"
+import { pinModel } from "../../models/index.ts"
 import { readOptionalOption } from "../options.ts"
 
-export type ModelEnableCommandOptions = {
+export type ModelPinCommandOptions = {
   database: Database
 }
 
-export function makeModelEnableHandler(options: ModelEnableCommandOptions) {
+export function makeModelPinHandler(options: ModelPinCommandOptions) {
   return async (context: Cli.HandlerContext) => {
     const modelName = context.argValues["model-name"]
 
     if (modelName === undefined) {
-      throw new Error("expected command: model enable <model-name>")
+      throw new Error("expected command: model pin <model-name>")
     }
 
     const providerOption = readOptionalOption(context.options, "--provider")
@@ -23,7 +23,7 @@ export function makeModelEnableHandler(options: ModelEnableCommandOptions) {
       throw new Error("default provider is not configured")
     }
 
-    await enableModel(options.database, providerName, modelName)
-    console.log(`enabled: ${providerName}/${modelName}`)
+    await pinModel(options.database, providerName, modelName)
+    console.log(`pinned: ${providerName}/${modelName}`)
   }
 }

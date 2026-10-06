@@ -1,7 +1,7 @@
 import type * as Cli from "@xieyuheng/cli.js"
 import type { Database } from "../../database/index.ts"
 import {
-  isModelEnabled,
+  isModelPinned,
   listAvailableModels,
   listModelConfigs,
 } from "../../models/index.ts"
@@ -46,14 +46,14 @@ export function makeModelListHandler(options: ModelListCommandOptions) {
 
         for (const model of models) {
           const modelName = model.id
-          const enabled = await isModelEnabled(
+          const pinned = await isModelPinned(
             options.database,
             providerName,
             modelName,
           )
 
           const tags: Array<string> = []
-          if (enabled) tags.push("enabled")
+          if (pinned) tags.push("pinned")
           if (modelName === defaultModel) tags.push("default")
           const suffix = tags.length === 0 ? "" : ` (${tags.join(", ")})`
 

@@ -6,65 +6,56 @@ import { test } from "node:test"
 import { makeDatabase, type Database } from "../database/index.ts"
 import * as DeepSeek from "../providers/deepseek/index.ts"
 import * as OpenRouter from "../providers/openrouter/index.ts"
-import { disableModel } from "./disableModel.ts"
-import { enableModel } from "./enableModel.ts"
-import { isModelEnabled } from "./isModelEnabled.ts"
+import { isModelPinned } from "./isModelPinned.ts"
+import { pinModel } from "./pinModel.ts"
 import { setDefaultModel } from "./setDefaultModel.ts"
+import { unpinModel } from "./unpinModel.ts"
 
-test("disableModel marks an enabled model as disabled", async () => {
-  const root = await fs.mkdtemp(
-    Path.join(Os.tmpdir(), "windbell-disable-model-"),
-  )
+test("unpinModel marks a pinned model as unpinned", async () => {
+  const root = await fs.mkdtemp(Path.join(Os.tmpdir(), "windbell-pin-model-"))
 
   try {
     const database = makeDatabase({ root })
 
-    await database.providers.put("deepseek", {
-      name: "deepseek",
-      baseUrl: "https://api.deepseek.com",
-      defaultModel: null,
-    })
-    await enableModel(database, "deepseek", "deepseek-flash")
+    await pinModel(database, "deepseek", "deepseek-flash")
 
-    const result = await disableModel(database, "deepseek", "deepseek-flash")
+    const result = await unpinModel(database, "deepseek", "deepseek-flash")
 
     assert.equal(result, true)
     assert.equal(
-      await isModelEnabled(database, "deepseek", "deepseek-flash"),
+      await isModelPinned(database, "deepseek", "deepseek-flash"),
       false,
     )
     assert.deepEqual(
       (await readModelConfigsFile(database, "deepseek"))["deepseek-flash"],
-      { disabled: true },
+      { pinned: false },
     )
   } finally {
     await fs.rm(root, { recursive: true, force: true })
   }
 })
 
-test("disableModel preserves model config", async () => {
-  const root = await fs.mkdtemp(
-    Path.join(Os.tmpdir(), "windbell-disable-model-"),
-  )
+test("unpinModel preserves model config", async () => {
+  const root = await fs.mkdtemp(Path.join(Os.tmpdir(), "windbell-pin-model-"))
 
   try {
     const database = makeDatabase({ root })
 
     await writeModelConfigsFile(database, "deepseek", {
       "deepseek-flash": {
-        disabled: false,
+        pinned: true,
         thinking: "disabled",
         reasoningEffort: "low",
       },
     })
 
-    const result = await disableModel(database, "deepseek", "deepseek-flash")
+    const result = await unpinModel(database, "deepseek", "deepseek-flash")
 
     assert.equal(result, true)
     assert.deepEqual(
       (await readModelConfigsFile(database, "deepseek"))["deepseek-flash"],
       {
-        disabled: true,
+        pinned: false,
         thinking: "disabled",
         reasoningEffort: "low",
       },
@@ -74,10 +65,8 @@ test("disableModel preserves model config", async () => {
   }
 })
 
-test("disableModel clears matching default model", async () => {
-  const root = await fs.mkdtemp(
-    Path.join(Os.tmpdir(), "windbell-disable-model-"),
-  )
+test("unpinModel does not clear matching default model", async () => {
+  const root = await fs.mkdtemp(Path.join(Os.tmpdir(), "windbell-pin-model-"))
 
   try {
     const database = makeDatabase({ root })
@@ -87,39 +76,37 @@ test("disableModel clears matching default model", async () => {
       baseUrl: "https://api.deepseek.com",
       defaultModel: null,
     })
-    await enableModel(database, "deepseek", "deepseek-flash")
+    await pinModel(database, "deepseek", "deepseek-flash")
     await setDefaultModel(database, "deepseek", "deepseek-flash")
 
-    const result = await disableModel(database, "deepseek", "deepseek-flash")
+    const result = await unpinModel(database, "deepseek", "deepseek-flash")
 
     assert.equal(result, true)
     assert.deepEqual(await database.providers.get("deepseek"), {
       name: "deepseek",
       baseUrl: "https://api.deepseek.com",
-      defaultModel: null,
+      defaultModel: "deepseek-flash",
     })
   } finally {
     await fs.rm(root, { recursive: true, force: true })
   }
 })
 
-test("disableModel returns false when model is already disabled", async () => {
-  const root = await fs.mkdtemp(
-    Path.join(Os.tmpdir(), "windbell-disable-model-"),
-  )
+test("unpinModel returns false when model is already unpinned", async () => {
+  const root = await fs.mkdtemp(Path.join(Os.tmpdir(), "windbell-pin-model-"))
 
   try {
     const database = makeDatabase({ root })
 
     await writeModelConfigsFile(database, "deepseek", {
       "deepseek-flash": {
-        disabled: true,
+        pinned: false,
         thinking: "enabled",
         reasoningEffort: "high",
       },
     })
 
-    const result = await disableModel(database, "deepseek", "deepseek-flash")
+    const result = await unpinModel(database, "deepseek", "deepseek-flash")
 
     assert.equal(result, false)
   } finally {
@@ -127,32 +114,30 @@ test("disableModel returns false when model is already disabled", async () => {
   }
 })
 
-test("enableModel re-enables disabled model and preserves config", async () => {
-  const root = await fs.mkdtemp(
-    Path.join(Os.tmpdir(), "windbell-disable-model-"),
-  )
+test("pinModel re-pins an unpinned model and preserves config", async () => {
+  const root = await fs.mkdtemp(Path.join(Os.tmpdir(), "windbell-pin-model-"))
 
   try {
     const database = makeDatabase({ root })
 
     await writeModelConfigsFile(database, "deepseek", {
       "deepseek-flash": {
-        disabled: true,
+        pinned: false,
         thinking: "disabled",
         reasoningEffort: "low",
       },
     })
 
-    await enableModel(database, "deepseek", "deepseek-flash")
+    await pinModel(database, "deepseek", "deepseek-flash")
 
     assert.equal(
-      await isModelEnabled(database, "deepseek", "deepseek-flash"),
+      await isModelPinned(database, "deepseek", "deepseek-flash"),
       true,
     )
     assert.deepEqual(
       (await readModelConfigsFile(database, "deepseek"))["deepseek-flash"],
       {
-        disabled: false,
+        pinned: true,
         thinking: "disabled",
         reasoningEffort: "low",
       },
@@ -162,28 +147,24 @@ test("enableModel re-enables disabled model and preserves config", async () => {
   }
 })
 
-test("DeepSeek.makeModel rejects disabled config", () => {
-  assert.throws(
-    () =>
-      DeepSeek.makeModel({} as never, {
-        name: "deepseek-flash",
-        disabled: true,
-        thinking: "enabled",
-        reasoningEffort: "high",
-      }),
-    /model is disabled/,
-  )
+test("DeepSeek.makeModel accepts unpinned config", () => {
+  const model = DeepSeek.makeModel({} as never, {
+    name: "deepseek-flash",
+    pinned: false,
+    thinking: "enabled",
+    reasoningEffort: "high",
+  })
+
+  assert.equal(model.name, "deepseek-flash")
 })
 
-test("OpenRouter.makeModel rejects disabled config", () => {
-  assert.throws(
-    () =>
-      OpenRouter.makeModel({} as never, {
-        name: "openrouter/free",
-        disabled: true,
-      }),
-    /model is disabled/,
-  )
+test("OpenRouter.makeModel accepts unpinned config", () => {
+  const model = OpenRouter.makeModel({} as never, {
+    name: "openrouter/free",
+    pinned: false,
+  })
+
+  assert.equal(model.name, "openrouter/free")
 })
 
 async function readModelConfigsFile(

@@ -11,8 +11,8 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  enable: []
-  disable: []
+  pin: []
+  unpin: []
   setDefault: []
 }>()
 
@@ -32,11 +32,11 @@ const { t } = useI18n({
 
     <div class="flex flex-col gap-2 p-2">
       <ModelCardToolbar
-        :enabled="entry.enabled"
+        :pinned="entry.pinned"
         :is-default="entry.isDefault"
         :busy="busy"
-        @enable="emit('enable')"
-        @disable="emit('disable')"
+        @pin="emit('pin')"
+        @unpin="emit('unpin')"
         @set-default="emit('setDefault')"
       />
 

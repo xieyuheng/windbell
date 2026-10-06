@@ -11,13 +11,13 @@ import ModelCard from "./ModelCard.vue"
 import { providerMessages } from "./Provider.i18n.ts"
 import {
   deleteProviderApiKey,
-  disableProviderModel,
-  enableProviderModel,
   loadProviderState,
   makeProviderState,
+  pinProviderModel,
   putProviderApiKey,
   selectDefaultProvider,
   setDefaultProviderModel,
+  unpinProviderModel,
 } from "./ProviderState.ts"
 
 const route = useRoute()
@@ -34,17 +34,17 @@ onMounted(async () => {
   await loadProviderState(state)
 })
 
-async function handleEnableModel(modelName: string): Promise<void> {
+async function handlePinModel(modelName: string): Promise<void> {
   try {
-    await enableProviderModel(state, modelName)
+    await pinProviderModel(state, modelName)
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
   }
 }
 
-async function handleDisableModel(modelName: string): Promise<void> {
+async function handleUnpinModel(modelName: string): Promise<void> {
   try {
-    await disableProviderModel(state, modelName)
+    await unpinProviderModel(state, modelName)
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error)
   }
@@ -180,8 +180,8 @@ useHead(() => ({
             <ModelCard
               :entry="entry"
               :busy="state.busyModelNames[entry.name] === true"
-              @enable="handleEnableModel(entry.name)"
-              @disable="handleDisableModel(entry.name)"
+              @pin="handlePinModel(entry.name)"
+              @unpin="handleUnpinModel(entry.name)"
               @set-default="handleSetDefaultModel(entry.name)"
             />
           </li>

@@ -4,7 +4,7 @@ import { writeJsonFile } from "../../../database/index.ts"
 import { parseModelConfig } from "./parseModelConfig.ts"
 import { readModelConfigs } from "./readModelConfigs.ts"
 
-export async function disableModel(
+export async function unpinModel(
   database: Database,
   name: string,
 ): Promise<boolean> {
@@ -13,11 +13,11 @@ export async function disableModel(
   if (!Object.hasOwn(configs, name)) return false
 
   const config = parseModelConfig(name, configs[name])
-  if (config.disabled) return false
+  if (!config.pinned) return false
 
   configs[name] = {
     ...(configs[name] as Record<string, unknown>),
-    disabled: true,
+    pinned: false,
   }
 
   await writeJsonFile(modelConfigsPath(database), configs)
@@ -25,5 +25,5 @@ export async function disableModel(
 }
 
 function modelConfigsPath(database: Database): string {
-  return Path.join(database.providersRoot, "openrouter", "models.json")
+  return Path.join(database.providersRoot, "deepseek", "models.json")
 }

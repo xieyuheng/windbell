@@ -31,7 +31,7 @@ export const ProviderConfigListSchema: z.ZodType<Array<S.ProviderConfig>> =
 
 const DeepSeekModelConfigSchema = z.object({
   name: z.string(),
-  disabled: z.boolean(),
+  pinned: z.boolean(),
   thinking: z.enum(["enabled", "disabled"]),
   reasoningEffort: z.enum(["none", "low", "high", "max"]),
 })
@@ -63,7 +63,7 @@ const OpenRouterReasoningSchema = z.object({
 
 const OpenRouterModelConfigSchema = z.object({
   name: z.string(),
-  disabled: z.boolean(),
+  pinned: z.boolean(),
   reasoning: OpenRouterReasoningSchema.nullable().optional(),
   provider: z.record(z.string(), z.unknown()).nullable().optional(),
   extraBody: z.record(z.string(), z.unknown()).optional(),
@@ -139,7 +139,7 @@ const DeepSeekProviderModelEntrySchema: z.ZodType<S.DeepSeekProviderModelEntry> 
   z.object({
     providerName: z.literal("deepseek"),
     name: z.string(),
-    enabled: z.boolean(),
+    pinned: z.boolean(),
     isDefault: z.boolean(),
     config: DeepSeekModelConfigSchema.nullable(),
     info: DeepSeekModelInfoSchema.nullable(),
@@ -149,7 +149,7 @@ const OpenRouterProviderModelEntrySchema: z.ZodType<S.OpenRouterProviderModelEnt
   z.object({
     providerName: z.literal("openrouter"),
     name: z.string(),
-    enabled: z.boolean(),
+    pinned: z.boolean(),
     isDefault: z.boolean(),
     config: OpenRouterModelConfigSchema.nullable(),
     info: OpenRouterModelInfoSchema.nullable(),

@@ -6,14 +6,14 @@ import ToggleSwitch from "../../components/toggle/ToggleSwitch.vue"
 import { providerMessages } from "./Provider.i18n.ts"
 
 const props = defineProps<{
-  enabled: boolean
+  pinned: boolean
   isDefault: boolean
   busy: boolean
 }>()
 
 const emit = defineEmits<{
-  enable: []
-  disable: []
+  pin: []
+  unpin: []
   setDefault: []
 }>()
 
@@ -22,18 +22,18 @@ const { t } = useI18n({
   useScope: "local",
 })
 
-function requestToggleEnabled(nextEnabled: boolean): void {
-  if (props.busy || nextEnabled === props.enabled) return
+function requestTogglePinned(nextPinned: boolean): void {
+  if (props.busy || nextPinned === props.pinned) return
 
-  if (nextEnabled) {
-    emit("enable")
+  if (nextPinned) {
+    emit("pin")
   } else {
-    emit("disable")
+    emit("unpin")
   }
 }
 
 function requestSetDefault(): void {
-  if (!props.enabled || props.isDefault) return
+  if (props.isDefault) return
 
   emit("setDefault")
 }
@@ -42,15 +42,14 @@ function requestSetDefault(): void {
 <template>
   <div class="flex flex-wrap items-center gap-3 min-h-9">
     <ToggleSwitch
-      :model-value="props.enabled"
+      :model-value="props.pinned"
       :disabled="props.busy"
-      @update:model-value="requestToggleEnabled"
+      @update:model-value="requestTogglePinned"
     >
-      <span class="text-sm">{{ t("enableModel") }}</span>
+      <span class="text-sm">{{ t("pinModel") }}</span>
     </ToggleSwitch>
 
     <SmallButton
-      v-if="props.enabled"
       type="button"
       :disabled="props.busy || props.isDefault"
       @click="requestSetDefault"

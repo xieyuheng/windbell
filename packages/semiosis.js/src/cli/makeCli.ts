@@ -4,8 +4,8 @@ import { fileURLToPath } from "node:url"
 import { defaultDatabaseRoot, makeDatabase } from "../database/index.ts"
 import { makeBatchHandler } from "./commands/BatchCommand.ts"
 import { makeModelDefaultHandler } from "./commands/ModelDefaultCommand.ts"
-import { makeModelDisableHandler } from "./commands/ModelDisableCommand.ts"
-import { makeModelEnableHandler } from "./commands/ModelEnableCommand.ts"
+import { makeModelPinHandler } from "./commands/ModelPinCommand.ts"
+import { makeModelUnpinHandler } from "./commands/ModelUnpinCommand.ts"
 import { makeModelListHandler } from "./commands/ModelListCommand.ts"
 import { makeApiKeyDeleteHandler } from "./commands/ApiKeyDeleteCommand.ts"
 import { makeApiKeyPutHandler } from "./commands/ApiKeyPutCommand.ts"
@@ -43,22 +43,22 @@ export function makeCli() {
       handler: makeApiKeyDeleteHandler({ database }),
     },
     {
-      path: ["model", "enable"],
+      path: ["model", "pin"],
       args: ["model-name"],
       options: {
         "--provider": { valueName: "provider-name" },
       },
-      description: "enable a model",
-      handler: makeModelEnableHandler({ database }),
+      description: "pin a model",
+      handler: makeModelPinHandler({ database }),
     },
     {
-      path: ["model", "disable"],
+      path: ["model", "unpin"],
       args: ["model-name"],
       options: {
         "--provider": { valueName: "provider-name" },
       },
-      description: "disable a model",
-      handler: makeModelDisableHandler({ database }),
+      description: "unpin a model",
+      handler: makeModelUnpinHandler({ database }),
     },
     {
       path: ["model", "list"],

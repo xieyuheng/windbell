@@ -1,7 +1,6 @@
 import type { Database } from "../database/index.ts"
 import { readProviderConfig } from "../provider/index.ts"
 import { providerNames } from "../providers/providerNames.ts"
-import { isModelEnabled } from "./isModelEnabled.ts"
 
 export async function setDefaultModel(
   database: Database,
@@ -13,10 +12,6 @@ export async function setDefaultModel(
   }
 
   const providerConfig = await readProviderConfig(database, providerName)
-
-  if (!(await isModelEnabled(database, providerName, name))) {
-    throw new Error(`model is not enabled: ${providerName}/${name}`)
-  }
 
   await database.providers.put(providerName, {
     ...providerConfig,

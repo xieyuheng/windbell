@@ -8,11 +8,7 @@ export async function readModelConfig(
   name: string,
 ): Promise<ModelConfig> {
   const configs = await readModelConfigs(database)
-  if (!Object.hasOwn(configs, name)) {
-    throw new Error(
-      `[readModelConfig] model config not found: openrouter/${name}`,
-    )
-  }
+  const value = Object.hasOwn(configs, name) ? configs[name] : undefined
 
-  return parseModelConfig(name, configs[name])
+  return parseModelConfig(name, value)
 }

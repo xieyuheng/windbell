@@ -83,25 +83,25 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     )
   })
 
-  app.post("/providers/:providerName/models/enable", async (c) => {
+  app.post("/providers/:providerName/models/pin", async (c) => {
     const providerName = c.req.param("providerName")
     assertSupportedProvider(providerName)
 
     const body = readRecord(await readJsonBody(c))
     const modelName = readString(body, "modelName")
 
-    await S.enableModel(options.database, providerName, modelName)
+    await S.pinModel(options.database, providerName, modelName)
     return sendEmpty(204)
   })
 
-  app.post("/providers/:providerName/models/disable", async (c) => {
+  app.post("/providers/:providerName/models/unpin", async (c) => {
     const providerName = c.req.param("providerName")
     assertSupportedProvider(providerName)
 
     const body = readRecord(await readJsonBody(c))
     const modelName = readString(body, "modelName")
 
-    await S.disableModel(options.database, providerName, modelName)
+    await S.unpinModel(options.database, providerName, modelName)
     return sendEmpty(204)
   })
 

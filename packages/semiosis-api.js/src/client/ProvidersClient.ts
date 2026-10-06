@@ -30,8 +30,8 @@ export type ProvidersClient = {
   get(providerName: string): Promise<S.ProviderConfig | undefined>
   getApiKeyStatus(providerName: string): Promise<ProviderApiKeyStatus>
   listModels(options: ListModelsOptions): Promise<Array<S.ProviderModelEntry>>
-  enableModel(options: ModelActionOptions): Promise<void>
-  disableModel(options: ModelActionOptions): Promise<void>
+  pinModel(options: ModelActionOptions): Promise<void>
+  unpinModel(options: ModelActionOptions): Promise<void>
   setDefaultModel(options: ModelActionOptions): Promise<void>
   putApiKey(options: PutApiKeyOptions): Promise<void>
   deleteApiKey(providerName: string): Promise<void>
@@ -77,20 +77,20 @@ export function makeProvidersClient(
       output: ProviderModelEntryListSchema,
     }),
 
-    enableModel: makeJsonEndpoint(config, {
+    pinModel: makeJsonEndpoint(config, {
       method: "POST",
       path: (options: ModelActionOptions) =>
-        `/providers/${encodeURIComponent(options.providerName)}/models/enable`,
+        `/providers/${encodeURIComponent(options.providerName)}/models/pin`,
       body: (options: ModelActionOptions) => ({
         modelName: options.modelName,
       }),
       output: VoidSchema,
     }),
 
-    disableModel: makeJsonEndpoint(config, {
+    unpinModel: makeJsonEndpoint(config, {
       method: "POST",
       path: (options: ModelActionOptions) =>
-        `/providers/${encodeURIComponent(options.providerName)}/models/disable`,
+        `/providers/${encodeURIComponent(options.providerName)}/models/unpin`,
       body: (options: ModelActionOptions) => ({
         modelName: options.modelName,
       }),

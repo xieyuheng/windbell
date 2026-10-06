@@ -78,7 +78,7 @@ export async function loadProviderState(state: ProviderState): Promise<void> {
   }
 }
 
-export async function enableProviderModel(
+export async function pinProviderModel(
   state: ProviderState,
   modelName: string,
 ): Promise<void> {
@@ -87,7 +87,7 @@ export async function enableProviderModel(
   state.busyModelNames[modelName] = true
 
   try {
-    await semiosis.providers.enableModel({
+    await semiosis.providers.pinModel({
       providerName: state.providerName,
       modelName,
     })
@@ -97,7 +97,7 @@ export async function enableProviderModel(
   }
 }
 
-export async function disableProviderModel(
+export async function unpinProviderModel(
   state: ProviderState,
   modelName: string,
 ): Promise<void> {
@@ -106,7 +106,7 @@ export async function disableProviderModel(
   state.busyModelNames[modelName] = true
 
   try {
-    await semiosis.providers.disableModel({
+    await semiosis.providers.unpinModel({
       providerName: state.providerName,
       modelName,
     })

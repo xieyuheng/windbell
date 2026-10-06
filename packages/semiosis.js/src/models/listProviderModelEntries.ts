@@ -47,7 +47,7 @@ async function listDeepSeekEntries(
       return {
         providerName: "deepseek",
         name,
-        enabled: !config.disabled,
+        pinned: config.pinned,
         isDefault: providerConfig.defaultModel === name,
         config,
         info: null,
@@ -81,7 +81,7 @@ async function listOpenRouterEntries(
       return {
         providerName: "openrouter",
         name,
-        enabled: !config.disabled,
+        pinned: config.pinned,
         isDefault: providerConfig.defaultModel === name,
         config,
         info: null,
@@ -104,7 +104,7 @@ function mergeInfoEntries<Info extends { id: string }>(
   entries: Array<{
     providerName: string
     name: string
-    enabled: boolean
+    pinned: boolean
     isDefault: boolean
     config: unknown
     info: Info | null
@@ -132,7 +132,7 @@ function mergeInfoEntries<Info extends { id: string }>(
     entries.push({
       providerName: options.providerName,
       name: info.id,
-      enabled: false,
+      pinned: false,
       isDefault: options.defaultModel === info.id,
       config: null,
       info,

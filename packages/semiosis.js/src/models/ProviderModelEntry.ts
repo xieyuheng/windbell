@@ -10,7 +10,7 @@ export type ProviderModelEntryOf<
 > = {
   providerName: ProviderName
   name: string
-  enabled: boolean
+  pinned: boolean
   isDefault: boolean
   config: Config | null
   info: Info | null

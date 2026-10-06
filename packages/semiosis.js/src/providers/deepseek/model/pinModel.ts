@@ -4,7 +4,7 @@ import { writeJsonFile } from "../../../database/index.ts"
 import { parseModelConfig } from "./parseModelConfig.ts"
 import { readModelConfigs } from "./readModelConfigs.ts"
 
-export async function enableModel(
+export async function pinModel(
   database: Database,
   name: string,
 ): Promise<void> {
@@ -12,14 +12,14 @@ export async function enableModel(
 
   if (Object.hasOwn(configs, name)) {
     const config = parseModelConfig(name, configs[name])
-    if (!config.disabled) return
+    if (config.pinned) return
 
     configs[name] = {
       ...(configs[name] as Record<string, unknown>),
-      disabled: false,
+      pinned: true,
     }
   } else {
-    configs[name] = { disabled: false }
+    configs[name] = { pinned: true }
   }
 
   await writeJsonFile(modelConfigsPath(database), configs)

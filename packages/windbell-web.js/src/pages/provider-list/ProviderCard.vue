@@ -24,8 +24,8 @@ const { t } = useI18n({
   useScope: "local",
 })
 
-const enabledModels = computed(() =>
-  props.provider.models.filter((model) => model.enabled),
+const pinnedModels = computed(() =>
+  props.provider.models.filter((model) => model.pinned),
 )
 
 const providerRoute = computed(() => ({
@@ -114,13 +114,13 @@ function requestDeleteApiKey(): void {
           {{ t("models") }}
         </h3>
 
-        <p v-if="enabledModels.length === 0" class="text-sm text-ink">
+        <p v-if="pinnedModels.length === 0" class="text-sm text-ink">
           {{ t("noModels") }}
         </p>
 
         <ul v-else class="flex flex-col gap-1">
           <li
-            v-for="model in enabledModels"
+            v-for="model in pinnedModels"
             :key="model.name"
             class="rounded bg-line px-2 py-1.5"
           >

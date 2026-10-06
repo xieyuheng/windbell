@@ -7,7 +7,7 @@ const semiosis = makeSemiosisClient({
 
 export type ProviderModelLine = {
   name: string
-  enabled: boolean
+  pinned: boolean
   isDefault: boolean
 }
 
@@ -61,7 +61,7 @@ export async function loadProviderListState(
           isDefaultProvider: settings.defaultProvider === providerConfig.name,
           models: models.map((model) => ({
             name: model.name,
-            enabled: model.enabled,
+            pinned: model.pinned,
             isDefault: providerConfig.defaultModel === model.name,
           })),
         }

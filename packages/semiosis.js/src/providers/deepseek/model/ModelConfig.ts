@@ -1,6 +1,6 @@
 export type ModelConfig = {
   name: string
-  disabled: boolean
+  pinned: boolean
   thinking: "enabled" | "disabled"
   reasoningEffort: "none" | "low" | "high" | "max"
 }

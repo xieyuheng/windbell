@@ -72,13 +72,13 @@ router.defineRoutes([
     handler: makeProviderListHandler(),
   },
   {
-    path: ["model", "enable"],
+    path: ["model", "pin"],
     args: ["model-name"],
     options: {
       "--provider": { valueName: "provider-name" },
     },
-    description: "enable a model",
-    handler: makeModelEnableHandler(),
+    description: "pin a model",
+    handler: makeModelPinHandler(),
   },
 ])
 ```

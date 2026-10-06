@@ -35,13 +35,13 @@ test("readProviderConfig returns stored config when file exists", async () => {
     await database.providers.put("deepseek", {
       name: "deepseek",
       baseUrl: "https://api.deepseek.com/v1",
-      defaultModel: "deepseek-chat",
+      defaultModel: "deepseek-flash",
     })
 
     assert.deepEqual(await readProviderConfig(database, "deepseek"), {
       name: "deepseek",
       baseUrl: "https://api.deepseek.com/v1",
-      defaultModel: "deepseek-chat",
+      defaultModel: "deepseek-flash",
     })
   } finally {
     await fs.rm(root, { recursive: true, force: true })
