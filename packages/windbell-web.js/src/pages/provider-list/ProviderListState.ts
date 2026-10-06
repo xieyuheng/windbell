@@ -1,4 +1,4 @@
-import { makeSemiosisClient } from "@xieyuheng/semiosis-api.js/client"
+import { makeSemiosisClient } from "@windbell/semiosis-api.js/client"
 import { reactive } from "vue"
 
 const semiosis = makeSemiosisClient({

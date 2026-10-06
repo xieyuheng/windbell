@@ -1,5 +1,5 @@
-import { makeSemiosisClient } from "@xieyuheng/semiosis-api.js/client"
-import type * as S from "@xieyuheng/semiosis.js"
+import { makeSemiosisClient } from "@windbell/semiosis-api.js/client"
+import type * as S from "@windbell/semiosis.js"
 import { reactive } from "vue"
 
 export type SessionDustbinListItem = S.DustbinSessionIndex & {

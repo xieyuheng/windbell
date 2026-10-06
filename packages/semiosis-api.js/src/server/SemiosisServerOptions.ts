@@ -1,4 +1,4 @@
-import type * as S from "@xieyuheng/semiosis.js"
+import type * as S from "@windbell/semiosis.js"
 
 export type SemiosisServerOptions = {
   database: S.Database

@@ -1,4 +1,4 @@
-import type { FileSystemEntry } from "@xieyuheng/fs-api.js/client"
+import type { FileSystemEntry } from "@windbell/fs-api.js/client"
 
 export type RangerDirectoryContent = {
   type: "directory"

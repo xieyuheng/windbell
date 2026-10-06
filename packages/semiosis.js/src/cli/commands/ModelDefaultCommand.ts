@@ -1,4 +1,4 @@
-import type * as Cli from "@xieyuheng/cli.js"
+import type * as Cli from "@windbell/cli.js"
 import type { Database } from "../../database/index.ts"
 import { setDefaultModel } from "../../models/index.ts"
 import { readOptionalOption } from "../options.ts"

@@ -1,4 +1,4 @@
-import { errorReport } from "@xieyuheng/std.js/error"
+import { errorReport } from "@windbell/std.js/error"
 import type { Database } from "../database/index.ts"
 import { formatSign } from "../format/index.ts"
 import type { Repl } from "../repl/Repl.ts"

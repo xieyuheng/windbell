@@ -1,4 +1,4 @@
-import type * as Cli from "@xieyuheng/cli.js"
+import type * as Cli from "@windbell/cli.js"
 import { resolveDevOptions } from "../dev/resolveDevOptions.ts"
 import { runDev } from "../dev/runDev.ts"
 

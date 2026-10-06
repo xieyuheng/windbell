@@ -1,4 +1,4 @@
-import { makeJsonEndpoint } from "@xieyuheng/http.js"
+import { makeJsonEndpoint } from "@windbell/http.js"
 import type { SemiosisClientConfig } from "./SemiosisClient.ts"
 import { HealthSchema, type Health } from "./schemas.ts"
 

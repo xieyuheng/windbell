@@ -1,4 +1,4 @@
-import { makeSemiosisClient } from "@xieyuheng/semiosis-api.js/client"
+import { makeSemiosisClient } from "@windbell/semiosis-api.js/client"
 import { computed, reactive, watch } from "vue"
 import { useColorMode, type ColorMode } from "./color-mode.ts"
 

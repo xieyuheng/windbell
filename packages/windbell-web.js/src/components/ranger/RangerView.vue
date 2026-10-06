@@ -2,7 +2,7 @@
 import {
   makeFileSystemClient,
   type FileSystemEntry,
-} from "@xieyuheng/fs-api.js/client"
+} from "@windbell/fs-api.js/client"
 import type { Component } from "vue"
 import { ref, shallowRef, watch } from "vue"
 import { useI18n } from "vue-i18n"

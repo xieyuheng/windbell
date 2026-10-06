@@ -1,14 +1,14 @@
 {
-  "name": "@xieyuheng/windbell-web.js",
+  "name": "@windbell/windbell-web.js",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "dependencies": {
     "@lucide/vue": "1.52.0",
     "@unhead/vue": "3.4.2",
-    "@xieyuheng/fs-api.js": "workspace:*",
-    "@xieyuheng/semiosis-api.js": "workspace:*",
-    "@xieyuheng/semiosis.js": "workspace:*",
+    "@windbell/fs-api.js": "workspace:*",
+    "@windbell/semiosis-api.js": "workspace:*",
+    "@windbell/semiosis.js": "workspace:*",
     "ajv": "8.20.0",
     "mdast-util-from-markdown": "2.1.0",
     "mdast-util-frontmatter": "2.0.1",

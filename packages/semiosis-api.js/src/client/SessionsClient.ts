@@ -1,9 +1,9 @@
-import type * as S from "@xieyuheng/semiosis.js"
+import type * as S from "@windbell/semiosis.js"
 import {
   makeJsonEndpoint,
   withNotFoundAsUndefined,
   requestNdjson,
-} from "@xieyuheng/http.js"
+} from "@windbell/http.js"
 import type { SemiosisClientConfig } from "./SemiosisClient.ts"
 import {
   GenerateTitleOutputSchema,

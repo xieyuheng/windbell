@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type * as S from "@xieyuheng/semiosis.js"
-import { pwshToolParameters } from "@xieyuheng/semiosis.js/src/tools/pwsh/makePwshToolSign.ts"
+import type * as S from "@windbell/semiosis.js"
+import { pwshToolParameters } from "@windbell/semiosis.js/src/tools/pwsh/makePwshToolSign.ts"
 import { Ajv } from "ajv"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"

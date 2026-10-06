@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type * as S from "@xieyuheng/semiosis.js"
-import { bashToolParameters } from "@xieyuheng/semiosis.js/src/tools/bash/makeBashToolSign.ts"
+import type * as S from "@windbell/semiosis.js"
+import { bashToolParameters } from "@windbell/semiosis.js/src/tools/bash/makeBashToolSign.ts"
 import { Ajv } from "ajv"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"

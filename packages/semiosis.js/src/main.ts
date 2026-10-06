@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node
 
-import { errorReport } from "@xieyuheng/std.js/error"
+import { errorReport } from "@windbell/std.js/error"
 import process from "node:process"
 import { makeCli } from "./cli/makeCli.ts"
 

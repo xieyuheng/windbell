@@ -3,7 +3,7 @@ import {
   requestBytes,
   requestServerSentEvents,
   type ServerSentEvent,
-} from "@xieyuheng/http.js"
+} from "@windbell/http.js"
 import type {
   FileSystemEntry,
   InspectFileResult,

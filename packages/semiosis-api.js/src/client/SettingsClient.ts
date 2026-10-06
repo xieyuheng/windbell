@@ -1,5 +1,5 @@
-import type * as S from "@xieyuheng/semiosis.js"
-import { makeJsonEndpoint } from "@xieyuheng/http.js"
+import type * as S from "@windbell/semiosis.js"
+import { makeJsonEndpoint } from "@windbell/http.js"
 import type { SemiosisClientConfig } from "./SemiosisClient.ts"
 import { SettingsSchema, VoidSchema } from "./schemas.ts"
 

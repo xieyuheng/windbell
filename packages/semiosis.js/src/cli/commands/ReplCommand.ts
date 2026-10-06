@@ -1,5 +1,5 @@
 import process from "node:process"
-import type * as Cli from "@xieyuheng/cli.js"
+import type * as Cli from "@windbell/cli.js"
 import type { Database } from "../../database/index.ts"
 import { resumeAgentRepl, startAgentRepl } from "../../agent-repl/index.ts"
 import { makeTtyRepl } from "../../repls/index.ts"

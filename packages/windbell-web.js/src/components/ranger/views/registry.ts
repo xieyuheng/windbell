@@ -1,7 +1,7 @@
 import {
   makeFileSystemClient,
   type FileSystemEntry,
-} from "@xieyuheng/fs-api.js/client"
+} from "@windbell/fs-api.js/client"
 import type { Component } from "vue"
 import MarkdownView from "./MarkdownView.vue"
 import TextView from "./TextView.vue"

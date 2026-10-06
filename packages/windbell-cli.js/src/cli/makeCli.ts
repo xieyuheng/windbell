@@ -1,5 +1,5 @@
-import * as Cli from "@xieyuheng/cli.js"
-import { getPackageJson } from "@xieyuheng/std.js/node"
+import * as Cli from "@windbell/cli.js"
+import { getPackageJson } from "@windbell/std.js/node"
 import { fileURLToPath } from "node:url"
 import { makeDevHandler } from "./commands/dev.ts"
 import { makeStartHandler } from "./commands/start.ts"

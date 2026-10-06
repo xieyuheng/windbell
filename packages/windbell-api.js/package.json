@@ -1,5 +1,5 @@
 {
-  "name": "@xieyuheng/windbell-api.js",
+  "name": "@windbell/windbell-api.js",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -13,9 +13,9 @@
   },
   "dependencies": {
     "@hono/node-server": "2.1.3",
-    "@xieyuheng/fs-api.js": "workspace:*",
-    "@xieyuheng/semiosis-api.js": "workspace:*",
-    "@xieyuheng/semiosis.js": "workspace:*",
+    "@windbell/fs-api.js": "workspace:*",
+    "@windbell/semiosis-api.js": "workspace:*",
+    "@windbell/semiosis.js": "workspace:*",
     "hono": "4.13.13"
   },
   "devDependencies": {

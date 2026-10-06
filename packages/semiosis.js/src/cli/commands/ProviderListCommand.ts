@@ -1,4 +1,4 @@
-import type * as Cli from "@xieyuheng/cli.js"
+import type * as Cli from "@windbell/cli.js"
 import type { Database } from "../../database/index.ts"
 import { hasApiKey } from "../../database/index.ts"
 import { readProviderConfig } from "../../provider/index.ts"

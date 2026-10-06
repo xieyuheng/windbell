@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Plus, Settings, Trash2, Wrench } from "@lucide/vue"
-import type * as S from "@xieyuheng/semiosis.js"
+import type * as S from "@windbell/semiosis.js"
 import { useHead } from "@unhead/vue"
 import PageLayout from "../../components/layout/PageLayout.vue"
 import { onMounted, ref } from "vue"

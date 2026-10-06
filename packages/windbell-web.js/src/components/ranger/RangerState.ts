@@ -1,7 +1,7 @@
 import {
   makeFileSystemClient,
   type FileSystemEntry,
-} from "@xieyuheng/fs-api.js/client"
+} from "@windbell/fs-api.js/client"
 import { reactive } from "vue"
 import { isSamePath, parentPath } from "./RangerPath.ts"
 import {

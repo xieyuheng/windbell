@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArchiveRestore, Trash2 } from "@lucide/vue"
-import type * as S from "@xieyuheng/semiosis.js"
+import type * as S from "@windbell/semiosis.js"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import Card from "../../components/card/Card.vue"

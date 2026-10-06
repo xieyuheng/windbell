@@ -27,7 +27,7 @@ The client wraps the endpoints into a typed JavaScript interface.
 
 ```typescript
 import { Hono } from "hono"
-import { makeFileSystemRouter } from "@xieyuheng/fs-api.js"
+import { makeFileSystemRouter } from "@windbell/fs-api.js"
 
 const app = new Hono()
 
@@ -37,7 +37,7 @@ app.route("/api/fs", makeFileSystemRouter())
 ## Server
 
 ```typescript
-import { startFileSystemServer } from "@xieyuheng/fs-api.js"
+import { startFileSystemServer } from "@windbell/fs-api.js"
 
 const { server, url } = await startFileSystemServer({
   host: "127.0.0.1",
@@ -50,7 +50,7 @@ const { server, url } = await startFileSystemServer({
 ## Client
 
 ```typescript
-import { makeFileSystemClient } from "@xieyuheng/fs-api.js"
+import { makeFileSystemClient } from "@windbell/fs-api.js"
 
 const fs = makeFileSystemClient({ baseUrl: "http://127.0.0.1:3000/fs" })
 

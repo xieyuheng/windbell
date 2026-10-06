@@ -1,5 +1,5 @@
-import * as S from "@xieyuheng/semiosis.js"
-import { closeServer, startWindbellServer } from "@xieyuheng/windbell-api.js"
+import * as S from "@windbell/semiosis.js"
+import { closeServer, startWindbellServer } from "@windbell/windbell-api.js"
 import Path from "node:path"
 import { createServer, type ViteDevServer } from "vite"
 import type { DevOptions } from "./resolveDevOptions.ts"

@@ -1,4 +1,4 @@
-import type * as S from "@xieyuheng/semiosis.js"
+import type * as S from "@windbell/semiosis.js"
 import { z } from "zod"
 
 export type Health = {

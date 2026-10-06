@@ -1,5 +1,5 @@
 import { app, BrowserWindow } from "electron"
-import { closeServer } from "@xieyuheng/windbell-api.js"
+import { closeServer } from "@windbell/windbell-api.js"
 import { createWindow } from "./createWindow.ts"
 import { makeMainState, type MainState } from "./MainState.ts"
 import { startAppServer } from "./startAppServer.ts"

@@ -11,7 +11,7 @@ importers:
 
   packages/cli.js:
     dependencies:
-      '@xieyuheng/std.js':
+      '@windbell/std.js':
         specifier: workspace:*
         version: link:../std.js
     devDependencies:
@@ -30,7 +30,7 @@ importers:
       '@hono/node-server':
         specifier: 2.1.3
         version: 2.1.3(hono@4.13.13)
-      '@xieyuheng/http.js':
+      '@windbell/http.js':
         specifier: workspace:*
         version: link:../http.js
       hono:
@@ -71,10 +71,10 @@ importers:
       '@hono/node-server':
         specifier: 2.1.3
         version: 2.1.3(hono@4.13.13)
-      '@xieyuheng/http.js':
+      '@windbell/http.js':
         specifier: workspace:*
         version: link:../http.js
-      '@xieyuheng/semiosis.js':
+      '@windbell/semiosis.js':
         specifier: workspace:*
         version: link:../semiosis.js
       hono:
@@ -96,13 +96,13 @@ importers:
 
   packages/semiosis.js:
     dependencies:
-      '@xieyuheng/cli.js':
+      '@windbell/cli.js':
         specifier: workspace:*
         version: link:../cli.js
-      '@xieyuheng/http.js':
+      '@windbell/http.js':
         specifier: workspace:*
         version: link:../http.js
-      '@xieyuheng/std.js':
+      '@windbell/std.js':
         specifier: workspace:*
         version: link:../std.js
       ajv:
@@ -139,13 +139,13 @@ importers:
       '@hono/node-server':
         specifier: 2.1.3
         version: 2.1.3(hono@4.13.13)
-      '@xieyuheng/fs-api.js':
+      '@windbell/fs-api.js':
         specifier: workspace:*
         version: link:../fs-api.js
-      '@xieyuheng/semiosis-api.js':
+      '@windbell/semiosis-api.js':
         specifier: workspace:*
         version: link:../semiosis-api.js
-      '@xieyuheng/semiosis.js':
+      '@windbell/semiosis.js':
         specifier: workspace:*
         version: link:../semiosis.js
       hono:
@@ -167,16 +167,16 @@ importers:
       '@hono/node-server':
         specifier: 2.1.3
         version: 2.1.3(hono@4.13.13)
-      '@xieyuheng/cli.js':
+      '@windbell/cli.js':
         specifier: workspace:*
         version: link:../cli.js
-      '@xieyuheng/semiosis.js':
+      '@windbell/semiosis.js':
         specifier: workspace:*
         version: link:../semiosis.js
-      '@xieyuheng/std.js':
+      '@windbell/std.js':
         specifier: workspace:*
         version: link:../std.js
-      '@xieyuheng/windbell-api.js':
+      '@windbell/windbell-api.js':
         specifier: workspace:*
         version: link:../windbell-api.js
       vite:
@@ -201,10 +201,10 @@ importers:
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.4
-      '@xieyuheng/semiosis.js':
+      '@windbell/semiosis.js':
         specifier: workspace:*
         version: link:../semiosis.js
-      '@xieyuheng/windbell-api.js':
+      '@windbell/windbell-api.js':
         specifier: workspace:*
         version: link:../windbell-api.js
       electron:
@@ -231,13 +231,13 @@ importers:
       '@unhead/vue':
         specifier: 3.4.2
         version: 3.4.2(@oxc-project/types@0.152.0)(esbuild@0.28.2)(lightningcss@1.33.0)(rolldown@1.2.12)(vite@8.3.2(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(vue@3.5.43(typescript-native-bridge@6.0.3-bridge.17.tsgo.7.0.2))
-      '@xieyuheng/fs-api.js':
+      '@windbell/fs-api.js':
         specifier: workspace:*
         version: link:../fs-api.js
-      '@xieyuheng/semiosis-api.js':
+      '@windbell/semiosis-api.js':
         specifier: workspace:*
         version: link:../semiosis-api.js
-      '@xieyuheng/semiosis.js':
+      '@windbell/semiosis.js':
         specifier: workspace:*
         version: link:../semiosis.js
       ajv:

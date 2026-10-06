@@ -1,4 +1,4 @@
-import { errorReport } from "@xieyuheng/std.js/error"
+import { errorReport } from "@windbell/std.js/error"
 import type { Client } from "../client/index.ts"
 import type { Model } from "../../../model/index.ts"
 import { ErrorSign } from "../../../sign/index.ts"

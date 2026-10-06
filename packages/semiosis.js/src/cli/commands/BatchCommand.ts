@@ -1,6 +1,6 @@
 import Path from "node:path"
 import process from "node:process"
-import type * as Cli from "@xieyuheng/cli.js"
+import type * as Cli from "@windbell/cli.js"
 import { agentInterpret } from "../../agent/index.ts"
 import type { Database } from "../../database/index.ts"
 import { formatSign } from "../../format/index.ts"

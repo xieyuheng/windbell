@@ -1,6 +1,6 @@
 import { app } from "electron"
-import * as S from "@xieyuheng/semiosis.js"
-import { startWindbellServer } from "@xieyuheng/windbell-api.js"
+import * as S from "@windbell/semiosis.js"
+import { startWindbellServer } from "@windbell/windbell-api.js"
 import Path from "node:path"
 import { fileURLToPath } from "node:url"
 import type { MainState } from "./MainState.ts"
