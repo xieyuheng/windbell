@@ -98,39 +98,31 @@ function json(value: unknown): string {
           <div class="flex flex-wrap">
             <dt class="text-ink">{{ t("reasoning") }}{{ t("colon") }}</dt>
             <dd>
-              <pre
-                class="overflow-auto font-mono"
-                >{{
-                  entry.config.reasoning
-                    ? json(entry.config.reasoning)
-                    : t("none")
-                }}</pre>
+              <pre class="overflow-auto font-mono">{{
+                entry.config.reasoning
+                  ? json(entry.config.reasoning)
+                  : t("none")
+              }}</pre>
             </dd>
           </div>
 
           <div class="flex flex-wrap">
             <dt class="text-ink">{{ t("provider") }}{{ t("colon") }}</dt>
             <dd>
-              <pre
-                class="overflow-auto font-mono"
-                >{{
-                  entry.config.provider
-                    ? json(entry.config.provider)
-                    : t("none")
-                }}</pre>
+              <pre class="overflow-auto font-mono">{{
+                entry.config.provider ? json(entry.config.provider) : t("none")
+              }}</pre>
             </dd>
           </div>
 
           <div class="flex flex-wrap">
             <dt class="text-ink">{{ t("extraBody") }}{{ t("colon") }}</dt>
             <dd>
-              <pre
-                class="overflow-auto font-mono"
-                >{{
-                  entry.config.extraBody
-                    ? json(entry.config.extraBody)
-                    : t("none")
-                }}</pre>
+              <pre class="overflow-auto font-mono">{{
+                entry.config.extraBody
+                  ? json(entry.config.extraBody)
+                  : t("none")
+              }}</pre>
             </dd>
           </div>
         </dl>
