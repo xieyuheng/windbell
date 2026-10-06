@@ -31,7 +31,7 @@ useHead(() => ({
   >
     <div
       v-if="isDataLoading"
-      class="fixed inset-x-0 top-0 z-[100] h-0.5 animate-pulse bg-ink"
+      class="fixed inset-x-0 top-0 z-[100] h-0.5 animate-pulse bg-ink/30"
     />
 
     <RouterView :key="route.fullPath" />
