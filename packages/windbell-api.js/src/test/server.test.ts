@@ -125,7 +125,7 @@ test("windbell router", async (t) => {
       },
       body: JSON.stringify({
         name: "test",
-        root: "/tmp/windbell-api-test",
+        root: Path.join(tmpdir(), "windbell-api-test"),
       }),
     })
 
