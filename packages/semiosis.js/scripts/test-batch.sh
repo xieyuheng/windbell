@@ -6,23 +6,24 @@ database_dir="$(mktemp -d)"
 export WINDBELL_DATABASE="$database_dir"
 trap 'rm -rf "$database_dir"' EXIT
 
-mkdir -p snapshot
+snapshot_dir="snapshot/linux"
+mkdir -p "$snapshot_dir"
 
 node src/main.ts batch \
   --provider mock \
   --model conversation \
   --prompts mock/prompts/conversation.md \
-  > snapshot/conversation.out
+  > "$snapshot_dir/conversation.out"
 
 node src/main.ts batch \
   --provider mock \
   --model tool-errors \
   --prompts mock/prompts/tool-errors.md \
-  > snapshot/tool-errors.out
+  > "$snapshot_dir/tool-errors.out"
 
-  node src/main.ts batch \
+node src/main.ts batch \
   --provider mock \
   --model truncate-output \
   --prompts mock/prompts/truncate-output.md \
   --max-output-chars 4 \
-  > snapshot/truncate-output.out
+  > "$snapshot_dir/truncate-output.out"

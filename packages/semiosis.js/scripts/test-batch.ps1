@@ -11,29 +11,33 @@ New-Item -ItemType Directory -Path $databaseDir | Out-Null
 $env:WINDBELL_DATABASE = $databaseDir
 
 try {
-  New-Item -ItemType Directory -Force snapshot | Out-Null
+  $snapshotDir = 'snapshot/win32'
+  New-Item -ItemType Directory -Force -Path $snapshotDir | Out-Null
 
   $conversation = @(
     '--provider', 'mock'
-    '--model', 'conversation'
+    '--model', 'conversation-pwsh'
     '--prompts', 'mock/prompts/conversation.md'
   )
-  node src/main.ts batch @conversation > snapshot/conversation.out
+  $conversationOut = Join-Path $snapshotDir 'conversation.out'
+  node src/main.ts batch @conversation > $conversationOut
 
   $toolErrors = @(
     '--provider', 'mock'
-    '--model', 'tool-errors'
+    '--model', 'tool-errors-pwsh'
     '--prompts', 'mock/prompts/tool-errors.md'
   )
-  node src/main.ts batch @toolErrors > snapshot/tool-errors.out
+  $toolErrorsOut = Join-Path $snapshotDir 'tool-errors.out'
+  node src/main.ts batch @toolErrors > $toolErrorsOut
 
   $truncateOutput = @(
     '--provider', 'mock'
-    '--model', 'truncate-output'
+    '--model', 'truncate-output-pwsh'
     '--prompts', 'mock/prompts/truncate-output.md'
     '--max-output-chars', '4'
   )
-  node src/main.ts batch @truncateOutput > snapshot/truncate-output.out
+  $truncateOutputOut = Join-Path $snapshotDir 'truncate-output.out'
+  node src/main.ts batch @truncateOutput > $truncateOutputOut
 } finally {
   Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $databaseDir
 }

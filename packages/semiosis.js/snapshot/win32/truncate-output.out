@@ -30,39 +30,34 @@ You are a helpful software engineer assistant.
 
 [user]
 
-测试工具错误。
+测试输出截断。
 
 [reasoning]
 
-先故意制造两个工具错误。
+测试输出截断。
+
+[assistant]
+
+先打印一长串数字。
 
 [tool-call]
 
-missing
-
-{}
-
-[tool-call]
-
-bash
+pwsh
 
 {
-  "command": "printf out; printf err >&2; exit 3"
+  "command": "[Console]::Out.Write('1234567890')"
 }
 
 [tool-output]
 
-[ToolRouter] unknown tool: missing
-
-[tool-output]
-
-[ToolRouter] unknown tool: bash
+1234
+[output-truncated]
 
 [reasoning]
 
-已经收到两个工具错误。
+输出已经被截断。
 
 [assistant]
 
-missing 工具不存在，bash 命令以非零状态结束。
+已完成截断测试。
 

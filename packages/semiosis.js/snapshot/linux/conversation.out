@@ -1,13 +1,12 @@
 [tool]
 
-pwsh
+bash
 
-Run commands in a PowerShell shell.
+Run commands in a bash shell.
 * When invoking this tool, the contents of the "command" parameter does NOT need to be XML-escaped.
 * Network access depends on the task environment. Prefer configured mirrors/proxies when they are available.
-* Shell state is not persistent across calls. Use `Set-Location <dir>; <command>` when you need a specific working directory.
-* Use native Windows paths (C:\...) and $env:NAME variables; this is PowerShell, not bash.
-* To inspect a particular line range of a file, use `Get-Content <file> | Select-Object -Skip <n> -First <m>`.
+* Shell state is not persistent across calls. Use `cd <dir> && <command>` when you need a specific working directory.
+* To inspect a particular line range of a file, e.g. lines 10-25, try 'sed -n 10,25p /path/to/the/file'.
 * Please avoid commands that may produce a very large amount of output.
 
 {
@@ -15,7 +14,7 @@ Run commands in a PowerShell shell.
   "properties": {
     "command": {
       "type": "string",
-      "description": "The PowerShell command to execute."
+      "description": "The bash command to execute."
     }
   },
   "required": [
@@ -50,7 +49,10 @@ bash
 
 [tool-output]
 
-[ToolRouter] unknown tool: bash
+# semiosis.js
+
+A minimal coding agent for DeepSeek API.
+
 
 [reasoning]
 
@@ -82,7 +84,19 @@ bash
 
 [tool-output]
 
-[ToolRouter] unknown tool: bash
+#!/usr/bin/env -S node
+
+import { errorReport } from "@windbell/std.js/error"
+import process from "node:process"
+import { makeCli } from "./cli/makeCli.ts"
+
+try {
+  await makeCli().run(process.argv.slice(2))
+} catch (error) {
+  console.log(errorReport(error))
+  process.exit(1)
+}
+
 
 [reasoning]
 
