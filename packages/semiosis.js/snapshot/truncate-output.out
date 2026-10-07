@@ -1,12 +1,13 @@
 [tool]
 
-bash
+pwsh
 
-Run commands in a bash shell.
+Run commands in a PowerShell shell.
 * When invoking this tool, the contents of the "command" parameter does NOT need to be XML-escaped.
 * Network access depends on the task environment. Prefer configured mirrors/proxies when they are available.
-* Shell state is not persistent across calls. Use `cd <dir> && <command>` when you need a specific working directory.
-* To inspect a particular line range of a file, e.g. lines 10-25, try 'sed -n 10,25p /path/to/the/file'.
+* Shell state is not persistent across calls. Use `Set-Location <dir>; <command>` when you need a specific working directory.
+* Use native Windows paths (C:\...) and $env:NAME variables; this is PowerShell, not bash.
+* To inspect a particular line range of a file, use `Get-Content <file> | Select-Object -Skip <n> -First <m>`.
 * Please avoid commands that may produce a very large amount of output.
 
 {
@@ -14,7 +15,7 @@ Run commands in a bash shell.
   "properties": {
     "command": {
       "type": "string",
-      "description": "The bash command to execute."
+      "description": "The PowerShell command to execute."
     }
   },
   "required": [
@@ -49,8 +50,7 @@ bash
 
 [tool-output]
 
-1234
-[output-truncated]
+[ToolRouter] unknown tool: bash
 
 [reasoning]
 

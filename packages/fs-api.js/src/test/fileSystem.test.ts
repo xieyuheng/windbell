@@ -222,7 +222,12 @@ test("fileSystem client and server", async (t) => {
   ])
 
   const notesLink = Path.join(root, "notes-link")
-  await fs.symlink(Path.join(root, "notes"), notesLink, "dir")
+  // Windows needs Developer Mode for real symlinks; junctions need no privilege.
+  await fs.symlink(
+    Path.join(root, "notes"),
+    notesLink,
+    process.platform === "win32" ? "junction" : "dir",
+  )
   assert.equal(await client.isDirectory(notesLink), true)
 
   const entriesWithLink = await client.listEntries(root)

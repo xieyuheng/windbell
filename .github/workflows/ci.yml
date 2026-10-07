@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Keep in sync with installers/install.sh (WINDBELL_NODE_VERSION / WINDBELL_PNPM_VERSION).
+env:
+  NODE_VERSION: "24.21.0"
+  PNPM_VERSION: "12.9.1"
+
+jobs:
+  parity:
+    name: script parity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: every script has a PowerShell sibling
+        shell: bash
+        run: |
+          status=0
+          while IFS= read -r sh; do
+            case "$sh" in
+              scripts/clean-branches.sh|scripts/new-worktree.sh|*/dist-linux.sh) continue ;;
+            esac
+            if [ ! -f "${sh%.sh}.ps1" ]; then
+              echo "::error::missing PowerShell sibling for $sh"
+              status=1
+            fi
+          done < <(find scripts packages/*/scripts -name '*.sh' -type f)
+          exit $status
+
+  stage1:
+    name: stage1 (${{ matrix.os }})
+    needs: parity
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: stage1 (bash)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: bash scripts/all.sh
+
+      - name: stage1 (powershell)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/all.ps1

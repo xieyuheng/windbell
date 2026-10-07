@@ -1,0 +1,10 @@
+# Line endings: LF everywhere, on every platform.
+#
+# This repo is developed on both Linux and Windows. Normalizing to LF keeps
+# the bash scripts runnable, keeps CI (ubuntu-latest) and local checkouts
+# byte-identical, and makes "core.autocrlf" irrelevant: eol=lf overrides it.
+* text=auto eol=lf
+
+# The one exception: cmd.exe wants CRLF in Windows command scripts.
+*.bat text eol=crlf
+*.cmd text eol=crlf
