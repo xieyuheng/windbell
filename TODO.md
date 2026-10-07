@@ -1,7 +1,3 @@
-# windbell-desktop.js
-
-[windbell-desktop.js] 打包 windows electron app
-
 # meta-lisp
 
 IDE 如何与 meta-lisp 结合？
