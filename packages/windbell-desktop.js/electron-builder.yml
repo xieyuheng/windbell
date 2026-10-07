@@ -30,3 +30,22 @@ mac:
 win:
   target:
     - nsis
+    - portable
+    - zip
+
+nsis:
+  # electron-builder picks the install directory name as follows:
+  #
+  #   APP_FILENAME = getWindowsInstallationDirName(appInfo, !oneClick || isPerMachine)
+  #
+  # With the default oneClick installer that flag is false, so it falls back to
+  # appInfo.sanitizedName -- the npm package name with "/" stripped, i.e.
+  # "@windbellwindbell-desktop.js". Setting oneClick to false makes it use
+  # appInfo.productFilename instead, so the app lands in
+  # %LOCALAPPDATA%\Programs\windbell.
+  oneClick: false
+  perMachine: false
+  artifactName: "${productName}-${version}-${os}-${arch}-setup.${ext}"
+
+portable:
+  artifactName: "${productName}-${version}-${os}-${arch}-portable.${ext}"

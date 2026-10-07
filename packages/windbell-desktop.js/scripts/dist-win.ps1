@@ -1,4 +1,7 @@
-# windbell-desktop Windows NSIS build
+# windbell-desktop Windows build
+#
+# Builds every target listed under `win.target` in electron-builder.yml
+# (currently: nsis installer, portable single-file exe, zip archive).
 #
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File .\scripts\dist-win.ps1
@@ -26,7 +29,7 @@ if (-not $env:ELECTRON_BUILDER_BINARIES_MIRROR) {
 }
 
 npx.cmd electron-builder `
-  --win nsis `
+  --win `
   --config electron-builder.yml `
   --publish never `
   @args
