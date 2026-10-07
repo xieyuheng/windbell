@@ -7,7 +7,7 @@
 #
 # Usage:
 #   sh install.sh
-#   sh install.sh --version master --build web
+#   sh install.sh --no-build
 #
 # Environment overrides:
 #   WINDBELL_HOME          default: $HOME/.windbell
@@ -18,7 +18,9 @@
 #   WINDBELL_PNPM_VERSION  default: 12.9.1
 #   WINDBELL_NODE_MIRROR   default: https://nodejs.org/dist
 #   WINDBELL_USER_AGENT    default: a browser-like UA
-#   WINDBELL_BUILD         default: web  (none|web|desktop|all)
+#   ELECTRON_MIRROR        default: https://npmmirror.com/mirrors/electron/
+#   ELECTRON_BUILDER_BINARIES_MIRROR
+#                          default: https://npmmirror.com/mirrors/electron-builder-binaries/
 
 set -eu
 
@@ -28,7 +30,7 @@ WINDBELL_REPO_FALLBACK="${WINDBELL_REPO_FALLBACK:-https://git.sr.ht/~xieyuheng/w
 WINDBELL_VERSION="${WINDBELL_VERSION:-master}"
 WINDBELL_NODE_VERSION="${WINDBELL_NODE_VERSION:-v24.21.0}"
 WINDBELL_PNPM_VERSION="${WINDBELL_PNPM_VERSION:-12.9.1}"
-WINDBELL_BUILD="${WINDBELL_BUILD:-web}"
+DO_BUILD=1
 
 # Node download settings.
 #
@@ -60,8 +62,7 @@ Options:
   --version REF         git branch or tag (default: master)
   --node-version VER    Node version, e.g. v24.21.0
   --pnpm-version VER    pnpm version, e.g. 12.9.1
-  --build MODE          none | web | desktop | all (default: web)
-  --no-build            same as --build none
+  --no-build            install dependencies only; skip all builds
   -h, --help            show this help
 USAGE
 }
@@ -368,6 +369,8 @@ run_pnpm_install() {
     npm_config_store_dir="$LIB_DIR/pnpm/store" \
     ELECTRON_CACHE="$TMP_DIR/electron" \
     ELECTRON_BUILDER_CACHE="$TMP_DIR/electron-builder" \
+    ELECTRON_MIRROR="${ELECTRON_MIRROR:-https://npmmirror.com/mirrors/electron/}" \
+    ELECTRON_BUILDER_BINARIES_MIRROR="${ELECTRON_BUILDER_BINARIES_MIRROR:-https://npmmirror.com/mirrors/electron-builder-binaries/}" \
     "$PNPM_BIN" install --frozen-lockfile --store-dir "$LIB_DIR/pnpm/store"
   )
 }
@@ -396,36 +399,81 @@ build_desktop() {
   )
 }
 
-build_all() {
-  log "running the full developer build (scripts/stage1.sh)"
+package_desktop_linux() {
+  log "packaging windbell-desktop AppImage"
+
   (
-    cd "$SRC_DIR"
+    cd "$SRC_DIR/packages/windbell-desktop.js"
+
     PATH="$NODE_HOME/bin:$PATH" \
     XDG_CACHE_HOME="$TMP_DIR" \
     npm_config_cache="$TMP_DIR/npm" \
     ELECTRON_CACHE="$TMP_DIR/electron" \
     ELECTRON_BUILDER_CACHE="$TMP_DIR/electron-builder" \
-    sh ./scripts/stage1.sh
+    ELECTRON_MIRROR="${ELECTRON_MIRROR:-https://npmmirror.com/mirrors/electron/}" \
+    ELECTRON_BUILDER_BINARIES_MIRROR="${ELECTRON_BUILDER_BINARIES_MIRROR:-https://npmmirror.com/mirrors/electron-builder-binaries/}" \
+    ./node_modules/.bin/electron-builder \
+      --linux AppImage \
+      --config electron-builder.yml \
+      --publish never
   )
 }
 
+install_desktop_linux() {
+  _release_dir="$SRC_DIR/packages/windbell-desktop.js/release"
+  _appimage="$(ls -1t "$_release_dir"/windbell-*-linux-*.AppImage 2>/dev/null | head -n 1 || true)"
+
+  if [ -z "$_appimage" ]; then
+    die "windbell-desktop AppImage not found in $_release_dir"
+  fi
+
+  chmod +x "$_appimage"
+  log "installing windbell-desktop launcher"
+
+  cat > "$BIN_DIR/windbell-desktop" <<'SH'
+#!/bin/sh
+set -eu
+
+_windbell_bin_dir="$(CDPATH= cd "$(dirname "$0")" && pwd)"
+if [ ! -f "$_windbell_bin_dir/windbell-init.sh" ]; then
+  _windbell_bin_dir="$HOME/.windbell/bin"
+fi
+
+WINDBELL_HOME="${WINDBELL_HOME:-$(CDPATH= cd "$_windbell_bin_dir/.." && pwd)}"
+release_dir="$WINDBELL_HOME/src/windbell/packages/windbell-desktop.js/release"
+app="$(ls -1t "$release_dir"/windbell-*-linux-*.AppImage 2>/dev/null | head -n 1 || true)"
+
+if [ -z "$app" ]; then
+  printf 'windbell-desktop: AppImage not found in %s\n' "$release_dir" >&2
+  exit 1
+fi
+
+if [ -e /dev/fuse ]; then
+  exec "$app" "$@"
+else
+  exec env APPIMAGE_EXTRACT_AND_RUN=1 "$app" "$@"
+fi
+SH
+
+  chmod +x "$BIN_DIR/windbell-desktop"
+}
+
 build_project() {
-  case "$WINDBELL_BUILD" in
-    none)
-      log "skipping build"
-      ;;
-    web)
-      build_web
-      ;;
-    desktop)
-      build_web
-      build_desktop
-      ;;
-    all)
-      build_all
+  if [ "$DO_BUILD" != "1" ]; then
+    log "skipping build"
+    return 0
+  fi
+
+  build_web
+  build_desktop
+
+  case "$WINDBELL_PLATFORM" in
+    linux-*)
+      package_desktop_linux
+      install_desktop_linux
       ;;
     *)
-      die "invalid build mode: $WINDBELL_BUILD (expected: none|web|desktop|all)"
+      warn "desktop AppImage packaging is only supported on Linux; skipping"
       ;;
   esac
 }
@@ -585,6 +633,10 @@ final_message() {
   printf '  pnpm:     %s\n' "$PNPM_BIN"
   printf '  source:   %s\n' "$SRC_DIR"
   printf '  database: %s\n' "$DB_DIR"
+
+  if [ -x "$BIN_DIR/windbell-desktop" ]; then
+    printf '  desktop:  %s\n' "$BIN_DIR/windbell-desktop"
+  fi
   printf '\n'
   printf 'Add this to your shell profile if you want the commands in PATH:\n'
   printf '\n'
@@ -620,13 +672,8 @@ parse_args() {
         WINDBELL_PNPM_VERSION="$2"
         shift 2
         ;;
-      --build)
-        [ $# -ge 2 ] || die "--build requires an argument"
-        WINDBELL_BUILD="$2"
-        shift 2
-        ;;
       --no-build)
-        WINDBELL_BUILD=none
+        DO_BUILD=0
         shift
         ;;
       -h|--help)
