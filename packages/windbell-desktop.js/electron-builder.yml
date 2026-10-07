@@ -49,3 +49,4 @@ nsis:
 
 portable:
   artifactName: "${productName}-${version}-${os}-${arch}-portable.${ext}"
+  unpackDirName: windbell
