@@ -2,4 +2,4 @@
 
 set -e
 
-rm -rf snapshot
+rm -rf snapshot/linux
