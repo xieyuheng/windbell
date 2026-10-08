@@ -19,9 +19,6 @@
 #   WINDBELL_PNPM_VERSION  default: 12.9.1
 #   WINDBELL_NODE_MIRROR   default: https://nodejs.org/dist
 #   WINDBELL_USER_AGENT    default: a browser-like UA
-#   ELECTRON_MIRROR        default: https://npmmirror.com/mirrors/electron/
-#   ELECTRON_BUILDER_BINARIES_MIRROR
-#                          default: https://npmmirror.com/mirrors/electron-builder-binaries/
 #
 # NOTE: native commands are allowed to fail here (downloads fall back to
 # mirrors, git fetch falls back to other remotes). We therefore keep
@@ -345,10 +342,6 @@ function Set-WindbellEnv {
   $env:XDG_CACHE_HOME           = $script:TmpDir
   $env:npm_config_cache         = Join-Path $script:TmpDir 'npm'
   $env:npm_config_store_dir     = Join-Path $script:LibDir 'pnpm\store'
-  $env:ELECTRON_CACHE           = Join-Path $script:TmpDir 'electron'
-  $env:ELECTRON_BUILDER_CACHE   = Join-Path $script:TmpDir 'electron-builder'
-  $env:ELECTRON_MIRROR          = (Get-EnvOr 'ELECTRON_MIRROR' 'https://npmmirror.com/mirrors/electron/')
-  $env:ELECTRON_BUILDER_BINARIES_MIRROR = (Get-EnvOr 'ELECTRON_BUILDER_BINARIES_MIRROR' 'https://npmmirror.com/mirrors/electron-builder-binaries/')
 }
 
 function Invoke-PnpmInstall {
@@ -385,26 +378,6 @@ function Build-Web {
   Invoke-RunIn 'windbell-web.js' @('clean', 'build')
 }
 
-function Build-Desktop {
-  Write-Log 'building windbell-desktop main'
-  Invoke-RunIn 'windbell-desktop.js' @('clean', 'build')
-}
-
-function Build-DesktopPackage {
-  Write-Log 'packaging windbell-desktop NSIS installer'
-
-  $desktopDir = Join-Path $script:SrcDir 'packages\windbell-desktop.js'
-
-  Push-Location $desktopDir
-  try {
-    Set-WindbellEnv
-    & (Join-Path $desktopDir 'scripts\dist-win.ps1')
-    if ($LASTEXITCODE -ne 0) { Write-Die 'electron-builder failed' }
-  } finally {
-    Pop-Location
-  }
-}
-
 function Invoke-BuildProject {
   if (-not $script:DoBuild) {
     Write-Log 'skipping build'
@@ -412,8 +385,6 @@ function Invoke-BuildProject {
   }
 
   Build-Web
-  Build-Desktop
-  Build-DesktopPackage
 }
 # ---------------------------------------------------------------------------
 # shims
@@ -538,11 +509,6 @@ function Write-FinalMessage {
   Write-Host "  source:   $script:SrcDir"
   Write-Host "  database: $script:DbDir"
 
-  $releaseDir = Join-Path $script:SrcDir 'packages\windbell-desktop.js\release'
-  $installer = Get-ChildItem -Path $releaseDir -Filter '*.exe' -ErrorAction SilentlyContinue |
-    Sort-Object LastWriteTime -Descending | Select-Object -First 1
-  if ($installer) { Write-Host "  desktop:  $($installer.FullName)" }
-
   Write-Host ''
   Write-Host 'Add this directory to your PATH if you want the commands available:'
   Write-Host ''
@@ -615,7 +581,6 @@ function Main {
   New-Item -ItemType Directory -Force -Path $script:LibDir, $script:BinDir,
     (Join-Path $script:TmpDir 'download'), (Join-Path $script:TmpDir 'npm'),
     (Join-Path $script:TmpDir 'node'), (Join-Path $script:TmpDir 'pnpm'),
-    (Join-Path $script:TmpDir 'electron'), (Join-Path $script:TmpDir 'electron-builder'),
     (Join-Path $script:LibDir 'node'), (Join-Path $script:LibDir 'pnpm'),
     (Join-Path $script:LibDir 'pnpm\store'), (Join-Path $script:LibDir 'npm'),
     (Join-Path $script:LibDir 'npm\global') | Out-Null

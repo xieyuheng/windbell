@@ -14,7 +14,6 @@ set -e
 ./scripts/run-in.sh semiosis-api.js format.sh
 ./scripts/run-in.sh windbell-cli.js format.sh
 ./scripts/run-in.sh windbell-api.js format.sh
-./scripts/run-in.sh windbell-desktop.js format.sh
 ./scripts/run-in.sh windbell-web.js format.sh
 
 # ts check
@@ -27,7 +26,6 @@ set -e
 ./scripts/run-in.sh semiosis-api.js check.sh
 ./scripts/run-in.sh windbell-cli.js check.sh
 ./scripts/run-in.sh windbell-api.js check.sh
-./scripts/run-in.sh windbell-desktop.js check.sh
 ./scripts/run-in.sh windbell-web.js check.sh
 
 # ts test
@@ -44,7 +42,3 @@ set -e
 # frontend build
 
 ./scripts/run-in.sh windbell-web.js clean.sh build.sh
-
-# electron main build
-
-./scripts/run-in.sh windbell-desktop.js clean.sh build.sh

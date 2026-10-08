@@ -2,7 +2,6 @@ packages:
   - "packages/*.js"
 
 allowBuilds:
-  electron-winstaller: false
   esbuild: true
 
 overrides:

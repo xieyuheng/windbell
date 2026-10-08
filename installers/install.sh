@@ -18,9 +18,6 @@
 #   WINDBELL_PNPM_VERSION  default: 12.9.1
 #   WINDBELL_NODE_MIRROR   default: https://nodejs.org/dist
 #   WINDBELL_USER_AGENT    default: a browser-like UA
-#   ELECTRON_MIRROR        default: https://npmmirror.com/mirrors/electron/
-#   ELECTRON_BUILDER_BINARIES_MIRROR
-#                          default: https://npmmirror.com/mirrors/electron-builder-binaries/
 
 set -eu
 
@@ -367,10 +364,6 @@ run_pnpm_install() {
     XDG_CACHE_HOME="$TMP_DIR" \
     npm_config_cache="$TMP_DIR/npm" \
     npm_config_store_dir="$LIB_DIR/pnpm/store" \
-    ELECTRON_CACHE="$TMP_DIR/electron" \
-    ELECTRON_BUILDER_CACHE="$TMP_DIR/electron-builder" \
-    ELECTRON_MIRROR="${ELECTRON_MIRROR:-https://npmmirror.com/mirrors/electron/}" \
-    ELECTRON_BUILDER_BINARIES_MIRROR="${ELECTRON_BUILDER_BINARIES_MIRROR:-https://npmmirror.com/mirrors/electron-builder-binaries/}" \
     "$PNPM_BIN" install --frozen-lockfile --store-dir "$LIB_DIR/pnpm/store"
   )
 }
@@ -386,78 +379,6 @@ build_web() {
   )
 }
 
-build_desktop() {
-  log "building windbell-desktop main"
-  (
-    cd "$SRC_DIR"
-    PATH="$NODE_HOME/bin:$PATH" \
-    XDG_CACHE_HOME="$TMP_DIR" \
-    npm_config_cache="$TMP_DIR/npm" \
-    ELECTRON_CACHE="$TMP_DIR/electron" \
-    ELECTRON_BUILDER_CACHE="$TMP_DIR/electron-builder" \
-    sh ./scripts/run-in.sh windbell-desktop.js clean.sh build.sh
-  )
-}
-
-package_desktop_linux() {
-  log "packaging windbell-desktop AppImage"
-
-  (
-    cd "$SRC_DIR/packages/windbell-desktop.js"
-
-    PATH="$NODE_HOME/bin:$PATH" \
-    XDG_CACHE_HOME="$TMP_DIR" \
-    npm_config_cache="$TMP_DIR/npm" \
-    ELECTRON_CACHE="$TMP_DIR/electron" \
-    ELECTRON_BUILDER_CACHE="$TMP_DIR/electron-builder" \
-    ELECTRON_MIRROR="${ELECTRON_MIRROR:-https://npmmirror.com/mirrors/electron/}" \
-    ELECTRON_BUILDER_BINARIES_MIRROR="${ELECTRON_BUILDER_BINARIES_MIRROR:-https://npmmirror.com/mirrors/electron-builder-binaries/}" \
-    ./node_modules/.bin/electron-builder \
-      --linux AppImage \
-      --config electron-builder.yml \
-      --publish never
-  )
-}
-
-install_desktop_linux() {
-  _release_dir="$SRC_DIR/packages/windbell-desktop.js/release"
-  _appimage="$(ls -1t "$_release_dir"/windbell-*-linux-*.AppImage 2>/dev/null | head -n 1 || true)"
-
-  if [ -z "$_appimage" ]; then
-    die "windbell-desktop AppImage not found in $_release_dir"
-  fi
-
-  chmod +x "$_appimage"
-  log "installing windbell-desktop launcher"
-
-  cat > "$BIN_DIR/windbell-desktop" <<'SH'
-#!/bin/sh
-set -eu
-
-_windbell_bin_dir="$(CDPATH= cd "$(dirname "$0")" && pwd)"
-if [ ! -f "$_windbell_bin_dir/windbell-init.sh" ]; then
-  _windbell_bin_dir="$HOME/.windbell/bin"
-fi
-
-WINDBELL_HOME="${WINDBELL_HOME:-$(CDPATH= cd "$_windbell_bin_dir/.." && pwd)}"
-release_dir="$WINDBELL_HOME/src/windbell/packages/windbell-desktop.js/release"
-app="$(ls -1t "$release_dir"/windbell-*-linux-*.AppImage 2>/dev/null | head -n 1 || true)"
-
-if [ -z "$app" ]; then
-  printf 'windbell-desktop: AppImage not found in %s\n' "$release_dir" >&2
-  exit 1
-fi
-
-if [ -e /dev/fuse ]; then
-  exec "$app" "$@"
-else
-  exec env APPIMAGE_EXTRACT_AND_RUN=1 "$app" "$@"
-fi
-SH
-
-  chmod +x "$BIN_DIR/windbell-desktop"
-}
-
 build_project() {
   if [ "$DO_BUILD" != "1" ]; then
     log "skipping build"
@@ -465,17 +386,6 @@ build_project() {
   fi
 
   build_web
-  build_desktop
-
-  case "$WINDBELL_PLATFORM" in
-    linux-*)
-      package_desktop_linux
-      install_desktop_linux
-      ;;
-    *)
-      warn "desktop AppImage packaging is only supported on Linux; skipping"
-      ;;
-  esac
 }
 
 write_shims() {
@@ -633,10 +543,6 @@ final_message() {
   printf '  pnpm:     %s\n' "$PNPM_BIN"
   printf '  source:   %s\n' "$SRC_DIR"
   printf '  database: %s\n' "$DB_DIR"
-
-  if [ -x "$BIN_DIR/windbell-desktop" ]; then
-    printf '  desktop:  %s\n' "$BIN_DIR/windbell-desktop"
-  fi
   printf '\n'
   printf 'Add this to your shell profile if you want the commands in PATH:\n'
   printf '\n'
@@ -709,7 +615,7 @@ main() {
   esac
 
   mkdir -p "$LIB_DIR" "$BIN_DIR" "$TMP_DIR/download" "$TMP_DIR/npm" \
-    "$TMP_DIR/node" "$TMP_DIR/pnpm" "$TMP_DIR/electron" "$TMP_DIR/electron-builder" \
+    "$TMP_DIR/node" "$TMP_DIR/pnpm" \
     "$LIB_DIR/node" "$LIB_DIR/pnpm" "$LIB_DIR/pnpm/store" "$LIB_DIR/npm" "$LIB_DIR/npm/global"
 
   WINDBELL_PLATFORM="$(detect_platform)"

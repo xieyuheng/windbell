@@ -18,7 +18,6 @@ Set-Location (Join-Path $PSScriptRoot '..')
 ./scripts/run-in.ps1 semiosis-api.js format
 ./scripts/run-in.ps1 windbell-cli.js format
 ./scripts/run-in.ps1 windbell-api.js format
-./scripts/run-in.ps1 windbell-desktop.js format
 ./scripts/run-in.ps1 windbell-web.js format
 
 # ts check
@@ -31,7 +30,6 @@ Set-Location (Join-Path $PSScriptRoot '..')
 ./scripts/run-in.ps1 semiosis-api.js check
 ./scripts/run-in.ps1 windbell-cli.js check
 ./scripts/run-in.ps1 windbell-api.js check
-./scripts/run-in.ps1 windbell-desktop.js check
 ./scripts/run-in.ps1 windbell-web.js check
 
 # ts test
@@ -48,4 +46,3 @@ Set-Location (Join-Path $PSScriptRoot '..')
 # frontend build
 
 ./scripts/run-in.ps1 windbell-web.js clean build
-./scripts/run-in.ps1 windbell-desktop.js clean build
