@@ -1,3 +1,5 @@
+全面删除 windbell-desktop
+
 # meta-lisp
 
 IDE 如何与 meta-lisp 结合？
