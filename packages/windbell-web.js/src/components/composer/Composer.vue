@@ -2,6 +2,7 @@
 import { ArrowUp, Maximize2, Minimize2, Square } from "@lucide/vue"
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
+import RoundButton from "../buttons/RoundButton.vue"
 import { composerMessages } from "./Composer.i18n.ts"
 import {
   captureCompactMetrics,
@@ -314,18 +315,18 @@ function handleToggle(): void {
         @keydown="handleCompactKeydown"
       />
 
-      <button
-        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink/70 transition-colors hover:bg-line/50 hover:text-ink"
+      <RoundButton
+        variant="ghost"
         type="button"
         :aria-label="t('expandInput')"
         :title="t('expandInput')"
         @click="handleToggle"
       >
         <Maximize2 :size="16" :stroke-width="1.5" aria-hidden="true" />
-      </button>
+      </RoundButton>
 
-      <button
-        class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sign-user/60 text-ink transition-transform duration-150 hover:scale-110 disabled:pointer-events-none disabled:opacity-50"
+      <RoundButton
+        variant="accent"
         type="submit"
         :disabled="props.disabled || props.submitDisabled || props.submitting"
         :aria-label="
@@ -341,7 +342,7 @@ function handleToggle(): void {
         />
 
         <ArrowUp v-else :size="18" :stroke-width="1.5" aria-hidden="true" />
-      </button>
+      </RoundButton>
     </form>
 
     <form
@@ -364,9 +365,9 @@ function handleToggle(): void {
       />
 
       <div class="flex shrink-0 items-center justify-end gap-2">
-        <button
+        <RoundButton
           v-if="props.collapsible"
-          class="flex h-10 w-10 items-center justify-center rounded-full text-ink/70 transition-colors hover:bg-line/50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
+          variant="ghost"
           type="button"
           :disabled="!canCollapse"
           :aria-label="t('collapseInput')"
@@ -374,10 +375,10 @@ function handleToggle(): void {
           @click="handleToggle"
         >
           <Minimize2 :size="16" :stroke-width="1.5" aria-hidden="true" />
-        </button>
+        </RoundButton>
 
-        <button
-          class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sign-user/60 text-ink transition-transform duration-150 hover:scale-110 disabled:pointer-events-none disabled:opacity-50"
+        <RoundButton
+          variant="accent"
           type="submit"
           :disabled="props.disabled || props.submitDisabled || props.submitting"
           :aria-label="
@@ -393,7 +394,7 @@ function handleToggle(): void {
           />
 
           <ArrowUp v-else :size="18" :stroke-width="1.5" aria-hidden="true" />
-        </button>
+        </RoundButton>
       </div>
     </form>
   </div>
