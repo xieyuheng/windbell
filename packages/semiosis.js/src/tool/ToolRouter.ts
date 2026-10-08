@@ -11,11 +11,6 @@ export type ToolRunOptions = {
   signal?: AbortSignal
 }
 
-const cancelledNotExecutedMessage = "[cancelled] tool call was not executed."
-
-const cancelledDuringExecutionMessage =
-  "[cancelled] tool execution aborted; it may have partially executed."
-
 export class ToolRouter {
   ajv = new Ajv({
     allErrors: true,
@@ -40,7 +35,10 @@ export class ToolRouter {
     const signal = options.signal
 
     if (signal?.aborted) {
-      return ToolOutputSign(toolCall.callId, cancelledNotExecutedMessage)
+      return ToolOutputSign(
+        toolCall.callId,
+        "[cancelled] tool call was not executed.",
+      )
     }
 
     try {
@@ -70,7 +68,10 @@ export class ToolRouter {
       return ToolOutputSign(toolCall.callId, content)
     } catch (error) {
       if (signal?.aborted) {
-        return ToolOutputSign(toolCall.callId, cancelledDuringExecutionMessage)
+        return ToolOutputSign(
+          toolCall.callId,
+          "[cancelled] tool execution aborted; it may have partially executed.",
+        )
       }
 
       return ToolOutputSign(toolCall.callId, errorReport(error))
