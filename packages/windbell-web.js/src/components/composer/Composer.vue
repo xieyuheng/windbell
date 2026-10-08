@@ -300,7 +300,7 @@ function handleToggle(): void {
     <form
       v-if="!showExpanded"
       ref="compactForm"
-      class="pointer-events-auto flex w-full shrink-0 items-center gap-2 rounded-full border border-line/60 bg-paper/60 backdrop-blur transition-colors"
+      class="composer-surface pointer-events-auto flex w-full shrink-0 items-center gap-2 rounded-full border border-line/60 bg-paper/60 backdrop-blur transition-colors"
       @submit.prevent="submit"
     >
       <textarea
@@ -347,7 +347,7 @@ function handleToggle(): void {
     <form
       v-else
       ref="expandedForm"
-      class="pointer-events-auto flex w-full shrink-0 flex-col gap-2 overflow-hidden rounded-2xl border border-line/60 bg-paper/60 p-2 backdrop-blur transition-colors"
+      class="composer-surface pointer-events-auto flex w-full shrink-0 flex-col gap-2 overflow-hidden rounded-2xl border border-line/60 bg-paper/60 p-2 backdrop-blur transition-colors"
       @submit.prevent="submit"
     >
       <textarea
@@ -402,6 +402,22 @@ function handleToggle(): void {
 <style scoped>
 .composer-shell {
   transition: height 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.composer-surface {
+  transition:
+    border-color 160ms ease-out,
+    box-shadow 160ms ease-out;
+}
+
+.composer-surface:hover {
+  border-color: color-mix(in oklab, var(--color-ink) 28%, transparent);
+}
+
+.composer-surface:focus-within {
+  border-color: color-mix(in oklab, var(--color-sign-user) 58%, transparent);
+  box-shadow: 0 0 0 3px
+    color-mix(in oklab, var(--color-sign-user) 24%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
