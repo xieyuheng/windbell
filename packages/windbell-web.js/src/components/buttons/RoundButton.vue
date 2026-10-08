@@ -14,8 +14,10 @@ const props = withDefaults(
 
 <template>
   <button
-    class="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-line/60 bg-paper/60 text-ink backdrop-blur transition-colors hover:text-ink disabled:pointer-events-none disabled:opacity-50"
-    :class="props.active ? 'border-ink/40 bg-sign-user/60 text-ink' : ''"
+    class="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-line/60 bg-paper/30 text-ink backdrop-blur transition-colors disabled:pointer-events-none disabled:opacity-50"
+    :class="{
+      'bg-sign-user/30'  : props.active
+    }"
     :type="props.type"
     :disabled="props.disabled"
   >
