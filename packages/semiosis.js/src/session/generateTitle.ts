@@ -9,15 +9,19 @@ export type GenerateTitleOptions = {
 export async function generateTitle(
   options: GenerateTitleOptions,
 ): Promise<string> {
-  const output = await options.model.interpret([
-    ...options.context,
-    UserSign(
-      "Generate a short title that summarizes the conversation above. Use the conversation's language. Reply with the title only.",
-    ),
-  ])
+  try {
+    const output = await options.model.interpret([
+      ...options.context,
+      UserSign(
+        "Generate a short title that summarizes the conversation above. Use the conversation's language. Reply with the title only.",
+      ),
+    ])
 
-  const assistantSign = output.find(isAssistantSign)
-  if (assistantSign === undefined) return ""
+    const assistantSign = output.find(isAssistantSign)
+    if (assistantSign === undefined) return ""
 
-  return assistantSign.content
+    return assistantSign.content
+  } catch {
+    return ""
+  }
 }

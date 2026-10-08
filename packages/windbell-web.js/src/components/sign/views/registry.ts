@@ -1,6 +1,5 @@
 import type { Component } from "vue"
 import type * as S from "@windbell/semiosis.js"
-import SignErrorView from "./SignErrorView.vue"
 import SignMarkdownView from "./SignMarkdownView.vue"
 import SignProviderDataView from "./SignProviderDataView.vue"
 import SignToolCallView from "./SignToolCallView.vue"
@@ -54,11 +53,6 @@ const signViews = {
     component: SignToolOutputView,
     labelKey: "signKind.toolOutput",
     color: "var(--color-sign-tool-output)",
-  },
-  ErrorSign: {
-    component: SignErrorView,
-    labelKey: "signKind.error",
-    color: "var(--color-sign-error)",
   },
 } satisfies Record<S.Sign["kind"], SignViewConfig>
 

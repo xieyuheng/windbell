@@ -238,11 +238,6 @@ const ToolOutputSignSchema: z.ZodType<S.ToolOutputSign> = z.object({
   content: z.string(),
 })
 
-const ErrorSignSchema: z.ZodType<S.ErrorSign> = z.object({
-  kind: z.literal("ErrorSign"),
-  message: z.string(),
-})
-
 export const SignSchema: z.ZodType<S.Sign> = z.union([
   PersonaSignSchema,
   UserSignSchema,
@@ -252,7 +247,6 @@ export const SignSchema: z.ZodType<S.Sign> = z.union([
   ToolSignSchema,
   ToolCallSignSchema,
   ToolOutputSignSchema,
-  ErrorSignSchema,
 ])
 
 const SessionIndexFields = {

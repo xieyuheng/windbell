@@ -141,16 +141,7 @@ function makeMessage(sign: Sign): Message {
     }
   }
 
-  if (
-    isReasoningSign(sign) ||
-    isAssistantSign(sign) ||
-    isToolCallSign(sign) ||
-    isToolSign(sign)
-  ) {
-    throw new Error(`[interpret] unexpected message sign: ${sign.kind}`)
-  }
-
-  throw new Error(`[interpret] cannot send ${sign.kind}`)
+  throw new Error(`[interpret] unexpected message sign: ${sign.kind}`)
 }
 
 function makeOutputSigns(message: Message): Array<Sign> {

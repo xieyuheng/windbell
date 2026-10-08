@@ -1,7 +1,5 @@
 import {
-  ErrorSign,
   isAssistantSign,
-  isErrorSign,
   isProviderDataSign,
   isReasoningSign,
   isToolCallSign,
@@ -35,21 +33,15 @@ export async function* agentInterpret(
     const toolCallSigns: Array<ToolCallSign> = []
 
     for (const sign of output) {
-      if (isErrorSign(sign)) {
-        yield sign
-        return
-      }
-
       if (
         !isReasoningSign(sign) &&
         !isAssistantSign(sign) &&
         !isProviderDataSign(sign) &&
         !isToolCallSign(sign)
       ) {
-        yield ErrorSign(
+        throw new Error(
           `[agentInterpret] unexpected model output sign: ${sign.kind}`,
         )
-        return
       }
 
       await agent.appendContext([sign])

@@ -235,7 +235,9 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       context: session.context,
     })
 
-    await service.sessions.updateTitle(sessionId, title)
+    if (title !== "") {
+      await service.sessions.updateTitle(sessionId, title)
+    }
 
     return sendJson(200, { title })
   })

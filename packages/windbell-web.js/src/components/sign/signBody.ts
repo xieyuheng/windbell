@@ -24,9 +24,5 @@ export function signBody(sign: S.Sign): string {
     case "ToolOutputSign": {
       return sign.content
     }
-
-    case "ErrorSign": {
-      return sign.message
-    }
   }
 }

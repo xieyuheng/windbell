@@ -45,10 +45,6 @@ const signSchema = z.discriminatedUnion("kind", [
     callId: z.string(),
     content: z.string(),
   }),
-  z.object({
-    kind: z.literal("ErrorSign"),
-    message: z.string(),
-  }),
 ])
 
 const modelOutputSchema = z.array(signSchema)

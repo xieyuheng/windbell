@@ -15,7 +15,6 @@ const signTagBackgroundByKind = {
   ToolCallSign: 58,
   ToolSign: 25,
   ToolOutputSign: 94,
-  ErrorSign: 88,
 } as const satisfies Record<Sign["kind"], number>
 
 const signTagForeground = "\x1b[38;5;255m"
@@ -73,10 +72,6 @@ export function formatSign(
 
     case "ToolOutputSign": {
       return `${formatSignTag(sign.kind, "tool-output", options)}\n\n${sign.content}\n`
-    }
-
-    case "ErrorSign": {
-      return `${formatSignTag(sign.kind, "error", options)}\n\n${sign.message}\n`
     }
   }
 }

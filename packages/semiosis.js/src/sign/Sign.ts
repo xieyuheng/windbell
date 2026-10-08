@@ -7,7 +7,6 @@ export type Sign =
   | ToolSign
   | ToolCallSign
   | ToolOutputSign
-  | ErrorSign
 
 export type PersonaSign = {
   kind: "PersonaSign"
@@ -194,25 +193,4 @@ export function isToolOutputSign(value: Sign): value is ToolOutputSign {
 export function asToolOutputSign(value: Sign): ToolOutputSign {
   if (isToolOutputSign(value)) return value
   throw new Error(`[asToolOutputSign] fail on: ${value.kind}`)
-}
-
-export type ErrorSign = {
-  kind: "ErrorSign"
-  message: string
-}
-
-export function ErrorSign(message: string): ErrorSign {
-  return {
-    kind: "ErrorSign",
-    message,
-  }
-}
-
-export function isErrorSign(value: Sign): value is ErrorSign {
-  return value.kind === "ErrorSign"
-}
-
-export function asErrorSign(value: Sign): ErrorSign {
-  if (isErrorSign(value)) return value
-  throw new Error(`[asErrorSign] fail on: ${value.kind}`)
 }
