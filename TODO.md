@@ -1,10 +1,5 @@
 # semiosis.js
 
-现在还有哪里用到了 ErrorSign？
-我们可否完全删除 ErrorSign 来避免 agent 再被卡住？
-
-# semiosis.js
-
 目前，我们的 agent 接口不支持 SSE 式的信息返回，
 因此前端也无法渲染流式的 UI 变化，
 导致在 AI 需要思考很久的时候，用户看不到响应。

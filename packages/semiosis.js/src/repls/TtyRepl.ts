@@ -203,6 +203,8 @@ export function makeTtyRepl(): Repl {
       return
     }
 
+    // - why: not call close(). Ctrl-C should cancel the current operation
+    //   and keep the REPL alive, so the user can decide what to do next.
     for (const handler of cancelHandlers) {
       handler()
     }

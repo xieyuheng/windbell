@@ -10,7 +10,13 @@ export function makeAgentReplInputHandler(
 ): ReplInputHandler {
   return async (input: string): Promise<void> => {
     const controller = new AbortController()
+
     const offCancel = repl.onCancel(() => {
+      if (controller.signal.aborted) return
+
+      repl.println(
+        "[cancelling] user requested cancellation; stopping current tool...",
+      )
       controller.abort()
     })
 
