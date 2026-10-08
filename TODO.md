@@ -1,30 +1,3 @@
----
-
-同意修改 schema 为 choices: z.array(ChoiceSchema).min(1)，
-修改 schema 之后，这里可以拿到类型良好的数据吗？
-如果不能，那还不如在这里 throw。
-
----
-
-最重要的是 fetch 网络错误等等请求失败错误如何处理？
-
-- 在第一次调用 interpret 之前，
-  input 中的 user sign 已经写入数据库了。
-  这可能是不安全的对吗？
-
-- 另外，interpret 还可能来自 tool call 循环，
-  这种情况停下是安全的对吗。
-
-- 这些错误经过 api 层之后，在前端的体现是什么？
-  - 我们可否在前端做一定次数的重试逻辑，
-    然后停下来在前端报错？
-
-新错误边界：
-
-- CLI：AgentReplInputHandler
-- Web API：makeSemiosisRouter
-- title 生成：generateTitle 内部 best-effort catch
-
 # semiosis.js
 
 目前，我们的 agent 接口不支持 SSE 式的信息返回，

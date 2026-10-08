@@ -38,11 +38,7 @@ export async function interpret(
   }
 
   const output = await client.chat.completions.create(request)
-  const message = output.choices?.[0]?.message
-
-  if (message === undefined) {
-    throw new Error("[interpret] output.choices[0].message is missing")
-  }
+  const message = output.choices[0].message
 
   return makeOutputSigns(message)
 }

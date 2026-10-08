@@ -47,7 +47,7 @@ export const ChatCompletionSchema = z.object({
   provider: z.string(),
   system_fingerprint: z.string().nullable().optional(),
   service_tier: z.string().nullable().optional(),
-  choices: z.array(ChoiceSchema),
+  choices: z.array(ChoiceSchema).nonempty(),
   usage: UsageSchema,
 })
 

@@ -31,7 +31,7 @@ export const ChatCompletionSchema = z.object({
   object: z.literal("chat.completion"),
   created: z.number(),
   model: z.string(),
-  choices: z.array(ChoiceSchema),
+  choices: z.array(ChoiceSchema).nonempty(),
   usage: UsageSchema,
   system_fingerprint: z.string().optional(),
 })
