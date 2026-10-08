@@ -185,7 +185,7 @@ function handleToggle(): void {
     <textarea
       ref="compactTextarea"
       v-model="input"
-      class="h-10 min-w-0 flex-1 resize-none overflow-hidden bg-transparent px-3 py-2 leading-6 text-ink outline-none placeholder:text-ink disabled:opacity-50"
+      class="h-10 min-w-0 flex-1 resize-none overflow-hidden bg-transparent px-3 py-2 leading-6 text-ink outline-none placeholder:text-ink/60 disabled:opacity-50"
       :disabled="props.disabled"
       :placeholder="props.placeholder"
       rows="1"
@@ -229,7 +229,7 @@ function handleToggle(): void {
     <textarea
       ref="expandedTextarea"
       v-model="input"
-      class="thin-scrollbar w-full resize-none overflow-y-auto bg-transparent px-3 py-2 leading-6 text-ink outline-none placeholder:text-ink disabled:opacity-50"
+      class="thin-scrollbar w-full resize-none overflow-y-auto bg-transparent px-3 py-2 leading-6 text-ink outline-none placeholder:text-ink/60 disabled:opacity-50"
       :disabled="props.disabled"
       :placeholder="props.placeholder"
       :rows="props.minRows"
