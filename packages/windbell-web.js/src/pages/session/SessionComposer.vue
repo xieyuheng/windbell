@@ -209,7 +209,7 @@ function handleToggle(): void {
     />
 
     <button
-      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-ink/70 transition-colors hover:bg-line/50 hover:text-ink"
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink/70 transition-colors hover:bg-line/50 hover:text-ink"
       type="button"
       :aria-label="t('expandInput')"
       :title="t('expandInput')"
@@ -251,7 +251,7 @@ function handleToggle(): void {
 
     <div class="flex shrink-0 items-center justify-end gap-2">
       <button
-        class="flex h-8 w-8 items-center justify-center rounded-md text-ink/70 transition-colors hover:bg-line/50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
+        class="flex h-10 w-10 items-center justify-center rounded-full text-ink/70 transition-colors hover:bg-line/50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
         type="button"
         :disabled="!canCollapse"
         :aria-label="t('collapseInput')"
