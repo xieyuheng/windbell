@@ -2,6 +2,10 @@ import { spawn } from "node:child_process"
 import process from "node:process"
 import { StringDecoder } from "node:string_decoder"
 import type { ToolHandler } from "../../tool/index.ts"
+import {
+  killChildProcessTree,
+  useDetachedChildProcess,
+} from "../killChildProcessTree.ts"
 import { resolvePwshPath } from "./resolvePwshPath.ts"
 
 const encodingPreamble =
@@ -19,6 +23,7 @@ type PwshRunOptions = {
   timeoutMs: number
   maxOutputChars: number
   executable?: string
+  signal?: AbortSignal
 }
 
 type PwshRunResult = {
@@ -29,6 +34,7 @@ type PwshRunResult = {
   stdoutTruncated: boolean
   stderrTruncated: boolean
   timedOut: boolean
+  cancelled: boolean
 }
 
 export type PwshToolHandlerOptions = {
@@ -41,7 +47,7 @@ export type PwshToolHandlerOptions = {
 export function makePwshToolHandler(
   options: PwshToolHandlerOptions,
 ): ToolHandler {
-  return async (args) => {
+  return async (args, handlerOptions) => {
     const command = args.command as string
 
     const result = await pwshRun(command, {
@@ -49,6 +55,7 @@ export function makePwshToolHandler(
       timeoutMs: options.timeoutMs,
       maxOutputChars: options.maxOutputChars,
       executable: options.executable,
+      signal: handlerOptions.signal,
     })
 
     return formatPwshRunResult(result, options.timeoutMs)
@@ -59,6 +66,10 @@ function pwshRun(
   command: string,
   options: PwshRunOptions,
 ): Promise<PwshRunResult> {
+  if (options.signal?.aborted) {
+    return Promise.resolve(cancelledPwshRunResult())
+  }
+
   return new Promise((resolve, reject) => {
     const child = spawn(
       resolvePwshPath(options.executable),
@@ -76,6 +87,8 @@ function pwshRun(
           ...envOverrides,
         },
         stdio: ["ignore", "pipe", "pipe"],
+        // POSIX process group: let cancellation kill the shell and descendants.
+        detached: useDetachedChildProcess,
       },
     )
 
@@ -84,11 +97,22 @@ function pwshRun(
     let stdoutTruncated = false
     let stderrTruncated = false
     let timedOut = false
+    let cancelled = false
+
+    const onAbort = (): void => {
+      cancelled = true
+      killChildProcessTree(child)
+    }
 
     const timer = setTimeout(() => {
       timedOut = true
-      child.kill("SIGKILL")
+      killChildProcessTree(child)
     }, options.timeoutMs)
+
+    const cleanup = (): void => {
+      clearTimeout(timer)
+      options.signal?.removeEventListener("abort", onAbort)
+    }
 
     const appendStdout = (text: string): void => {
       if (stdoutTruncated) return
@@ -124,12 +148,27 @@ function pwshRun(
     })
 
     child.on("error", (error) => {
-      clearTimeout(timer)
+      cleanup()
+
+      if (cancelled) {
+        resolve({
+          exitCode: null,
+          signal: null,
+          stdout,
+          stderr,
+          stdoutTruncated,
+          stderrTruncated,
+          timedOut,
+          cancelled: true,
+        })
+        return
+      }
+
       reject(error)
     })
 
     child.on("close", (code, signal) => {
-      clearTimeout(timer)
+      cleanup()
       appendStdout(stdoutDecoder.end())
       appendStderr(stderrDecoder.end())
       resolve({
@@ -140,24 +179,50 @@ function pwshRun(
         stdoutTruncated,
         stderrTruncated,
         timedOut,
+        cancelled,
       })
     })
+
+    options.signal?.addEventListener("abort", onAbort, { once: true })
+
+    if (options.signal?.aborted) {
+      onAbort()
+    }
   })
+}
+
+function cancelledPwshRunResult(): PwshRunResult {
+  return {
+    exitCode: null,
+    signal: null,
+    stdout: "",
+    stderr: "",
+    stdoutTruncated: false,
+    stderrTruncated: false,
+    timedOut: false,
+    cancelled: true,
+  }
 }
 
 function formatPwshRunResult(result: PwshRunResult, timeoutMs: number): string {
   const lines: Array<string> = []
 
-  if (result.timedOut) {
-    lines.push(`[timeout ${timeoutMs}ms]`)
-  }
+  if (result.cancelled) {
+    lines.push(
+      "[cancelled] user aborted tool execution; it may have partially executed.",
+    )
+  } else {
+    if (result.timedOut) {
+      lines.push(`[timeout ${timeoutMs}ms]`)
+    }
 
-  if (result.exitCode !== 0) {
-    lines.push(`[exit-code ${result.exitCode}]`)
-  }
+    if (result.exitCode !== 0) {
+      lines.push(`[exit-code ${result.exitCode}]`)
+    }
 
-  if (result.signal) {
-    lines.push(`[signal ${result.signal}]`)
+    if (result.signal) {
+      lines.push(`[signal ${result.signal}]`)
+    }
   }
 
   lines.push(truncatedText(result.stdout, result.stdoutTruncated))

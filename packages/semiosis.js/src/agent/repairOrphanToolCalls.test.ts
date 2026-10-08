@@ -245,3 +245,72 @@ test("agentInterpret repairs persisted orphan tool calls and yields input", asyn
     await fs.rm(root, { recursive: true, force: true })
   }
 })
+
+test("agentInterpret marks remaining tool calls cancelled after abort", async () => {
+  const controller = new AbortController()
+  const handlerCalls: Array<string> = []
+  const toolRouter = makeToolRouter()
+
+  toolRouter.defineTool(
+    ToolSign("first", "First tool.", emptyObjectSchema),
+    async () => {
+      handlerCalls.push("first")
+      controller.abort()
+      throw new Error("aborted")
+    },
+  )
+
+  toolRouter.defineTool(
+    ToolSign("second", "Second tool.", emptyObjectSchema),
+    () => {
+      handlerCalls.push("second")
+      return "second result"
+    },
+  )
+
+  let interpretCount = 0
+  const model: Model = {
+    providerName: "test",
+    name: "test",
+    interpret: async () => {
+      interpretCount += 1
+      if (interpretCount === 1) {
+        return [
+          ToolCallSign({
+            callId: "call-first",
+            name: "first",
+            arguments: "{}",
+          }),
+          ToolCallSign({
+            callId: "call-second",
+            name: "second",
+            arguments: "{}",
+          }),
+        ]
+      }
+
+      return []
+    },
+  }
+
+  const context: Array<Sign> = []
+  const agent = makeTestAgent(context, model, toolRouter)
+  const yielded: Array<Sign> = []
+
+  for await (const sign of agentInterpret(agent, [UserSign("run")], {
+    signal: controller.signal,
+  })) {
+    yielded.push(sign)
+  }
+
+  assert.equal(interpretCount, 1)
+  assert.deepEqual(handlerCalls, ["first"])
+
+  const outputs = context.filter(isToolOutputSign)
+  assert.deepEqual(
+    outputs.map((output) => output.callId),
+    ["call-first", "call-second"],
+  )
+  assert.match(outputs[0]?.content ?? "", /\[cancelled\]/)
+  assert.match(outputs[1]?.content ?? "", /not executed/)
+})

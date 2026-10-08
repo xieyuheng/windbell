@@ -7,6 +7,15 @@ import {
 } from "../sign/index.ts"
 import type { ToolHandler, ToolRoute } from "./Tool.ts"
 
+export type ToolRunOptions = {
+  signal?: AbortSignal
+}
+
+const cancelledNotExecutedMessage = "[cancelled] tool call was not executed."
+
+const cancelledDuringExecutionMessage =
+  "[cancelled] tool execution aborted; it may have partially executed."
+
 export class ToolRouter {
   ajv = new Ajv({
     allErrors: true,
@@ -24,7 +33,16 @@ export class ToolRouter {
     this.routes[sign.name] = { sign, handler, validate }
   }
 
-  async run(toolCall: ToolCallSign): Promise<ToolOutputSign> {
+  async run(
+    toolCall: ToolCallSign,
+    options: ToolRunOptions = {},
+  ): Promise<ToolOutputSign> {
+    const signal = options.signal
+
+    if (signal?.aborted) {
+      return ToolOutputSign(toolCall.callId, cancelledNotExecutedMessage)
+    }
+
     try {
       const route = this.routes[toolCall.name]
       if (route === undefined) {
@@ -48,9 +66,13 @@ export class ToolRouter {
         )
       }
 
-      const content = await route.handler(args)
+      const content = await route.handler(args, { signal })
       return ToolOutputSign(toolCall.callId, content)
     } catch (error) {
+      if (signal?.aborted) {
+        return ToolOutputSign(toolCall.callId, cancelledDuringExecutionMessage)
+      }
+
       return ToolOutputSign(toolCall.callId, errorReport(error))
     }
   }

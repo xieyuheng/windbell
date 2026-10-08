@@ -9,13 +9,23 @@ export function makeAgentReplInputHandler(
   repl: Repl,
 ): ReplInputHandler {
   return async (input: string): Promise<void> => {
+    const controller = new AbortController()
+    const offCancel = repl.onCancel(() => {
+      controller.abort()
+    })
+
     try {
       repl.println("")
-      for await (const sign of agentInterpret(agent, [UserSign(input)])) {
+
+      for await (const sign of agentInterpret(agent, [UserSign(input)], {
+        signal: controller.signal,
+      })) {
         repl.println(formatSign(sign, { color: repl.useColor }))
       }
     } catch (error) {
       printAgentReplError(repl, error)
+    } finally {
+      offCancel()
     }
   }
 }

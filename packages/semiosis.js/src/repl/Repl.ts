@@ -26,5 +26,6 @@ export type Repl = {
   tryDispatchCommand(input: string): Promise<boolean>
   readInput(prompt: string): Promise<ReplInputResult>
   run(onInput: ReplInputHandler, prompt: string): Promise<void>
+  onCancel(handler: () => void): () => void
   close(): void
 }

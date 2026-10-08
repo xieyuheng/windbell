@@ -39,6 +39,11 @@ export function makeSessionState(sessionId: S.SessionId): SessionState {
 }
 
 const sessionStates = new Map<S.SessionId, SessionState>()
+const interpretationControllers = new Map<S.SessionId, AbortController>()
+
+export function cancelSessionInterpretation(state: SessionState): void {
+  interpretationControllers.get(state.sessionId)?.abort()
+}
 
 export function getSessionState(sessionId: S.SessionId): SessionState {
   let state = sessionStates.get(sessionId)
@@ -110,9 +115,18 @@ export async function loadSessionState(
 export async function interpretSession(
   state: SessionState,
   content: string,
+  options: { signal?: AbortSignal } = {},
 ): Promise<boolean> {
   state.interpreting = true
   state.error = undefined
+
+  const controller =
+    options.signal === undefined ? new AbortController() : undefined
+  const signal = options.signal ?? controller?.signal
+
+  if (controller !== undefined) {
+    interpretationControllers.set(state.sessionId, controller)
+  }
 
   try {
     const settings = await semiosis.settings.get()
@@ -148,15 +162,25 @@ export async function interpretSession(
       sessionId: state.sessionId,
       model: modelRef,
       input: [input],
+      signal,
     })) {
       state.context.push(sign)
     }
 
     return true
   } catch (error) {
+    if (signal?.aborted) return false
+
     state.error = error instanceof Error ? error.message : String(error)
     return false
   } finally {
+    if (
+      controller !== undefined &&
+      interpretationControllers.get(state.sessionId) === controller
+    ) {
+      interpretationControllers.delete(state.sessionId)
+    }
+
     state.interpreting = false
   }
 }

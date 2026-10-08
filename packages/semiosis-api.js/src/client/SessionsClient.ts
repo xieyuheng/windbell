@@ -30,6 +30,7 @@ export type InterpretOptions = {
   sessionId: S.SessionId
   model: S.ModelRef
   input: Array<S.Sign>
+  signal?: AbortSignal
 }
 
 export type InterpretEvent =
@@ -100,7 +101,12 @@ export function makeSessionsClient(
         baseUrl: config.baseUrl,
         method: "POST",
         path: `/sessions/${encodeURIComponent(options.sessionId)}/interpret`,
-        body: options,
+        body: {
+          sessionId: options.sessionId,
+          model: options.model,
+          input: options.input,
+        },
+        signal: options.signal,
       })) {
         if (event.type === "sign") {
           yield event.sign

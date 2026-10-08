@@ -11,6 +11,7 @@ import SessionToolbar from "./SessionToolbar.vue"
 import Ranger from "../../components/ranger/Ranger.vue"
 import { sessionMessages } from "./Session.i18n.ts"
 import {
+  cancelSessionInterpretation,
   generateSessionTitle,
   getSessionState,
   interpretSession,
@@ -97,6 +98,10 @@ function goBack(): void {
       workspaceId: state.workspaceId,
     },
   })
+}
+
+function cancel(): void {
+  cancelSessionInterpretation(state)
 }
 
 async function send(): Promise<void> {
@@ -188,11 +193,13 @@ useHead(() => ({
             v-model="input"
             autofocus
             :submitting="state.interpreting"
+            cancelable
             :placeholder="t('inputPlaceholder')"
             :submit-label="t('send')"
             :submitting-label="t('sending')"
             :collapse-on-submit="true"
             @submit="send"
+            @cancel="cancel"
           />
         </div>
       </div>

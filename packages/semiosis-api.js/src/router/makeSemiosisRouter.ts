@@ -397,7 +397,9 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
 
     return stream(c, async (stream) => {
       try {
-        for await (const sign of S.agentInterpret(agent, input)) {
+        for await (const sign of S.agentInterpret(agent, input, {
+          signal: c.req.raw.signal,
+        })) {
           await stream.writeln(
             JSON.stringify({
               type: "sign",

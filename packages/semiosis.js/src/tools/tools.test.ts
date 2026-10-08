@@ -3,7 +3,7 @@ import fs from "node:fs/promises"
 import Os from "node:os"
 import Path from "node:path"
 import { test } from "node:test"
-import { makeBashToolSign } from "./bash/index.ts"
+import { makeBashToolHandler, makeBashToolSign } from "./bash/index.ts"
 import { assertSessionToolPlatform } from "./assertSessionToolPlatform.ts"
 import {
   defaultShellDialect,
@@ -80,3 +80,27 @@ test("resolvePwshPath probes well-known win32 install locations", async () => {
     await fs.rm(root, { recursive: true, force: true })
   }
 })
+
+test(
+  "bash tool handler can be cancelled",
+  { skip: process.platform === "win32" },
+  async () => {
+    const controller = new AbortController()
+    const handler = makeBashToolHandler({
+      cwd: process.cwd(),
+      timeoutMs: 5_000,
+      maxOutputChars: 1_000,
+    })
+
+    const outputPromise = handler(
+      { command: "sleep 5" },
+      { signal: controller.signal },
+    )
+
+    setTimeout(() => controller.abort(), 20)
+
+    const output = await outputPromise
+
+    assert.match(output, /\[cancelled\]/)
+  },
+)

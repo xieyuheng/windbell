@@ -11,9 +11,14 @@ import {
 import type { Agent } from "./Agent.ts"
 import { repairOrphanToolCalls } from "./repairOrphanToolCalls.ts"
 
+export type AgentInterpretOptions = {
+  signal?: AbortSignal
+}
+
 export async function* agentInterpret(
   agent: Agent,
   input: Array<Sign>,
+  options: AgentInterpretOptions = {},
 ): AsyncGenerator<Sign> {
   const repairs = await repairOrphanToolCalls(agent)
   yield* repairs
@@ -22,6 +27,8 @@ export async function* agentInterpret(
   yield* input
 
   while (true) {
+    if (options.signal?.aborted) return
+
     const context = await agent.getContext()
     const output = await agent.model.interpret(context)
 
@@ -58,7 +65,9 @@ export async function* agentInterpret(
     }
 
     for (const toolCallSign of toolCallSigns) {
-      const sign = await agent.toolRouter.run(toolCallSign)
+      const sign = await agent.toolRouter.run(toolCallSign, {
+        signal: options.signal,
+      })
 
       await agent.appendContext([sign])
       yield sign

@@ -21,6 +21,7 @@ export function makeTtyRepl(): Repl {
   const commands = new Map<string, ReplCommand>()
   const messages: Array<string> = []
   const buffer: Array<string> = []
+  const cancelHandlers = new Set<() => void>()
 
   let lastKey: Readline.Key | undefined = undefined
   let isPasting = false
@@ -39,6 +40,14 @@ export function makeTtyRepl(): Repl {
 
   function listCommands(): Array<ReplCommand> {
     return [...commands.values()]
+  }
+
+  function onCancel(handler: () => void): () => void {
+    cancelHandlers.add(handler)
+
+    return () => {
+      cancelHandlers.delete(handler)
+    }
   }
 
   function onKeypress(_str: string, key: Readline.Key): void {
@@ -188,6 +197,16 @@ export function makeTtyRepl(): Repl {
   const readline = Readline.createInterface({ input, output })
   readline.on("line", onLine)
   readline.on("close", onClose)
+  readline.on("SIGINT", () => {
+    if (cancelHandlers.size === 0) {
+      close()
+      return
+    }
+
+    for (const handler of cancelHandlers) {
+      handler()
+    }
+  })
 
   if (useBracketedPaste) {
     output.write("\x1b[?2004h")
@@ -201,6 +220,7 @@ export function makeTtyRepl(): Repl {
     tryDispatchCommand,
     readInput,
     run,
+    onCancel,
     close,
   }
 }

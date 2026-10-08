@@ -25,6 +25,7 @@ const props = withDefaults(
     disabled?: boolean
     submitDisabled?: boolean
     submitting?: boolean
+    cancelable?: boolean
     placeholder?: string
     submitLabel?: string
     submittingLabel?: string
@@ -38,6 +39,7 @@ const props = withDefaults(
     disabled: false,
     submitDisabled: false,
     submitting: false,
+    cancelable: false,
     placeholder: "",
     submitLabel: "Send",
     submittingLabel: "Sending...",
@@ -51,6 +53,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   "update:modelValue": [value: string]
   submit: []
+  cancel: []
 }>()
 
 const { t } = useI18n({
@@ -81,6 +84,7 @@ let compactMetrics: CompactMetrics | null = null
 let finishTimer: number | undefined
 
 const showExpanded = computed(() => !props.collapsible || expanded.value)
+const showCancelButton = computed(() => props.submitting && props.cancelable)
 const hasNewline = computed(() => /[\r\n]/.test(input.value))
 const canCollapse = computed(() => {
   if (input.value === "") return true
@@ -282,6 +286,12 @@ function handleShellTransitionEnd(event: TransitionEvent): void {
   void finishAnimation()
 }
 
+function cancel(): void {
+  if (!showCancelButton.value) return
+
+  emit("cancel")
+}
+
 function submit(): void {
   if (props.disabled || props.submitDisabled || props.submitting) return
 
@@ -350,12 +360,26 @@ function handleToggle(): void {
 
       <RoundButton
         variant="accent"
-        type="submit"
-        :disabled="props.disabled || props.submitDisabled || props.submitting"
-        :aria-label="
-          props.submitting ? props.submittingLabel : props.submitLabel
+        :type="showCancelButton ? 'button' : 'submit'"
+        :disabled="
+          props.disabled ||
+          (showCancelButton ? false : props.submitDisabled || props.submitting)
         "
-        :title="props.submitting ? props.submittingLabel : props.submitLabel"
+        :aria-label="
+          showCancelButton
+            ? t('cancel')
+            : props.submitting
+              ? props.submittingLabel
+              : props.submitLabel
+        "
+        :title="
+          showCancelButton
+            ? t('cancel')
+            : props.submitting
+              ? props.submittingLabel
+              : props.submitLabel
+        "
+        @click="showCancelButton ? cancel() : undefined"
       >
         <Square
           v-if="props.submitting"
@@ -402,12 +426,28 @@ function handleToggle(): void {
 
         <RoundButton
           variant="accent"
-          type="submit"
-          :disabled="props.disabled || props.submitDisabled || props.submitting"
-          :aria-label="
-            props.submitting ? props.submittingLabel : props.submitLabel
+          :type="showCancelButton ? 'button' : 'submit'"
+          :disabled="
+            props.disabled ||
+            (showCancelButton
+              ? false
+              : props.submitDisabled || props.submitting)
           "
-          :title="props.submitting ? props.submittingLabel : props.submitLabel"
+          :aria-label="
+            showCancelButton
+              ? t('cancel')
+              : props.submitting
+                ? props.submittingLabel
+                : props.submitLabel
+          "
+          :title="
+            showCancelButton
+              ? t('cancel')
+              : props.submitting
+                ? props.submittingLabel
+                : props.submitLabel
+          "
+          @click="showCancelButton ? cancel() : undefined"
         >
           <Square
             v-if="props.submitting"
