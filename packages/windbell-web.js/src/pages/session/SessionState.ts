@@ -144,8 +144,6 @@ export async function interpretSession(
       content,
     }
 
-    state.context.push(input)
-
     for await (const sign of semiosis.sessions.interpret({
       sessionId: state.sessionId,
       model: modelRef,

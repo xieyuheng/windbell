@@ -111,11 +111,16 @@ test("agentInterpret repairs orphan tool calls before appending input", async ()
     },
   }
   const agent = makeTestAgent(context, model)
+  const yielded: Array<Sign> = []
 
-  for await (const _sign of agentInterpret(agent, [UserSign("next")])) {
-    // drain
+  for await (const sign of agentInterpret(agent, [UserSign("next")])) {
+    yielded.push(sign)
   }
 
+  assert.deepEqual(
+    yielded.map((sign) => sign.kind),
+    ["ToolOutputSign", "UserSign"],
+  )
   assert.deepEqual(
     context.map((sign) => sign.kind),
     ["ToolCallSign", "ToolOutputSign", "UserSign"],
@@ -170,7 +175,7 @@ test("agentInterpret records a ToolOutputSign for every tool call", async () => 
   assert.match(outputs[1]?.content ?? "", /tool exploded/)
 })
 
-test("makeAgentFromSession repairs persisted orphan tool calls", async () => {
+test("agentInterpret repairs persisted orphan tool calls and yields input", async () => {
   const root = await fs.mkdtemp(Path.join(Os.tmpdir(), "semiosis-repair-"))
 
   try {
@@ -193,17 +198,48 @@ test("makeAgentFromSession repairs persisted orphan tool calls", async () => {
       }),
     )
 
-    await makeAgentFromSession({
+    let interpretedContext: Array<Sign> = []
+    const model: Model = {
+      providerName: "test",
+      name: "test",
+      interpret: async (input) => {
+        interpretedContext = [...input]
+        return []
+      },
+    }
+
+    const agent = await makeAgentFromSession({
       database,
       sessionId: session.id,
-      model: unusedModel,
+      model,
       makeToolRouter: () => makeToolRouter(),
     })
+
+    const before = await database.sessions.get(session.id)
+    assert.deepEqual(
+      before?.context.map((sign) => sign.kind),
+      ["ToolCallSign"],
+    )
+
+    const yielded: Array<Sign> = []
+
+    for await (const sign of agentInterpret(agent, [UserSign("next")])) {
+      yielded.push(sign)
+    }
+
+    assert.deepEqual(
+      yielded.map((sign) => sign.kind),
+      ["ToolOutputSign", "UserSign"],
+    )
+    assert.deepEqual(
+      interpretedContext.map((sign) => sign.kind),
+      ["ToolCallSign", "ToolOutputSign", "UserSign"],
+    )
 
     const loaded = await database.sessions.get(session.id)
     assert.deepEqual(
       loaded?.context.map((sign) => sign.kind),
-      ["ToolCallSign", "ToolOutputSign"],
+      ["ToolCallSign", "ToolOutputSign", "UserSign"],
     )
   } finally {
     await fs.rm(root, { recursive: true, force: true })

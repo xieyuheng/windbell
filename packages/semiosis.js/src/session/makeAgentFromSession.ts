@@ -1,4 +1,4 @@
-import { makeAgent, repairOrphanToolCalls, type Agent } from "../agent/index.ts"
+import { makeAgent, type Agent } from "../agent/index.ts"
 import type { Database } from "../database/index.ts"
 import type { Model } from "../model/index.ts"
 import type { ToolRouter } from "../tool/index.ts"
@@ -38,7 +38,7 @@ export async function makeAgentFromSession(
 
   const toolRouter = await options.makeToolRouter({ session, workspace })
 
-  const agent = makeAgent({
+  return makeAgent({
     model: options.model,
     toolRouter,
     ...makeSessionContext({
@@ -46,7 +46,4 @@ export async function makeAgentFromSession(
       sessionStore: options.database.sessions,
     }),
   })
-
-  await repairOrphanToolCalls(agent)
-  return agent
 }

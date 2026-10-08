@@ -15,8 +15,11 @@ export async function* agentInterpret(
   agent: Agent,
   input: Array<Sign>,
 ): AsyncGenerator<Sign> {
-  await repairOrphanToolCalls(agent)
+  const repairs = await repairOrphanToolCalls(agent)
+  yield* repairs
+
   await agent.appendContext(input)
+  yield* input
 
   while (true) {
     const context = await agent.getContext()

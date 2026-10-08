@@ -140,6 +140,7 @@ test("semiosis client and server", async (t) => {
   }
 
   assert.ok(signs.length > 0)
+  assert.equal(signs[0]?.kind, "UserSign")
 
   const gotSession = await client.sessions.get(session.id)
   assert.ok((gotSession?.context.length ?? 0) > 1)

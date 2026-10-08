@@ -75,7 +75,6 @@ export function makeBatchHandler(options: BatchCommandOptions) {
 
     for (const prompt of promptBatch.prompts) {
       const userSign = UserSign(prompt)
-      console.log(formatSign(userSign))
 
       for await (const sign of agentInterpret(agent, [userSign])) {
         console.log(formatSign(sign))

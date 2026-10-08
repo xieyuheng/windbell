@@ -1,3 +1,4 @@
+import { repairOrphanToolCalls } from "../agent/index.ts"
 import type { Database } from "../database/index.ts"
 import { formatSign } from "../format/index.ts"
 import type { Model } from "../model/index.ts"
@@ -44,6 +45,8 @@ export async function resumeAgentRepl(
   const repl = options.repl
 
   try {
+    await repairOrphanToolCalls(agent)
+
     for (const sign of await agent.getContext()) {
       repl.println(formatSign(sign, { color: repl.useColor }))
     }
