@@ -11,22 +11,27 @@ export async function generateAndPrintTitle(
     onTitleChange?: (title: string) => Promise<void> | void
   },
 ): Promise<void> {
-  try {
-    const title = await generateTitle({
-      model: agent.model,
-      context: await agent.getContext(),
-    })
+  const result = await generateTitle({
+    model: agent.model,
+    context: await agent.getContext(),
+  })
 
-    await options.onTitleChange?.(title)
-
-    const titleTag = repl.useColor
-      ? formatWithBackground("[title]", 240)
-      : "[title]"
-
-    repl.println(`${titleTag}\n\n${title}\n`)
-  } catch (error) {
-    printAgentReplError(repl, error)
+  if (result.kind === "error") {
+    printAgentReplError(repl, result.error)
+    return
   }
+
+  const title = result.kind === "ok" ? result.title : ""
+
+  if (title !== "") {
+    await options.onTitleChange?.(title)
+  }
+
+  const titleTag = repl.useColor
+    ? formatWithBackground("[title]", 240)
+    : "[title]"
+
+  repl.println(`${titleTag}\n\n${title === "" ? "(empty)" : title}\n`)
 }
 
 export function makeTitleCommand(

@@ -230,10 +230,11 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       database: options.database,
     })
 
-    const title = await S.generateTitle({
+    const result = await S.generateTitle({
       model,
       context: session.context,
     })
+    const title = result.kind === "ok" ? result.title : ""
 
     if (title !== "") {
       await service.sessions.updateTitle(sessionId, title)

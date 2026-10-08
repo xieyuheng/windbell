@@ -6,9 +6,14 @@ export type GenerateTitleOptions = {
   context: Array<Sign>
 }
 
+export type GenerateTitleResult =
+  | { kind: "ok"; title: string }
+  | { kind: "empty" }
+  | { kind: "error"; error: unknown }
+
 export async function generateTitle(
   options: GenerateTitleOptions,
-): Promise<string> {
+): Promise<GenerateTitleResult> {
   try {
     const output = await options.model.interpret([
       ...options.context,
@@ -18,10 +23,17 @@ export async function generateTitle(
     ])
 
     const assistantSign = output.find(isAssistantSign)
-    if (assistantSign === undefined) return ""
+    if (assistantSign === undefined) {
+      return { kind: "empty" }
+    }
 
-    return assistantSign.content
-  } catch {
-    return ""
+    const title = assistantSign.content.trim()
+    if (title === "") {
+      return { kind: "empty" }
+    }
+
+    return { kind: "ok", title }
+  } catch (error) {
+    return { kind: "error", error }
   }
 }
