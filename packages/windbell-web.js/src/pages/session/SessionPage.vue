@@ -186,6 +186,7 @@ useHead(() => ({
         >
           <Composer
             v-model="input"
+            autofocus
             :submitting="state.interpreting"
             :placeholder="t('inputPlaceholder')"
             :submit-label="t('send')"

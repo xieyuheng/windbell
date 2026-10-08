@@ -28,6 +28,7 @@ const props = withDefaults(
     placeholder?: string
     submitLabel?: string
     submittingLabel?: string
+    autofocus?: boolean
     collapseOnSubmit?: boolean
     minRows?: number
     maxHeight?: string
@@ -40,6 +41,7 @@ const props = withDefaults(
     placeholder: "",
     submitLabel: "Send",
     submittingLabel: "Sending...",
+    autofocus: false,
     collapseOnSubmit: true,
     minRows: 5,
     maxHeight: "calc(100dvh - 6rem)",
@@ -239,13 +241,34 @@ function updateState(): void {
 
 watch(input, updateState, { flush: "post" })
 
+function focusActiveTextarea(): void {
+  const selection = {
+    start: input.value.length,
+    end: input.value.length,
+  }
+
+  if (showExpanded.value) {
+    writeSelection(expandedTextarea.value, selection)
+    return
+  }
+
+  writeSelection(compactTextarea.value, selection)
+}
+
 onMounted(() => {
   if (showExpanded.value) {
     void resizeExpandedTextarea()
+    if (props.autofocus) {
+      focusActiveTextarea()
+    }
+
     return
   }
 
   captureCompactHeight()
+  if (props.autofocus) {
+    focusActiveTextarea()
+  }
 })
 
 onBeforeUnmount(() => {

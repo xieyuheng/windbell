@@ -182,6 +182,7 @@ useHead(() => ({
 
     <Composer
       v-model="newSessionInput"
+      autofocus
       :collapsible="false"
       :disabled="creatingSession"
       :submit-disabled="!canCreateSession"
