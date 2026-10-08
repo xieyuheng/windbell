@@ -5,7 +5,7 @@ import { useI18n } from "vue-i18n"
 import { useRoute, useRouter } from "vue-router"
 import { makeDividerState } from "../../components/divider/DividerState.ts"
 import ResizeDivider from "../../components/divider/ResizeDivider.vue"
-import SessionComposer from "./SessionComposer.vue"
+import Composer from "../../components/composer/Composer.vue"
 import SessionSignList from "./SessionSignList.vue"
 import SessionToolbar from "./SessionToolbar.vue"
 import Ranger from "../../components/ranger/Ranger.vue"
@@ -184,10 +184,14 @@ useHead(() => ({
         <div
           class="pointer-events-none absolute inset-x-0 bottom-[env(safe-area-inset-bottom,0px)] z-10 px-2 py-4"
         >
-          <SessionComposer
+          <Composer
             v-model="input"
-            :interpreting="state.interpreting"
-            @send="send"
+            :submitting="state.interpreting"
+            :placeholder="t('inputPlaceholder')"
+            :submit-label="t('send')"
+            :submitting-label="t('sending')"
+            :collapse-on-submit="true"
+            @submit="send"
           />
         </div>
       </div>

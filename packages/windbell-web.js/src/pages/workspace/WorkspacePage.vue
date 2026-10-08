@@ -8,9 +8,9 @@ import { useI18n } from "vue-i18n"
 import { useRoute, useRouter } from "vue-router"
 import BackButton from "../../components/buttons/BackButton.vue"
 import MediumButton from "../../components/buttons/MediumButton.vue"
+import Composer from "../../components/composer/Composer.vue"
 import { sendSessionMessage } from "../session/SessionInbox.ts"
 import SessionCard from "./SessionCard.vue"
-import SessionStartComposer from "./SessionStartComposer.vue"
 import { workspaceMessages } from "./Workspace.i18n.ts"
 import {
   getWorkspaceState,
@@ -33,8 +33,15 @@ const workspaceId = computed(() => String(route.params.workspaceId ?? ""))
 const state = getWorkspaceState(workspaceId.value)
 const title = computed(() => state.workspace?.name ?? t("title"))
 const creatingSession = ref(false)
+const newSessionInput = ref("")
+const canCreateSession = computed(
+  () => newSessionInput.value.trim() !== "" && !creatingSession.value,
+)
 
-async function createSession(content: string): Promise<void> {
+async function createSession(): Promise<void> {
+  if (!canCreateSession.value) return
+
+  const content = newSessionInput.value.trim()
   creatingSession.value = true
 
   try {
@@ -173,7 +180,19 @@ useHead(() => ({
       </MediumButton>
     </div>
 
-    <SessionStartComposer :creating="creatingSession" @create="createSession" />
+    <Composer
+      v-model="newSessionInput"
+      :collapsible="false"
+      :disabled="creatingSession"
+      :submit-disabled="!canCreateSession"
+      :submitting="creatingSession"
+      :placeholder="t('newSessionPlaceholder')"
+      :submit-label="t('startSession')"
+      :submitting-label="t('startingSession')"
+      :collapse-on-submit="false"
+      max-height="min(60dvh, 32rem)"
+      @submit="createSession"
+    />
 
     <p
       v-if="state.error !== undefined && state.hasLoaded"
