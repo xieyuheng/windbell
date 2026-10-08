@@ -9,11 +9,13 @@ import {
   type ToolCallSign,
 } from "../sign/index.ts"
 import type { Agent } from "./Agent.ts"
+import { repairOrphanToolCalls } from "./repairOrphanToolCalls.ts"
 
 export async function* agentInterpret(
   agent: Agent,
   input: Array<Sign>,
 ): AsyncGenerator<Sign> {
+  await repairOrphanToolCalls(agent)
   await agent.appendContext(input)
 
   while (true) {
@@ -54,11 +56,6 @@ export async function* agentInterpret(
 
     for (const toolCallSign of toolCallSigns) {
       const sign = await agent.toolRouter.run(toolCallSign)
-
-      if (isErrorSign(sign)) {
-        yield sign
-        return
-      }
 
       await agent.appendContext([sign])
       yield sign

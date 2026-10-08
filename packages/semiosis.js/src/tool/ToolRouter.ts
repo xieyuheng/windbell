@@ -2,7 +2,6 @@ import { errorReport } from "@windbell/std.js/error"
 import { Ajv } from "ajv"
 import {
   ToolOutputSign,
-  type Sign,
   type ToolCallSign,
   type ToolSign,
 } from "../sign/index.ts"
@@ -25,16 +24,16 @@ export class ToolRouter {
     this.routes[sign.name] = { sign, handler, validate }
   }
 
-  async run(toolCall: ToolCallSign): Promise<Sign> {
-    const route = this.routes[toolCall.name]
-    if (route === undefined) {
-      return ToolOutputSign(
-        toolCall.callId,
-        `[ToolRouter] unknown tool: ${toolCall.name}`,
-      )
-    }
-
+  async run(toolCall: ToolCallSign): Promise<ToolOutputSign> {
     try {
+      const route = this.routes[toolCall.name]
+      if (route === undefined) {
+        return ToolOutputSign(
+          toolCall.callId,
+          `[ToolRouter] unknown tool: ${toolCall.name}`,
+        )
+      }
+
       const args = toolArgumentsParse(toolCall)
 
       if (!route.validate(args)) {
@@ -43,7 +42,8 @@ export class ToolRouter {
           .map((error) => `${error.instancePath} ${error.message}`.trim())
           .join("; ")
 
-        throw new Error(
+        return ToolOutputSign(
+          toolCall.callId,
           `[ToolRouter] invalid arguments for tool ${toolCall.name}: ${message}`,
         )
       }
