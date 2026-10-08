@@ -9,11 +9,3 @@ IDE 如何与 meta-lisp 结合？
 # windbell-web.js
 
 模仿 telegram 给对话设页面以及其他页面置纹样背景。
-
-# windbell database
-
-用 git 管理 ~/.windbell 文件夹
-
-- 自己尝试，先不要做成功能
-- 未来可以考虑做 git-api.js
-  - 本地部署 git 管理工具
