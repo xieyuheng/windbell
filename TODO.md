@@ -1,5 +1,15 @@
 # semiosis.js
 
+refactor turn functions
+
+# semiosis-api.js
+
+refactor makeSemiosisRouter.ts
+
+- learn about hono/streaming
+
+# semiosis.js
+
 目前，我们的 agent 接口不支持 SSE 式的信息返回，
 因此前端也无法渲染流式的 UI 变化，
 导致在 AI 需要思考很久的时候，用户看不到响应。
