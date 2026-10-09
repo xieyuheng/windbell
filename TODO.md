@@ -1,14 +1,66 @@
+# 学习
+
+hono api，尤其是 hono streaming api
+
+- 为了看懂 stream 相关的代码，从而 refactor 相关的代码
+
+学习 dsh 的插件机制
+
+- 实现复杂的功能的时候，
+  我还是会觉得设计出良好的代码组织方式，
+  是一个很难的谜题。
+
+  如何处理不能功能的边界？
+  什么时候应该用数据来作为不同功能之间的协议？
+  什么时候应该用接口函数？
+
+  也许 dsh 的插件机制真的有用。
+  是否与 laravel 的依赖注入类似？
+
+# usage
+
+目前我们的 agent interpret 只是返回一个 stream，
+而 vercel 的 `streamText` 返回的是一个 `StreamTextResult`：
+
+```typescript
+import { streamText } from 'ai';
+const result = streamText({
+  model: 'openai/gpt-5.6-sol',
+  prompt: 'Write a short poem about the ocean.',
+});
+
+for await (const chunk of result.textStream) {
+  process.stdout.write(chunk);
+}
+```
+
+返回 object，object 的 method 之间可以共享 state。
+返回一组函数，多个函数之间可以通过闭包来共享 state。
+
+我们是否要通过这种方式来支持 usage？
+或者说，我们应该通过给 agent interpret 增加 callback 来支持 usage？
+
+不对，这是 clinet 的设计，
+api 本身必须用 event stream 来实现。
+也就是把 usage 相关的信息作为 event 在 stream 中返回。
+
 # semiosis-api.js
 
 refactor makeSemiosisRouter.ts
 
 - learn about hono/streaming
 
+# 文学式编程
+
+给出 agent interpret 和 agent loop 和 markdown 文学式编程
+
 # windbell-web.js
 
 改空内容时的样式。
 
 - 比如 工作区没有对话。
+
+利用调色板设计 theme
 
 修复 markdown code block 所使用的背景颜色
 
