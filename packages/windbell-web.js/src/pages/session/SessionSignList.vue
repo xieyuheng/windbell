@@ -2,11 +2,18 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n"
 import SignCard from "../../components/sign/SignCard.vue"
+import TurnErrorCard from "./TurnErrorCard.vue"
 import { sessionMessages } from "./Session.i18n.ts"
 import type { SessionState } from "./SessionState.ts"
 
 const props = defineProps<{
   state: SessionState
+}>()
+
+const emit = defineEmits<{
+  retry: []
+  edit: []
+  dismiss: []
 }>()
 
 const { t } = useI18n({
@@ -20,14 +27,16 @@ const bottomAnchorVisible = ref(true)
 const title = computed(() =>
   props.state.hasLoaded ? props.state.title || t("notFound") : "",
 )
+const signs = computed(() => [
+  ...props.state.context,
+  ...(props.state.activeTurn?.signs ?? []),
+])
 
 let bottomObserver: IntersectionObserver | undefined
 
 async function scrollToBottom(): Promise<void> {
   await nextTick()
 
-  // Wait for a layout pass so sign cards have finished reflowing before
-  // measuring scrollHeight.
   await new Promise<void>((resolve) => {
     requestAnimationFrame(() => resolve())
   })
@@ -60,12 +69,9 @@ onBeforeUnmount(() => {
   bottomObserver?.disconnect()
 })
 
-watch(
-  () => props.state.context.length,
-  () => {
-    scheduleAutoScroll()
-  },
-)
+watch([() => signs.value.length, () => props.state.error], () => {
+  scheduleAutoScroll()
+})
 
 defineExpose({ scrollToBottom })
 </script>
@@ -80,22 +86,8 @@ defineExpose({ scrollToBottom })
         {{ title }}
       </h1>
 
-      <p
-        v-if="props.state.error !== undefined && props.state.hasLoaded"
-        class="text-sign-error"
-      >
-        {{ props.state.error }}
-      </p>
-
       <p v-if="props.state.isLoading" class="text-ink">
         {{ t("loading") }}
-      </p>
-
-      <p
-        v-else-if="props.state.error !== undefined && !props.state.hasLoaded"
-        class="text-sign-error"
-      >
-        {{ props.state.error }}
       </p>
 
       <ol
@@ -105,12 +97,22 @@ defineExpose({ scrollToBottom })
         :aria-busy="props.state.isPending"
       >
         <SignCard
-          v-for="(sign, index) in props.state.context"
+          v-for="(sign, index) in signs"
           :key="index"
           :sign="sign"
           :workspace-root="props.state.workspaceRoot"
         />
       </ol>
+
+      <TurnErrorCard
+        v-if="!props.state.isLoading && props.state.error !== undefined"
+        :message="props.state.error"
+        :retryable="props.state.errorRetryable"
+        :input-persisted="props.state.errorInputPersisted"
+        @retry="emit('retry')"
+        @edit="emit('edit')"
+        @dismiss="emit('dismiss')"
+      />
     </div>
 
     <div ref="bottomAnchor" class="h-px w-full" />

@@ -4,6 +4,7 @@ import type { SessionStore } from "../database/SessionStore.ts"
 import type { Sign } from "../sign/index.ts"
 import type { Turn } from "./Turn.ts"
 import type { TurnEvent } from "./TurnEvent.ts"
+import { replayTurn } from "./replayTurn.ts"
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
@@ -24,11 +25,15 @@ export async function* runTurn(
   const { sessions, agent, input, signal } = options
   const turn: Turn = { ...options.turn }
 
-  const interpreter = turn.inputPersisted
-    ? agentContinue(agent, { signal })
-    : agentInterpret(agent, input, { signal })
-
   try {
+    for await (const sign of replayTurn({ sessions, turn })) {
+      yield { type: "sign", sign }
+    }
+
+    const interpreter = turn.inputPersisted
+      ? agentContinue(agent, { signal })
+      : agentInterpret(agent, input, { signal })
+
     for await (const event of interpreter) {
       if (event.type === "input-persisted") {
         turn.inputPersisted = true

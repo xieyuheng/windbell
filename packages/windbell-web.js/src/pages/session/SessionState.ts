@@ -2,12 +2,19 @@ import { makeSemiosisClient } from "@windbell/semiosis-api.js/client"
 import type * as S from "@windbell/semiosis.js"
 import { reactive } from "vue"
 
+export type SessionActiveTurn = {
+  turnId: string
+  input: string
+  signs: Array<S.Sign>
+}
+
 export type SessionState = {
   sessionId: S.SessionId
   workspaceId: S.WorkspaceId
   workspaceRoot: string
   title: string
   context: Array<S.Sign>
+  activeTurn: SessionActiveTurn | undefined
   modelRef: S.ModelRef | undefined
   hasLoaded: boolean
   isLoading: boolean
@@ -15,11 +22,24 @@ export type SessionState = {
   requestId: number
   interpreting: boolean
   error: string | undefined
+  errorRetryable: boolean
+  errorInputPersisted: boolean
 }
 
 const semiosis = makeSemiosisClient({
   baseUrl: "/api/semiosis",
 })
+
+const maxInterpretAttempts = 3
+const retryDelaysMs = [500, 1_000, 2_000]
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function isNetworkError(error: unknown): boolean {
+  return error instanceof TypeError
+}
 
 export function makeSessionState(sessionId: S.SessionId): SessionState {
   return reactive<SessionState>({
@@ -28,6 +48,7 @@ export function makeSessionState(sessionId: S.SessionId): SessionState {
     workspaceRoot: "",
     title: "",
     context: [],
+    activeTurn: undefined,
     modelRef: undefined,
     hasLoaded: false,
     isLoading: true,
@@ -35,6 +56,8 @@ export function makeSessionState(sessionId: S.SessionId): SessionState {
     requestId: 0,
     interpreting: false,
     error: undefined,
+    errorRetryable: false,
+    errorInputPersisted: false,
   })
 }
 
@@ -70,6 +93,8 @@ export async function loadSessionState(
   }
 
   state.error = undefined
+  state.errorRetryable = false
+  state.errorInputPersisted = false
 
   try {
     const session = await semiosis.sessions.get(sessionId)
@@ -79,6 +104,7 @@ export async function loadSessionState(
     if (session === undefined) {
       state.title = ""
       state.context = []
+      state.activeTurn = undefined
       state.workspaceId = ""
       state.workspaceRoot = ""
       state.modelRef = undefined
@@ -98,6 +124,7 @@ export async function loadSessionState(
     state.workspaceId = session.workspaceId
     state.title = session.title
     state.context = session.context
+    state.activeTurn = undefined
     state.workspaceRoot = workspace.root
     state.hasLoaded = true
   } catch (error) {
@@ -115,10 +142,12 @@ export async function loadSessionState(
 export async function interpretSession(
   state: SessionState,
   content: string,
-  options: { signal?: AbortSignal } = {},
+  options: { signal?: AbortSignal; turnId?: string } = {},
 ): Promise<boolean> {
   state.interpreting = true
   state.error = undefined
+  state.errorRetryable = false
+  state.errorInputPersisted = false
 
   const controller =
     options.signal === undefined ? new AbortController() : undefined
@@ -157,28 +186,59 @@ export async function interpretSession(
       kind: "UserSign",
       content,
     }
-    const turnId = `turn-${crypto.randomUUID()}`
+    const turnId = options.turnId ?? `turn-${crypto.randomUUID()}`
 
-    for await (const event of semiosis.sessions.interpret({
-      sessionId: state.sessionId,
-      model: modelRef,
-      turnId,
-      input: [input],
-      signal,
-    })) {
-      if (event.type === "error") {
-        state.error = event.message
-        return false
+    if (state.activeTurn?.turnId !== turnId) {
+      if (state.activeTurn !== undefined && state.errorInputPersisted) {
+        state.context.push(...state.activeTurn.signs)
       }
 
-      state.context.push(event.sign)
+      state.activeTurn = {
+        turnId,
+        input: content,
+        signs: [],
+      }
+    } else {
+      state.activeTurn.input = content
     }
 
-    return true
+    const activeTurn = state.activeTurn
+
+    for (let attempt = 1; attempt <= maxInterpretAttempts; attempt += 1) {
+      activeTurn.signs = []
+
+      const shouldRetry =
+        (await runInterpretAttempt({
+          state,
+          activeTurn,
+          modelRef,
+          input,
+          signal,
+        })) && attempt < maxInterpretAttempts
+
+      if (!shouldRetry) {
+        if (state.error !== undefined) {
+          activeTurn.input = content
+          return false
+        }
+
+        state.context.push(...activeTurn.signs)
+        state.activeTurn = undefined
+        state.errorRetryable = false
+        state.errorInputPersisted = false
+        return true
+      }
+
+      const delayMs = retryDelaysMs[attempt - 1] ?? retryDelaysMs.at(-1) ?? 0
+      await delay(delayMs)
+    }
+
+    return false
   } catch (error) {
     if (signal?.aborted) return false
 
     state.error = error instanceof Error ? error.message : String(error)
+    state.errorRetryable = false
     return false
   } finally {
     if (
@@ -190,6 +250,81 @@ export async function interpretSession(
 
     state.interpreting = false
   }
+}
+
+async function runInterpretAttempt(options: {
+  state: SessionState
+  activeTurn: SessionActiveTurn
+  modelRef: S.ModelRef
+  input: S.UserSign
+  signal: AbortSignal | undefined
+}): Promise<boolean> {
+  const { state, activeTurn, modelRef, input, signal } = options
+
+  try {
+    for await (const event of semiosis.sessions.interpret({
+      sessionId: state.sessionId,
+      model: modelRef,
+      turnId: activeTurn.turnId,
+      input: [input],
+      signal,
+    })) {
+      if (event.type === "error") {
+        state.error = event.message
+        state.errorRetryable = event.retryable
+        state.errorInputPersisted = event.inputPersisted
+        return event.retryable
+      }
+
+      activeTurn.signs.push(event.sign)
+    }
+
+    return false
+  } catch (error) {
+    if (signal?.aborted) return false
+
+    const retryable = isNetworkError(error)
+
+    state.error = error instanceof Error ? error.message : String(error)
+    state.errorRetryable = retryable
+    return retryable
+  }
+}
+
+export async function retrySessionInterpretation(
+  state: SessionState,
+): Promise<boolean> {
+  if (state.activeTurn === undefined || state.interpreting) return false
+
+  return await interpretSession(state, state.activeTurn.input, {
+    turnId: state.activeTurn.turnId,
+  })
+}
+
+export function editSessionInterpretation(
+  state: SessionState,
+): string | undefined {
+  if (state.activeTurn === undefined || state.errorInputPersisted) {
+    return undefined
+  }
+
+  const input = state.activeTurn.input
+  state.activeTurn = undefined
+  state.error = undefined
+  state.errorRetryable = false
+  state.errorInputPersisted = false
+  return input
+}
+
+export function dismissSessionError(state: SessionState): void {
+  if (state.activeTurn !== undefined) {
+    state.context.push(...state.activeTurn.signs)
+    state.activeTurn = undefined
+  }
+
+  state.error = undefined
+  state.errorRetryable = false
+  state.errorInputPersisted = false
 }
 
 export async function generateSessionTitle(state: SessionState): Promise<void> {

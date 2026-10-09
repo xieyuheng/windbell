@@ -5,7 +5,7 @@ import type { SessionId } from "../session/Session.ts"
 
 export type TurnId = string
 
-export type TurnStatus = "pending" | "completed" | "failed" | "cancelled"
+export type TurnStatus = "pending" | "completed" | "failed"
 
 export type Turn = {
   id: TurnId

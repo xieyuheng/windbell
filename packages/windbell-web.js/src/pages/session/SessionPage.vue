@@ -12,9 +12,12 @@ import Ranger from "../../components/ranger/Ranger.vue"
 import { sessionMessages } from "./Session.i18n.ts"
 import {
   cancelSessionInterpretation,
+  dismissSessionError,
+  editSessionInterpretation,
   generateSessionTitle,
   getSessionState,
   interpretSession,
+  retrySessionInterpretation,
 } from "./SessionState.ts"
 import { receiveSessionMessages, type SessionMessage } from "./SessionInbox.ts"
 
@@ -104,6 +107,22 @@ function cancel(): void {
   cancelSessionInterpretation(state)
 }
 
+function retry(): void {
+  void retrySessionInterpretation(state)
+}
+
+function edit(): void {
+  const value = editSessionInterpretation(state)
+
+  if (value !== undefined) {
+    input.value = value
+  }
+}
+
+function dismiss(): void {
+  dismissSessionError(state)
+}
+
 async function send(): Promise<void> {
   if (state.isLoading || state.isPending) return
 
@@ -184,7 +203,13 @@ useHead(() => ({
           />
         </div>
 
-        <SessionSignList ref="signList" :state="state" />
+        <SessionSignList
+          ref="signList"
+          :state="state"
+          @retry="retry"
+          @edit="edit"
+          @dismiss="dismiss"
+        />
 
         <div
           class="pointer-events-none absolute inset-x-0 bottom-[env(safe-area-inset-bottom,0px)] z-10 px-2 py-4"
