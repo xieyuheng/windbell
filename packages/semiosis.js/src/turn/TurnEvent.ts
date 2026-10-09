@@ -4,6 +4,7 @@ export type TurnEvent =
   | { type: "sign"; sign: Sign }
   | {
       type: "error"
-      error: unknown
+      message: string
+      retryable: boolean
       inputPersisted: boolean
     }

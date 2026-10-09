@@ -14,48 +14,38 @@ export type AgentInterpretOptions = {
 }
 
 export type AgentInterpretEvent =
-  | { type: "sign"; sign: Sign }
-  | { type: "error"; error: unknown; inputPersisted: boolean }
+  { type: "sign"; sign: Sign } | { type: "input-persisted" }
+
 
 export async function* agentInterpret(
   agent: Agent,
   input: Array<Sign>,
   options: AgentInterpretOptions = {},
 ): AsyncGenerator<AgentInterpretEvent> {
-  let inputPersisted = false
+  yield* repairAgent(agent)
 
-  try {
-    yield* repairAgent(agent)
+  const context = [...(await agent.getContext()), ...input]
+  const output = await agent.model.interpret(context)
 
-    const context = [...(await agent.getContext()), ...input]
-    const output = await agent.model.interpret(context)
+  await agent.appendContext(input)
+  yield { type: "input-persisted" }
 
-    await agent.appendContext(input)
-    inputPersisted = true
-
-    for (const sign of input) {
-      yield { type: "sign", sign }
-    }
-
-    yield* runAgentOutput(agent, output, options)
-  } catch (error) {
-    yield { type: "error", error, inputPersisted }
+  for (const sign of input) {
+    yield { type: "sign", sign }
   }
+
+  yield* runAgentOutput(agent, output, options)
 }
 
 export async function* agentContinue(
   agent: Agent,
   options: AgentInterpretOptions = {},
 ): AsyncGenerator<AgentInterpretEvent> {
-  try {
-    yield* repairAgent(agent)
+  yield* repairAgent(agent)
 
-    const output = await agent.model.interpret(await agent.getContext())
+  const output = await agent.model.interpret(await agent.getContext())
 
-    yield* runAgentOutput(agent, output, options)
-  } catch (error) {
-    yield { type: "error", error, inputPersisted: true }
-  }
+  yield* runAgentOutput(agent, output, options)
 }
 
 async function* repairAgent(agent: Agent): AsyncGenerator<AgentInterpretEvent> {
@@ -94,9 +84,7 @@ async function* runAgentOutput(
     yield* output.map((sign): AgentInterpretEvent => ({ type: "sign", sign }))
 
     const toolCallSigns = output.filter(isToolCallSign)
-    if (toolCallSigns.length === 0) {
-      return
-    }
+    if (toolCallSigns.length === 0) return
 
     for (const toolCallSign of toolCallSigns) {
       const sign = await agent.toolRouter.run(toolCallSign, {

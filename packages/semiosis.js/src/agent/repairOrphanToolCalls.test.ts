@@ -56,9 +56,7 @@ async function collectAgentInterpretSigns(
   const signs: Array<Sign> = []
 
   for await (const event of events) {
-    if (event.type === "error") {
-      throw event.error
-    }
+    if (event.type !== "sign") continue
 
     signs.push(event.sign)
   }
@@ -69,10 +67,8 @@ async function collectAgentInterpretSigns(
 async function drainAgentInterpretEvents(
   events: AsyncIterable<AgentInterpretEvent>,
 ): Promise<void> {
-  for await (const event of events) {
-    if (event.type === "error") {
-      throw event.error
-    }
+  for await (const _event of events) {
+    // drain
   }
 }
 
@@ -338,7 +334,7 @@ test("agentInterpret marks remaining tool calls cancelled after abort", async ()
   assert.match(outputs[1]?.content ?? "", /not executed/)
 })
 
-test("agentInterpret yields error event when model.interpret throws", async () => {
+test("agentInterpret throws when model.interpret throws", async () => {
   const error = new Error("boom")
   const model: Model = {
     providerName: "test",
@@ -349,18 +345,17 @@ test("agentInterpret yields error event when model.interpret throws", async () =
   }
   const context: Array<Sign> = []
   const agent = makeTestAgent(context, model)
-  const events: Array<AgentInterpretEvent> = []
+  let caughtError: unknown = undefined
 
-  for await (const event of agentInterpret(agent, [UserSign("hello")])) {
-    events.push(event)
+  try {
+    for await (const _event of agentInterpret(agent, [UserSign("hello")])) {
+      // drain
+    }
+  } catch (caught) {
+    caughtError = caught
   }
 
-  const lastEvent = events.at(-1)
-
-  assert.equal(lastEvent?.type, "error")
-  if (lastEvent?.type !== "error") return
-  assert.equal(lastEvent.error, error)
-  assert.equal(lastEvent.inputPersisted, false)
+  assert.equal(caughtError, error)
   assert.deepEqual(context, [])
 })
 

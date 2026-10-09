@@ -20,7 +20,7 @@ export type Turn = {
   startSequence: number
   endSequence: number
 
-  error?: string
+  error?: { message: string }
 
   createdAt: number
   updatedAt: number

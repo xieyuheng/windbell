@@ -77,13 +77,15 @@ export function makeBatchHandler(options: BatchCommandOptions) {
     for (const prompt of promptBatch.prompts) {
       const userSign = UserSign(prompt)
 
-      for await (const event of agentInterpret(agent, [userSign])) {
-        if (event.type === "error") {
-          console.error(`[error] ${errorReport(event.error)}`)
-          return
-        }
+      try {
+        for await (const event of agentInterpret(agent, [userSign])) {
+          if (event.type !== "sign") continue
 
-        console.log(formatSign(event.sign))
+          console.log(formatSign(event.sign))
+        }
+      } catch (error) {
+        console.error(`[error] ${errorReport(error)}`)
+        return
       }
     }
   }

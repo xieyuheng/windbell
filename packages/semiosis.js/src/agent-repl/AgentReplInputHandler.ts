@@ -26,10 +26,7 @@ export function makeAgentReplInputHandler(
       for await (const event of agentInterpret(agent, [UserSign(input)], {
         signal: controller.signal,
       })) {
-        if (event.type === "error") {
-          printAgentReplError(repl, event.error)
-          break
-        }
+        if (event.type !== "sign") continue
 
         repl.println(formatSign(event.sign, { color: repl.useColor }))
       }

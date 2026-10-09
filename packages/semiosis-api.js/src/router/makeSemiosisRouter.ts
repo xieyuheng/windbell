@@ -447,13 +447,14 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
             turn: resolved.turn,
             input,
             signal: c.req.raw.signal,
+            isRetryable: isRetryableError,
           })) {
             if (event.type === "error") {
               await stream.writeln(
                 JSON.stringify({
                   type: "error",
-                  message: errorMessage(event.error),
-                  retryable: isRetryableError(event.error),
+                  message: event.message,
+                  retryable: event.retryable,
                   inputPersisted: event.inputPersisted,
                 }),
               )

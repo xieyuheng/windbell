@@ -137,7 +137,7 @@ test("semiosis client and server", async (t) => {
     turnId: "turn-test-1",
     input: [S.UserSign("hello")],
   })) {
-    if (event.type === "error") throw event.error
+    if (event.type === "error") throw new Error(event.message)
 
     signs.push(event.sign)
   }
@@ -158,7 +158,7 @@ test("semiosis client and server", async (t) => {
     turnId: "turn-test-1",
     input: [S.UserSign("hello")],
   })) {
-    if (event.type === "error") throw event.error
+    if (event.type === "error") throw new Error(event.message)
 
     replayedSigns.push(event.sign)
   }

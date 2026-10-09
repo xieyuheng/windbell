@@ -44,24 +44,14 @@ export type InterpretEvent =
       inputPersisted: boolean
     }
 
-export class InterpretError extends Error {
-  retryable: boolean
-  inputPersisted: boolean
-
-  constructor(options: {
-    message: string
-    retryable: boolean
-    inputPersisted: boolean
-  }) {
-    super(options.message)
-    this.name = "InterpretError"
-    this.retryable = options.retryable
-    this.inputPersisted = options.inputPersisted
-  }
-}
-
 export type SessionsInterpretEvent =
-  { type: "sign"; sign: S.Sign } | { type: "error"; error: InterpretError }
+  | { type: "sign"; sign: S.Sign }
+  | {
+      type: "error"
+      message: string
+      retryable: boolean
+      inputPersisted: boolean
+    }
 
 export type SessionsClient = {
   list(options: ListSessionsOptions): Promise<Array<S.SessionIndex>>
@@ -141,11 +131,9 @@ export function makeSessionsClient(
         } else if (event.type === "error") {
           yield {
             type: "error",
-            error: new InterpretError({
-              message: event.message,
-              retryable: event.retryable,
-              inputPersisted: event.inputPersisted,
-            }),
+            message: event.message,
+            retryable: event.retryable,
+            inputPersisted: event.inputPersisted,
           }
           return
         } else if (event.type === "done") {

@@ -5,16 +5,17 @@ import type { Sign } from "../sign/index.ts"
 import type { Turn } from "./Turn.ts"
 import type { TurnEvent } from "./TurnEvent.ts"
 
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error)
+}
+
 export type RunTurnOptions = {
   sessions: SessionStore
   agent: Agent
   turn: Turn
   input: Array<Sign>
   signal?: AbortSignal
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error)
+  isRetryable?: (error: unknown) => boolean
 }
 
 export async function* runTurn(
@@ -27,39 +28,40 @@ export async function* runTurn(
     ? agentContinue(agent, { signal })
     : agentInterpret(agent, input, { signal })
 
-  const inputSigns = new Set(input)
+  try {
+    for await (const event of interpreter) {
+      if (event.type === "input-persisted") {
+        turn.inputPersisted = true
+        turn.endSequence = await sessions.nextSignSequence(turn.sessionId)
+        turn.updatedAt = Date.now()
+        await sessions.putTurn(turn)
+        continue
+      }
 
-  for await (const event of interpreter) {
-    if (event.type === "error") {
-      turn.status = "failed"
-      turn.error = errorMessage(event.error)
-      turn.inputPersisted = event.inputPersisted
       turn.endSequence = await sessions.nextSignSequence(turn.sessionId)
       turn.updatedAt = Date.now()
       await sessions.putTurn(turn)
 
-      yield {
-        type: "error",
-        error: event.error,
-        inputPersisted: event.inputPersisted,
-      }
-      return
+      yield { type: "sign", sign: event.sign }
     }
 
-    if (!turn.inputPersisted && inputSigns.has(event.sign)) {
-      turn.inputPersisted = true
-    }
-
+    turn.status = "completed"
+    turn.completedAt = Date.now()
+    turn.endSequence = await sessions.nextSignSequence(turn.sessionId)
+    turn.updatedAt = Date.now()
+    await sessions.putTurn(turn)
+  } catch (error) {
+    turn.status = "failed"
+    turn.error = { message: errorMessage(error) }
     turn.endSequence = await sessions.nextSignSequence(turn.sessionId)
     turn.updatedAt = Date.now()
     await sessions.putTurn(turn)
 
-    yield { type: "sign", sign: event.sign }
+    yield {
+      type: "error",
+      message: errorMessage(error),
+      retryable: options.isRetryable?.(error) ?? false,
+      inputPersisted: turn.inputPersisted,
+    }
   }
-
-  turn.status = "completed"
-  turn.completedAt = Date.now()
-  turn.endSequence = await sessions.nextSignSequence(turn.sessionId)
-  turn.updatedAt = Date.now()
-  await sessions.putTurn(turn)
 }

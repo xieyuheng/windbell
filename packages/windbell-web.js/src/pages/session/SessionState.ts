@@ -167,7 +167,7 @@ export async function interpretSession(
       signal,
     })) {
       if (event.type === "error") {
-        state.error = event.error.message
+        state.error = event.message
         return false
       }
 
