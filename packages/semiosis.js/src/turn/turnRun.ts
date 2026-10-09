@@ -4,13 +4,13 @@ import type { SessionStore } from "../database/SessionStore.ts"
 import type { Sign } from "../sign/index.ts"
 import type { Turn } from "./Turn.ts"
 import type { TurnEvent } from "./TurnEvent.ts"
-import { replayTurn } from "./replayTurn.ts"
+import { turnReplay } from "./turnReplay.ts"
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
 }
 
-export type RunTurnOptions = {
+export type TurnRunOptions = {
   sessions: SessionStore
   agent: Agent
   turn: Turn
@@ -19,14 +19,14 @@ export type RunTurnOptions = {
   isRetryable?: (error: unknown) => boolean
 }
 
-export async function* runTurn(
-  options: RunTurnOptions,
+export async function* turnRun(
+  options: TurnRunOptions,
 ): AsyncGenerator<TurnEvent> {
   const { sessions, agent, input, signal } = options
   const turn: Turn = { ...options.turn }
 
   try {
-    for await (const sign of replayTurn({ sessions, turn })) {
+    for await (const sign of turnReplay({ sessions, turn })) {
       yield { type: "sign", sign }
     }
 
@@ -50,17 +50,9 @@ export async function* runTurn(
       yield { type: "sign", sign: event.sign }
     }
 
-    turn.status = "completed"
-    turn.completedAt = Date.now()
-    turn.endSequence = await sessions.nextSignSequence(turn.sessionId)
-    turn.updatedAt = Date.now()
-    await sessions.putTurn(turn)
+    await markCompletedTurn(sessions, turn)
   } catch (error) {
-    turn.status = "failed"
-    turn.error = { message: errorMessage(error) }
-    turn.endSequence = await sessions.nextSignSequence(turn.sessionId)
-    turn.updatedAt = Date.now()
-    await sessions.putTurn(turn)
+    await markFailedTurn(sessions, turn, error)
 
     yield {
       type: "error",
@@ -69,4 +61,27 @@ export async function* runTurn(
       inputPersisted: turn.inputPersisted,
     }
   }
+}
+
+export async function markCompletedTurn(
+  sessions: SessionStore,
+  turn: Turn,
+): Promise<void> {
+  turn.status = "completed"
+  turn.completedAt = Date.now()
+  turn.endSequence = await sessions.nextSignSequence(turn.sessionId)
+  turn.updatedAt = Date.now()
+  await sessions.putTurn(turn)
+}
+
+export async function markFailedTurn(
+  sessions: SessionStore,
+  turn: Turn,
+  error: unknown,
+): Promise<void> {
+  turn.status = "failed"
+  turn.error = { message: errorMessage(error) }
+  turn.endSequence = await sessions.nextSignSequence(turn.sessionId)
+  turn.updatedAt = Date.now()
+  await sessions.putTurn(turn)
 }

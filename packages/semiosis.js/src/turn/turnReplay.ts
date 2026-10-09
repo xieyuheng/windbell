@@ -2,13 +2,13 @@ import type { SessionStore } from "../database/SessionStore.ts"
 import type { Sign } from "../sign/index.ts"
 import type { Turn } from "./Turn.ts"
 
-export type ReplayTurnOptions = {
+export type TurnReplayOptions = {
   sessions: SessionStore
   turn: Turn
 }
 
-export async function* replayTurn(
-  options: ReplayTurnOptions,
+export async function* turnReplay(
+  options: TurnReplayOptions,
 ): AsyncGenerator<Sign> {
   const signs = await options.sessions.sliceContextBySequence(
     options.turn.sessionId,

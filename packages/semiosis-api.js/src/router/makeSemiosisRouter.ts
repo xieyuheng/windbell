@@ -410,7 +410,7 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       if (resolved.kind === "replay") {
         return stream(c, async (stream) => {
           try {
-            for await (const sign of S.replayTurn({
+            for await (const sign of S.turnReplay({
               sessions: database.sessions,
               turn: resolved.turn,
             })) {
@@ -441,7 +441,7 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
 
       return stream(c, async (stream) => {
         try {
-          for await (const event of S.runTurn({
+          for await (const event of S.turnRun({
             sessions: database.sessions,
             agent,
             turn: resolved.turn,
