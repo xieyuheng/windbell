@@ -64,6 +64,68 @@ export function makeSessionState(sessionId: S.SessionId): SessionState {
 const sessionStates = new Map<S.SessionId, SessionState>()
 const interpretationControllers = new Map<S.SessionId, AbortController>()
 
+function clearSessionError(state: SessionState): void {
+  state.error = undefined
+  state.errorRetryable = false
+  state.errorInputPersisted = false
+}
+
+function commitActiveTurn(state: SessionState): void {
+  if (state.activeTurn === undefined) return
+
+  state.context.push(...state.activeTurn.signs)
+  state.activeTurn = undefined
+}
+
+function beginActiveTurn(
+  state: SessionState,
+  content: string,
+  turnId?: string,
+): SessionActiveTurn {
+  const id = turnId ?? `turn-${crypto.randomUUID()}`
+
+  if (state.activeTurn?.turnId === id) {
+    state.activeTurn.input = content
+    return state.activeTurn
+  }
+
+  if (state.activeTurn !== undefined && state.errorInputPersisted) {
+    commitActiveTurn(state)
+  }
+
+  state.activeTurn = {
+    turnId: id,
+    input: content,
+    signs: [],
+  }
+
+  return state.activeTurn
+}
+
+async function readSessionModelRef(): Promise<S.ModelRef> {
+  const settings = await semiosis.settings.get()
+  const providerName = settings.defaultProvider
+
+  if (providerName === null) {
+    throw new Error("default provider is not configured")
+  }
+
+  const providerConfig = await semiosis.providers.get(providerName)
+
+  if (providerConfig === undefined) {
+    throw new Error(`provider not found: ${providerName}`)
+  }
+
+  if (providerConfig.defaultModel === null) {
+    throw new Error(`default model is not configured: ${providerName}`)
+  }
+
+  return {
+    providerName: providerConfig.name,
+    name: providerConfig.defaultModel,
+  }
+}
+
 export function cancelSessionInterpretation(state: SessionState): void {
   interpretationControllers.get(state.sessionId)?.abort()
 }
@@ -92,9 +154,7 @@ export async function loadSessionState(
     state.isLoading = true
   }
 
-  state.error = undefined
-  state.errorRetryable = false
-  state.errorInputPersisted = false
+  clearSessionError(state)
 
   try {
     const session = await semiosis.sessions.get(sessionId)
@@ -139,119 +199,6 @@ export async function loadSessionState(
   }
 }
 
-export async function interpretSession(
-  state: SessionState,
-  content: string,
-  options: { signal?: AbortSignal; turnId?: string } = {},
-): Promise<boolean> {
-  state.interpreting = true
-  state.error = undefined
-  state.errorRetryable = false
-  state.errorInputPersisted = false
-
-  const controller =
-    options.signal === undefined ? new AbortController() : undefined
-  const signal = options.signal ?? controller?.signal
-
-  if (controller !== undefined) {
-    interpretationControllers.set(state.sessionId, controller)
-  }
-
-  try {
-    const settings = await semiosis.settings.get()
-    const providerName = settings.defaultProvider
-
-    if (providerName === null) {
-      throw new Error("default provider is not configured")
-    }
-
-    const providerConfig = await semiosis.providers.get(providerName)
-
-    if (providerConfig === undefined) {
-      throw new Error(`provider not found: ${providerName}`)
-    }
-
-    if (providerConfig.defaultModel === null) {
-      throw new Error(`default model is not configured: ${providerName}`)
-    }
-
-    const modelRef: S.ModelRef = {
-      providerName: providerConfig.name,
-      name: providerConfig.defaultModel,
-    }
-
-    state.modelRef = modelRef
-
-    const input: S.UserSign = {
-      kind: "UserSign",
-      content,
-    }
-    const turnId = options.turnId ?? `turn-${crypto.randomUUID()}`
-
-    if (state.activeTurn?.turnId !== turnId) {
-      if (state.activeTurn !== undefined && state.errorInputPersisted) {
-        state.context.push(...state.activeTurn.signs)
-      }
-
-      state.activeTurn = {
-        turnId,
-        input: content,
-        signs: [],
-      }
-    } else {
-      state.activeTurn.input = content
-    }
-
-    const activeTurn = state.activeTurn
-
-    for (let attempt = 1; attempt <= maxInterpretAttempts; attempt += 1) {
-      activeTurn.signs = []
-
-      const shouldRetry =
-        (await runInterpretAttempt({
-          state,
-          activeTurn,
-          modelRef,
-          input,
-          signal,
-        })) && attempt < maxInterpretAttempts
-
-      if (!shouldRetry) {
-        if (state.error !== undefined) {
-          activeTurn.input = content
-          return false
-        }
-
-        state.context.push(...activeTurn.signs)
-        state.activeTurn = undefined
-        state.errorRetryable = false
-        state.errorInputPersisted = false
-        return true
-      }
-
-      const delayMs = retryDelaysMs[attempt - 1] ?? retryDelaysMs.at(-1) ?? 0
-      await delay(delayMs)
-    }
-
-    return false
-  } catch (error) {
-    if (signal?.aborted) return false
-
-    state.error = error instanceof Error ? error.message : String(error)
-    state.errorRetryable = false
-    return false
-  } finally {
-    if (
-      controller !== undefined &&
-      interpretationControllers.get(state.sessionId) === controller
-    ) {
-      interpretationControllers.delete(state.sessionId)
-    }
-
-    state.interpreting = false
-  }
-}
-
 async function runInterpretAttempt(options: {
   state: SessionState
   activeTurn: SessionActiveTurn
@@ -291,6 +238,95 @@ async function runInterpretAttempt(options: {
   }
 }
 
+async function runActiveTurnWithRetries(options: {
+  state: SessionState
+  activeTurn: SessionActiveTurn
+  modelRef: S.ModelRef
+  input: S.UserSign
+  signal: AbortSignal | undefined
+}): Promise<boolean> {
+  const { state, activeTurn, modelRef, input, signal } = options
+
+  for (let attempt = 1; attempt <= maxInterpretAttempts; attempt += 1) {
+    activeTurn.signs = []
+
+    const shouldRetry =
+      (await runInterpretAttempt({
+        state,
+        activeTurn,
+        modelRef,
+        input,
+        signal,
+      })) && attempt < maxInterpretAttempts
+
+    if (!shouldRetry) {
+      if (state.error !== undefined) {
+        return false
+      }
+
+      commitActiveTurn(state)
+      clearSessionError(state)
+      return true
+    }
+
+    const delayMs = retryDelaysMs[attempt - 1] ?? retryDelaysMs.at(-1) ?? 0
+    await delay(delayMs)
+  }
+
+  return false
+}
+
+export async function interpretSession(
+  state: SessionState,
+  content: string,
+  options: { signal?: AbortSignal; turnId?: string } = {},
+): Promise<boolean> {
+  state.interpreting = true
+  clearSessionError(state)
+
+  const controller =
+    options.signal === undefined ? new AbortController() : undefined
+  const signal = options.signal ?? controller?.signal
+
+  if (controller !== undefined) {
+    interpretationControllers.set(state.sessionId, controller)
+  }
+
+  try {
+    const modelRef = await readSessionModelRef()
+    state.modelRef = modelRef
+
+    const input: S.UserSign = {
+      kind: "UserSign",
+      content,
+    }
+    const activeTurn = beginActiveTurn(state, content, options.turnId)
+
+    return await runActiveTurnWithRetries({
+      state,
+      activeTurn,
+      modelRef,
+      input,
+      signal,
+    })
+  } catch (error) {
+    if (signal?.aborted) return false
+
+    state.error = error instanceof Error ? error.message : String(error)
+    state.errorRetryable = false
+    return false
+  } finally {
+    if (
+      controller !== undefined &&
+      interpretationControllers.get(state.sessionId) === controller
+    ) {
+      interpretationControllers.delete(state.sessionId)
+    }
+
+    state.interpreting = false
+  }
+}
+
 export async function retrySessionInterpretation(
   state: SessionState,
 ): Promise<boolean> {
@@ -310,21 +346,13 @@ export function editSessionInterpretation(
 
   const input = state.activeTurn.input
   state.activeTurn = undefined
-  state.error = undefined
-  state.errorRetryable = false
-  state.errorInputPersisted = false
+  clearSessionError(state)
   return input
 }
 
 export function dismissSessionError(state: SessionState): void {
-  if (state.activeTurn !== undefined) {
-    state.context.push(...state.activeTurn.signs)
-    state.activeTurn = undefined
-  }
-
-  state.error = undefined
-  state.errorRetryable = false
-  state.errorInputPersisted = false
+  commitActiveTurn(state)
+  clearSessionError(state)
 }
 
 export async function generateSessionTitle(state: SessionState): Promise<void> {
