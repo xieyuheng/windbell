@@ -1,7 +1,3 @@
-# semiosis.js
-
-refactor turn functions
-
 # semiosis-api.js
 
 refactor makeSemiosisRouter.ts
@@ -27,6 +23,8 @@ refactor makeSemiosisRouter.ts
 改空内容时的样式。
 
 - 比如 工作区没有对话。
+
+修复 markdown code block 所使用的背景颜色
 
 # windbell-web.js
 

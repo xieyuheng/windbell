@@ -16,7 +16,6 @@ export type AgentInterpretOptions = {
 export type AgentInterpretEvent =
   { type: "sign"; sign: Sign } | { type: "input-persisted" }
 
-
 export async function* agentInterpret(
   agent: Agent,
   input: Array<Sign>,
