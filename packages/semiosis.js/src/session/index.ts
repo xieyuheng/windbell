@@ -1,4 +1,5 @@
 export * from "./Session.ts"
+export * from "./Turn.ts"
 export * from "./makeAgentFromSession.ts"
 export * from "./makeSessionContext.ts"
 export * from "./generateTitle.ts"

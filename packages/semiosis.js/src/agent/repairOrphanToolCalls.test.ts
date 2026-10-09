@@ -16,7 +16,11 @@ import {
 import { makeToolRouter, type ToolRouter } from "../tool/index.ts"
 import { makeAgentFromSession } from "../session/index.ts"
 import { makeAgent, type Agent } from "./Agent.ts"
-import { agentInterpret, type AgentInterpretEvent } from "./agentInterpret.ts"
+import {
+  agentContinue,
+  agentInterpret,
+  type AgentInterpretEvent,
+} from "./agentInterpret.ts"
 import { repairOrphanToolCalls } from "./repairOrphanToolCalls.ts"
 
 const emptyObjectSchema = {
@@ -356,4 +360,32 @@ test("agentInterpret yields error event when model.interpret throws", async () =
   assert.equal(lastEvent?.type, "error")
   if (lastEvent?.type !== "error") return
   assert.equal(lastEvent.error, error)
+  assert.equal(lastEvent.inputPersisted, false)
+  assert.deepEqual(context, [])
+})
+
+test("agentContinue continues from persisted context without appending input", async () => {
+  const context: Array<Sign> = [UserSign("hello")]
+  let interpretedContext: Array<Sign> = []
+  const model: Model = {
+    providerName: "test",
+    name: "test",
+    interpret: async (input) => {
+      interpretedContext = [...input]
+      return []
+    },
+  }
+  const agent = makeTestAgent(context, model)
+
+  const yielded = await collectAgentInterpretSigns(agentContinue(agent))
+
+  assert.deepEqual(yielded, [])
+  assert.deepEqual(
+    interpretedContext.map((sign) => sign.kind),
+    ["UserSign"],
+  )
+  assert.deepEqual(
+    context.map((sign) => sign.kind),
+    ["UserSign"],
+  )
 })

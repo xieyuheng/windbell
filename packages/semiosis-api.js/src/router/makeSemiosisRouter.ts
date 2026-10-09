@@ -10,6 +10,7 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
   const service = makeSemiosisService({
     database: options.database,
   })
+  const runningTurns = new Set<string>()
 
   app.get("/health", async () => {
     return sendJson(200, {
@@ -365,6 +366,7 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const sessionId = c.req.param("sessionId")
     const body = readRecord(await readJsonBody(c))
     const modelOptions = readModel(body, "model")
+    const turnId = readTurnId(body)
     const input = readSigns(body, "input")
 
     const session = await service.sessions.get(sessionId)
@@ -376,6 +378,35 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     if (workspace === undefined) {
       throw new HTTPException(404, {
         message: `workspace not found: ${session.workspaceId}`,
+      })
+    }
+
+    const inputHash = S.makeInputHash(input)
+    const existingTurn = await service.sessions.getTurn(sessionId, turnId)
+
+    if (existingTurn !== undefined && existingTurn.inputHash !== inputHash) {
+      throw new HTTPException(409, {
+        message: `turn input mismatch: ${turnId}`,
+      })
+    }
+
+    if (existingTurn?.status === "completed") {
+      c.header("Content-Type", "application/x-ndjson; charset=utf-8")
+      c.header("Cache-Control", "no-store")
+      c.header("X-Accel-Buffering", "no")
+
+      return stream(c, async (stream) => {
+        const signs = await service.sessions.sliceContextBySequence(
+          sessionId,
+          existingTurn.startSequence,
+          existingTurn.endSequence,
+        )
+
+        for (const sign of signs) {
+          await stream.writeln(JSON.stringify({ type: "sign", sign }))
+        }
+
+        await stream.writeln(JSON.stringify({ type: "done" }))
       })
     }
 
@@ -394,27 +425,82 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       makeToolRouter: () => toolRouter,
     })
 
+    const now = Date.now()
+    const startSequence =
+      existingTurn?.startSequence ??
+      (await service.sessions.nextSignSequence(sessionId))
+
+    const turn: S.Turn =
+      existingTurn === undefined
+        ? {
+            id: turnId,
+            sessionId,
+            status: "pending",
+            model: modelOptions,
+            inputHash,
+            inputPersisted: false,
+            startSequence,
+            endSequence: startSequence,
+            createdAt: now,
+            updatedAt: now,
+          }
+        : {
+            ...existingTurn,
+            status: "pending",
+            error: undefined,
+            updatedAt: now,
+          }
+
+    await service.sessions.putTurn(turn)
+
     c.header("Content-Type", "application/x-ndjson; charset=utf-8")
     c.header("Cache-Control", "no-store")
     c.header("X-Accel-Buffering", "no")
 
+    const turnKey = `${sessionId}:${turnId}`
+    if (runningTurns.has(turnKey)) {
+      throw new HTTPException(409, {
+        message: `turn is already running: ${turnId}`,
+      })
+    }
+    runningTurns.add(turnKey)
+
     return stream(c, async (stream) => {
+      const inputSigns = new Set(input)
+
       try {
-        for await (const event of S.agentInterpret(agent, input, {
-          signal: c.req.raw.signal,
-        })) {
+        const interpreter = turn.inputPersisted
+          ? S.agentContinue(agent, { signal: c.req.raw.signal })
+          : S.agentInterpret(agent, input, { signal: c.req.raw.signal })
+
+        for await (const event of interpreter) {
           if (event.type === "error") {
+            turn.status = "failed"
+            turn.error = errorMessage(event.error)
+            turn.inputPersisted = event.inputPersisted
+            turn.endSequence =
+              await service.sessions.nextSignSequence(sessionId)
+            turn.updatedAt = Date.now()
+            await service.sessions.putTurn(turn)
+
             await stream.writeln(
               JSON.stringify({
                 type: "error",
-                message:
-                  event.error instanceof Error
-                    ? event.error.message
-                    : String(event.error),
+                message: turn.error,
+                retryable: isRetryableError(event.error),
+                inputPersisted: event.inputPersisted,
               }),
             )
             return
           }
+
+          if (!turn.inputPersisted && inputSigns.has(event.sign)) {
+            turn.inputPersisted = true
+          }
+
+          turn.endSequence = await service.sessions.nextSignSequence(sessionId)
+          turn.updatedAt = Date.now()
+          await service.sessions.putTurn(turn)
 
           await stream.writeln(
             JSON.stringify({
@@ -424,16 +510,32 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
           )
         }
 
+        turn.status = "completed"
+        turn.completedAt = Date.now()
+        turn.endSequence = await service.sessions.nextSignSequence(sessionId)
+        turn.updatedAt = Date.now()
+        await service.sessions.putTurn(turn)
+
         await stream.writeln(JSON.stringify({ type: "done" }))
       } catch (error) {
         if (stream.aborted) return
 
+        turn.status = "failed"
+        turn.error = errorMessage(error)
+        turn.endSequence = await service.sessions.nextSignSequence(sessionId)
+        turn.updatedAt = Date.now()
+        await service.sessions.putTurn(turn)
+
         await stream.writeln(
           JSON.stringify({
             type: "error",
-            message: error instanceof Error ? error.message : String(error),
+            message: turn.error,
+            retryable: isRetryableError(error),
+            inputPersisted: turn.inputPersisted,
           }),
         )
+      } finally {
+        runningTurns.delete(turnKey)
       }
     })
   })
@@ -474,6 +576,34 @@ async function runDustbinAction(action: () => Promise<void>): Promise<void> {
 
     throw error
   }
+}
+
+function readTurnId(body: Record<string, unknown>): string {
+  const value = readString(body, "turnId")
+  if (!/^[a-zA-Z0-9_-]+$/.test(value)) {
+    throw new HTTPException(400, {
+      message: `field \`turnId\` is invalid: ${value}`,
+    })
+  }
+
+  return value
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error)
+}
+
+function isRetryableError(error: unknown): boolean {
+  if (error instanceof TypeError) return true
+
+  if (error !== null && typeof error === "object") {
+    const status = (error as { status?: unknown }).status
+    if (typeof status === "number") {
+      return status === 408 || status === 429 || status >= 500
+    }
+  }
+
+  return false
 }
 
 async function readJsonBody(c: Context): Promise<unknown> {

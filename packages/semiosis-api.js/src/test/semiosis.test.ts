@@ -128,22 +128,49 @@ test("semiosis client and server", async (t) => {
 
   const signs: Array<S.Sign> = []
 
-  for await (const sign of client.sessions.interpret({
+  for await (const event of client.sessions.interpret({
     sessionId: session.id,
     model: {
       providerName: "mock",
       name: "conversation",
     },
+    turnId: "turn-test-1",
     input: [S.UserSign("hello")],
   })) {
-    signs.push(sign)
+    if (event.type === "error") throw event.error
+
+    signs.push(event.sign)
   }
 
   assert.ok(signs.length > 0)
   assert.equal(signs[0]?.kind, "UserSign")
 
+  const beforeReplay = await client.sessions.get(session.id)
+
+  const replayedSigns: Array<S.Sign> = []
+
+  for await (const event of client.sessions.interpret({
+    sessionId: session.id,
+    model: {
+      providerName: "mock",
+      name: "conversation",
+    },
+    turnId: "turn-test-1",
+    input: [S.UserSign("hello")],
+  })) {
+    if (event.type === "error") throw event.error
+
+    replayedSigns.push(event.sign)
+  }
+
+  assert.deepEqual(
+    replayedSigns.map((sign) => sign.kind),
+    signs.map((sign) => sign.kind),
+  )
+
   const gotSession = await client.sessions.get(session.id)
   assert.ok((gotSession?.context.length ?? 0) > 1)
+  assert.equal(gotSession?.context.length, beforeReplay?.context.length)
 
   const updatedWorkspace = await client.workspaces.get(workspace.id)
   assert.equal(updatedWorkspace?.updatedAt, gotSession?.updatedAt)

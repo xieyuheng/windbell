@@ -29,6 +29,7 @@ export type GenerateTitleOptions = {
 export type InterpretOptions = {
   sessionId: S.SessionId
   model: S.ModelRef
+  turnId: string
   input: Array<S.Sign>
   signal?: AbortSignal
 }
@@ -36,7 +37,31 @@ export type InterpretOptions = {
 export type InterpretEvent =
   | { type: "sign"; sign: S.Sign }
   | { type: "done" }
-  | { type: "error"; message: string }
+  | {
+      type: "error"
+      message: string
+      retryable: boolean
+      inputPersisted: boolean
+    }
+
+export class InterpretError extends Error {
+  retryable: boolean
+  inputPersisted: boolean
+
+  constructor(options: {
+    message: string
+    retryable: boolean
+    inputPersisted: boolean
+  }) {
+    super(options.message)
+    this.name = "InterpretError"
+    this.retryable = options.retryable
+    this.inputPersisted = options.inputPersisted
+  }
+}
+
+export type SessionsInterpretEvent =
+  { type: "sign"; sign: S.Sign } | { type: "error"; error: InterpretError }
 
 export type SessionsClient = {
   list(options: ListSessionsOptions): Promise<Array<S.SessionIndex>>
@@ -44,7 +69,7 @@ export type SessionsClient = {
   get(id: S.SessionId): Promise<S.Session | undefined>
   put(session: S.Session): Promise<void>
   generateTitle(options: GenerateTitleOptions): Promise<string>
-  interpret(options: InterpretOptions): AsyncGenerator<S.Sign>
+  interpret(options: InterpretOptions): AsyncGenerator<SessionsInterpretEvent>
   remove(id: S.SessionId): Promise<void>
 }
 
@@ -96,7 +121,9 @@ export function makeSessionsClient(
       output: GenerateTitleOutputSchema,
     }),
 
-    async *interpret(options: InterpretOptions) {
+    async *interpret(
+      options: InterpretOptions,
+    ): AsyncGenerator<SessionsInterpretEvent> {
       for await (const event of requestNdjson<InterpretEvent>({
         baseUrl: config.baseUrl,
         method: "POST",
@@ -104,14 +131,23 @@ export function makeSessionsClient(
         body: {
           sessionId: options.sessionId,
           model: options.model,
+          turnId: options.turnId,
           input: options.input,
         },
         signal: options.signal,
       })) {
         if (event.type === "sign") {
-          yield event.sign
+          yield { type: "sign", sign: event.sign }
         } else if (event.type === "error") {
-          throw new Error(event.message)
+          yield {
+            type: "error",
+            error: new InterpretError({
+              message: event.message,
+              retryable: event.retryable,
+              inputPersisted: event.inputPersisted,
+            }),
+          }
+          return
         } else if (event.type === "done") {
           return
         }

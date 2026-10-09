@@ -157,14 +157,21 @@ export async function interpretSession(
       kind: "UserSign",
       content,
     }
+    const turnId = `turn-${crypto.randomUUID()}`
 
-    for await (const sign of semiosis.sessions.interpret({
+    for await (const event of semiosis.sessions.interpret({
       sessionId: state.sessionId,
       model: modelRef,
+      turnId,
       input: [input],
       signal,
     })) {
-      state.context.push(sign)
+      if (event.type === "error") {
+        state.error = event.error.message
+        return false
+      }
+
+      state.context.push(event.sign)
     }
 
     return true

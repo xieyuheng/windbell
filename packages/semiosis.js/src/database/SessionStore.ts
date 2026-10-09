@@ -1,6 +1,7 @@
 import fs from "node:fs/promises"
 import Path from "node:path"
 import type { Session, SessionId, SessionIndex } from "../session/Session.ts"
+import type { Turn, TurnId } from "../session/Turn.ts"
 import type { Sign } from "../sign/index.ts"
 import type { WorkspaceId } from "../workspace/Workspace.ts"
 import { assertId, isValidId, makeId } from "./id.ts"
@@ -39,7 +40,16 @@ export type SessionStore = {
   get(id: SessionId): Promise<Session | undefined>
   list(options: ListSessionOptions): Promise<Array<SessionIndex>>
   put(session: Session): Promise<void>
-  appendSign(id: SessionId, sign: Sign): Promise<void>
+  appendSign(id: SessionId, sign: Sign): Promise<number>
+  nextSignSequence(id: SessionId): Promise<number>
+  sliceContextBySequence(
+    id: SessionId,
+    startSequence: number,
+    endSequence: number,
+  ): Promise<Array<Sign>>
+  getTurn(sessionId: SessionId, turnId: TurnId): Promise<Turn | undefined>
+  putTurn(turn: Turn): Promise<void>
+  listTurns(sessionId: SessionId): Promise<Array<Turn>>
   updateTitle(id: SessionId, title: string): Promise<void>
   remove(id: SessionId): Promise<void>
 }
@@ -56,8 +66,16 @@ export function makeSessionStore(options: SessionStoreOptions): SessionStore {
     return Path.join(sessionDir(id), "context")
   }
 
+  const turnsDir = (id: SessionId): string => {
+    return Path.join(sessionDir(id), "turns")
+  }
+
   const indexPath = (id: SessionId): string => {
     return Path.join(sessionDir(id), "index.json")
+  }
+
+  const turnPath = (sessionId: SessionId, turnId: TurnId): string => {
+    return Path.join(turnsDir(sessionId), `${turnId}.json`)
   }
 
   const readIndex = async (
@@ -71,7 +89,9 @@ export function makeSessionStore(options: SessionStoreOptions): SessionStore {
     return value as SessionIndex
   }
 
-  const readContext = async (id: SessionId): Promise<Array<Sign>> => {
+  const readContextEntries = async (
+    id: SessionId,
+  ): Promise<Array<{ sequence: number; sign: Sign }>> => {
     const directory = contextDir(id)
     const fileNames = await listFiles(directory)
     const entries: Array<{ sequence: number; sign: Sign }> = []
@@ -90,6 +110,11 @@ export function makeSessionStore(options: SessionStoreOptions): SessionStore {
     }
 
     entries.sort((a, b) => a.sequence - b.sequence)
+    return entries
+  }
+
+  const readContext = async (id: SessionId): Promise<Array<Sign>> => {
+    const entries = await readContextEntries(id)
     return entries.map((entry) => entry.sign)
   }
 
@@ -169,6 +194,7 @@ export function makeSessionStore(options: SessionStoreOptions): SessionStore {
       assertId(session.id)
 
       await fs.rm(contextDir(session.id), { recursive: true, force: true })
+      await fs.rm(turnsDir(session.id), { recursive: true, force: true })
       await ensureDir(contextDir(session.id))
 
       const index: SessionIndex = {
@@ -213,6 +239,59 @@ export function makeSessionStore(options: SessionStoreOptions): SessionStore {
 
       await writeJsonFile(indexPath(id), updatedIndex)
       await onSessionUpdated?.(updatedIndex)
+
+      return sequence
+    },
+
+    nextSignSequence,
+
+    async sliceContextBySequence(id, startSequence, endSequence) {
+      const entries = await readContextEntries(id)
+
+      return entries
+        .filter(
+          (entry) =>
+            entry.sequence >= startSequence && entry.sequence < endSequence,
+        )
+        .map((entry) => entry.sign)
+    },
+
+    async getTurn(sessionId, turnId) {
+      assertId(sessionId)
+      assertId(turnId)
+
+      const value = await readJsonFile(turnPath(sessionId, turnId))
+      if (value === undefined) return undefined
+
+      return value as Turn
+    },
+
+    async putTurn(turn) {
+      assertId(turn.sessionId)
+      assertId(turn.id)
+
+      await writeJsonFile(turnPath(turn.sessionId, turn.id), turn)
+    },
+
+    async listTurns(sessionId) {
+      assertId(sessionId)
+
+      const fileNames = await listFiles(turnsDir(sessionId))
+      const turns: Array<Turn> = []
+
+      for (const fileName of fileNames) {
+        if (!fileName.endsWith(".json")) continue
+
+        const value = await readJsonFile(
+          Path.join(turnsDir(sessionId), fileName),
+        )
+        if (value === undefined) continue
+
+        turns.push(value as Turn)
+      }
+
+      turns.sort((a, b) => a.createdAt - b.createdAt)
+      return turns
     },
 
     async updateTitle(id, title) {
