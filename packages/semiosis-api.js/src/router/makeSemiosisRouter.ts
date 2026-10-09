@@ -10,7 +10,7 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
   const service = makeSemiosisService({
     database: options.database,
   })
-  const runningTurns = new Set<string>()
+  const turnLock = new S.TurnLock()
 
   app.get("/health", async () => {
     return sendJson(200, {
@@ -381,163 +381,120 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       })
     }
 
-    const inputHash = S.makeInputHash(input)
-    const existingTurn = await service.sessions.getTurn(sessionId, turnId)
-
-    if (existingTurn !== undefined && existingTurn.inputHash !== inputHash) {
-      throw new HTTPException(409, {
-        message: `turn input mismatch: ${turnId}`,
-      })
-    }
-
-    if (existingTurn?.status === "completed") {
-      c.header("Content-Type", "application/x-ndjson; charset=utf-8")
-      c.header("Cache-Control", "no-store")
-      c.header("X-Accel-Buffering", "no")
-
-      return stream(c, async (stream) => {
-        const signs = await service.sessions.sliceContextBySequence(
-          sessionId,
-          existingTurn.startSequence,
-          existingTurn.endSequence,
-        )
-
-        for (const sign of signs) {
-          await stream.writeln(JSON.stringify({ type: "sign", sign }))
-        }
-
-        await stream.writeln(JSON.stringify({ type: "done" }))
-      })
-    }
-
-    const model = await S.makeModel(modelOptions, {
-      database: options.database,
-    })
-
-    const toolRouter = S.makeDefaultToolRouter({
-      cwd: workspace.root,
-    })
-
-    const agent = await S.makeAgentFromSession({
-      database: options.database,
-      sessionId: session.id,
-      model,
-      makeToolRouter: () => toolRouter,
-    })
-
-    const now = Date.now()
-    const startSequence =
-      existingTurn?.startSequence ??
-      (await service.sessions.nextSignSequence(sessionId))
-
-    const turn: S.Turn =
-      existingTurn === undefined
-        ? {
-            id: turnId,
-            sessionId,
-            status: "pending",
-            model: modelOptions,
-            inputHash,
-            inputPersisted: false,
-            startSequence,
-            endSequence: startSequence,
-            createdAt: now,
-            updatedAt: now,
-          }
-        : {
-            ...existingTurn,
-            status: "pending",
-            error: undefined,
-            updatedAt: now,
-          }
-
-    await service.sessions.putTurn(turn)
-
     c.header("Content-Type", "application/x-ndjson; charset=utf-8")
     c.header("Cache-Control", "no-store")
     c.header("X-Accel-Buffering", "no")
 
-    const turnKey = `${sessionId}:${turnId}`
-    if (runningTurns.has(turnKey)) {
-      throw new HTTPException(409, {
-        message: `turn is already running: ${turnId}`,
-      })
+    let unlock: () => void
+
+    try {
+      unlock = turnLock.tryLock(sessionId, turnId)
+    } catch (error) {
+      if (error instanceof S.TurnAlreadyRunningError) {
+        throw new HTTPException(409, { message: error.message })
+      }
+
+      throw error
     }
-    runningTurns.add(turnKey)
 
-    return stream(c, async (stream) => {
-      const inputSigns = new Set(input)
+    try {
+      const resolved = await S.resolveTurn({
+        sessions: service.sessions,
+        sessionId,
+        turnId,
+        model: modelOptions,
+        input,
+      })
 
-      try {
-        const interpreter = turn.inputPersisted
-          ? S.agentContinue(agent, { signal: c.req.raw.signal })
-          : S.agentInterpret(agent, input, { signal: c.req.raw.signal })
+      if (resolved.kind === "replay") {
+        return stream(c, async (stream) => {
+          try {
+            for await (const sign of S.replayTurn({
+              sessions: service.sessions,
+              turn: resolved.turn,
+            })) {
+              await stream.writeln(JSON.stringify({ type: "sign", sign }))
+            }
 
-        for await (const event of interpreter) {
-          if (event.type === "error") {
-            turn.status = "failed"
-            turn.error = errorMessage(event.error)
-            turn.inputPersisted = event.inputPersisted
-            turn.endSequence =
-              await service.sessions.nextSignSequence(sessionId)
-            turn.updatedAt = Date.now()
-            await service.sessions.putTurn(turn)
+            await stream.writeln(JSON.stringify({ type: "done" }))
+          } finally {
+            unlock()
+          }
+        })
+      }
+
+      const model = await S.makeModel(resolved.turn.model, {
+        database: options.database,
+      })
+
+      const toolRouter = S.makeDefaultToolRouter({
+        cwd: workspace.root,
+      })
+
+      const agent = await S.makeAgentFromSession({
+        database: options.database,
+        sessionId: session.id,
+        model,
+        makeToolRouter: () => toolRouter,
+      })
+
+      return stream(c, async (stream) => {
+        try {
+          for await (const event of S.runTurn({
+            sessions: service.sessions,
+            agent,
+            turn: resolved.turn,
+            input,
+            signal: c.req.raw.signal,
+          })) {
+            if (event.type === "error") {
+              await stream.writeln(
+                JSON.stringify({
+                  type: "error",
+                  message: errorMessage(event.error),
+                  retryable: isRetryableError(event.error),
+                  inputPersisted: event.inputPersisted,
+                }),
+              )
+              return
+            }
 
             await stream.writeln(
               JSON.stringify({
-                type: "error",
-                message: turn.error,
-                retryable: isRetryableError(event.error),
-                inputPersisted: event.inputPersisted,
+                type: "sign",
+                sign: event.sign,
               }),
             )
-            return
           }
 
-          if (!turn.inputPersisted && inputSigns.has(event.sign)) {
-            turn.inputPersisted = true
-          }
-
-          turn.endSequence = await service.sessions.nextSignSequence(sessionId)
-          turn.updatedAt = Date.now()
-          await service.sessions.putTurn(turn)
+          await stream.writeln(JSON.stringify({ type: "done" }))
+        } catch (error) {
+          if (stream.aborted) return
 
           await stream.writeln(
             JSON.stringify({
-              type: "sign",
-              sign: event.sign,
+              type: "error",
+              message: errorMessage(error),
+              retryable: isRetryableError(error),
+              inputPersisted: resolved.turn.inputPersisted,
             }),
           )
+        } finally {
+          unlock()
         }
+      })
+    } catch (error) {
+      unlock()
 
-        turn.status = "completed"
-        turn.completedAt = Date.now()
-        turn.endSequence = await service.sessions.nextSignSequence(sessionId)
-        turn.updatedAt = Date.now()
-        await service.sessions.putTurn(turn)
-
-        await stream.writeln(JSON.stringify({ type: "done" }))
-      } catch (error) {
-        if (stream.aborted) return
-
-        turn.status = "failed"
-        turn.error = errorMessage(error)
-        turn.endSequence = await service.sessions.nextSignSequence(sessionId)
-        turn.updatedAt = Date.now()
-        await service.sessions.putTurn(turn)
-
-        await stream.writeln(
-          JSON.stringify({
-            type: "error",
-            message: turn.error,
-            retryable: isRetryableError(error),
-            inputPersisted: turn.inputPersisted,
-          }),
-        )
-      } finally {
-        runningTurns.delete(turnKey)
+      if (
+        error instanceof S.TurnInputMismatchError ||
+        error instanceof S.TurnModelMismatchError
+      ) {
+        throw new HTTPException(409, { message: error.message })
       }
-    })
+
+      throw error
+    }
   })
 
   app.onError((error) => sendError(error))

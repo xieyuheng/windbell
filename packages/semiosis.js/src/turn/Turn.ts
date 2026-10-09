@@ -1,11 +1,15 @@
 import { createHash } from "node:crypto"
 import type { ModelRef } from "../model/index.ts"
 import type { Sign } from "../sign/index.ts"
-import type { SessionId } from "./Session.ts"
+import type { SessionId } from "../session/Session.ts"
 
 export type TurnId = string
 
-export type TurnStatus = "pending" | "completed" | "failed" | "cancelled"
+export type TurnStatus =
+  | "pending"
+  | "completed"
+  | "failed"
+  | "cancelled"
 
 export type Turn = {
   id: TurnId
