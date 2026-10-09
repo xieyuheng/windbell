@@ -4,6 +4,10 @@ import type {
   Message,
   Tool,
 } from "../client/index.ts"
+import type {
+  ModelInterpretEvent,
+  ModelInterpretOptions,
+} from "../../../model/index.ts"
 import {
   AssistantSign,
   ProviderDataSign,
@@ -22,11 +26,12 @@ import {
 } from "../../../sign/index.ts"
 import type { ModelConfig } from "./ModelConfig.ts"
 
-export async function interpret(
+export async function* interpret(
   client: Client,
   config: ModelConfig,
   input: Array<Sign>,
-): Promise<Array<Sign>> {
+  options: ModelInterpretOptions = {},
+): AsyncGenerator<ModelInterpretEvent> {
   const request: ChatCompletionInput = {
     model: config.name,
     messages: Array.from(parseMessage(input)),
@@ -45,10 +50,135 @@ export async function interpret(
     request.extraBody = config.extraBody
   }
 
-  const output = await client.chat.completions.create(request)
-  const message = output.choices[0].message
+  let reasoning = ""
+  let content = ""
+  const reasoningDetails: Array<Record<string, unknown>> = []
+  const toolCalls = new Map<number, ToolCallSign>()
 
-  return makeOutputSigns(message)
+  for await (const chunk of client.chat.completions.createStream(request, {
+    signal: options.signal,
+  })) {
+    const delta = chunk.choices?.[0]?.delta
+    if (delta === undefined) continue
+
+    if (typeof delta.reasoning === "string" && delta.reasoning !== "") {
+      reasoning += delta.reasoning
+      yield {
+        type: "delta",
+        delta: {
+          signKind: "ReasoningSign",
+          content: delta.reasoning,
+        },
+      }
+    }
+
+    if (delta.reasoning_details !== undefined) {
+      addReasoningDetails(reasoningDetails, delta.reasoning_details)
+    }
+
+    if (typeof delta.content === "string" && delta.content !== "") {
+      content += delta.content
+      yield {
+        type: "delta",
+        delta: {
+          signKind: "AssistantSign",
+          content: delta.content,
+        },
+      }
+    }
+
+    for (const toolCallDelta of delta.tool_calls ?? []) {
+      const index = toolCallDelta.index ?? 0
+      const toolCall =
+        toolCalls.get(index) ??
+        ToolCallSign({
+          callId: "",
+          name: "",
+          arguments: "",
+        })
+
+      if (toolCallDelta.id !== undefined) {
+        toolCall.callId = toolCallDelta.id
+      }
+
+      if (toolCallDelta.function?.name !== undefined) {
+        toolCall.name += toolCallDelta.function.name
+      }
+
+      if (toolCallDelta.function?.arguments !== undefined) {
+        toolCall.arguments += toolCallDelta.function.arguments
+      }
+
+      toolCalls.set(index, toolCall)
+    }
+  }
+
+  if (reasoning !== "") {
+    yield { type: "sign", sign: ReasoningSign(reasoning) }
+  }
+
+  const details = reasoningDetails.filter(
+    (detail): detail is Record<string, unknown> => detail !== undefined,
+  )
+  if (details.length !== 0) {
+    yield {
+      type: "sign",
+      sign: ProviderDataSign({
+        provider: "openrouter",
+        field: "reasoning_details",
+        data: details,
+      }),
+    }
+  }
+
+  if (content !== "") {
+    yield { type: "sign", sign: AssistantSign(content) }
+  }
+
+  for (const [index, toolCall] of [...toolCalls.entries()].sort(
+    ([left], [right]) => left - right,
+  )) {
+    if (toolCall.callId === "") {
+      toolCall.callId = `tool-call-${index}`
+    }
+
+    yield { type: "sign", sign: toolCall }
+  }
+}
+
+function addReasoningDetails(
+  target: Array<Record<string, unknown>>,
+  value: unknown,
+): void {
+  if (!Array.isArray(value)) return
+
+  for (const item of value) {
+    if (item === null || typeof item !== "object" || Array.isArray(item)) {
+      continue
+    }
+
+    const detail = item as Record<string, unknown>
+    const index =
+      typeof detail.index === "number" ? detail.index : target.length
+    const existing = target[index]
+
+    if (existing === undefined) {
+      target[index] = { ...detail }
+      continue
+    }
+
+    for (const [key, next] of Object.entries(detail)) {
+      if (
+        key === "text" &&
+        typeof next === "string" &&
+        typeof existing.text === "string"
+      ) {
+        existing.text += next
+      } else {
+        existing[key] = next
+      }
+    }
+  }
 }
 
 function* parseMessage(signs: Array<Sign>): Generator<Message> {
@@ -152,52 +282,6 @@ function makeMessage(sign: Sign): Message {
   }
 
   throw new Error(`[interpret] unexpected message sign: ${sign.kind}`)
-}
-
-function makeOutputSigns(message: Message): Array<Sign> {
-  const signs: Array<Sign> = []
-
-  if (
-    message.reasoning !== undefined &&
-    message.reasoning !== null &&
-    message.reasoning !== ""
-  ) {
-    signs.push(ReasoningSign(message.reasoning))
-  }
-
-  if (
-    message.reasoning_details !== undefined &&
-    message.reasoning_details !== null &&
-    message.reasoning_details.length !== 0
-  ) {
-    signs.push(
-      ProviderDataSign({
-        provider: "openrouter",
-        field: "reasoning_details",
-        data: message.reasoning_details,
-      }),
-    )
-  }
-
-  if (
-    message.content !== undefined &&
-    message.content !== null &&
-    message.content !== ""
-  ) {
-    signs.push(AssistantSign(message.content))
-  }
-
-  for (const toolCall of message.tool_calls ?? []) {
-    signs.push(
-      ToolCallSign({
-        callId: toolCall.id,
-        name: toolCall.function.name,
-        arguments: toolCall.function.arguments,
-      }),
-    )
-  }
-
-  return signs
 }
 
 function makeTool(sign: ToolSign): Tool {

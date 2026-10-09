@@ -7,6 +7,6 @@ export function makeModel(client: Client, config: ModelConfig): Model {
   return {
     providerName: "deepseek",
     name: config.name,
-    interpret: (input) => interpret(client, config, input),
+    interpret: (input, options) => interpret(client, config, input, options),
   }
 }

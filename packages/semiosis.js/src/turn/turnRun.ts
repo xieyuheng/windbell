@@ -43,6 +43,11 @@ export async function* turnRun(
         continue
       }
 
+      if (event.type === "delta") {
+        yield { type: "delta", delta: event.delta }
+        continue
+      }
+
       turn.endSequence = await sessions.nextSignSequence(turn.sessionId)
       turn.updatedAt = Date.now()
       await sessions.putTurn(turn)

@@ -18,7 +18,7 @@ export function makeMockModel(
     ...ref,
     turns: [],
     step: 0,
-    interpret: async (input) => {
+    interpret: async function* (input) {
       model.turns.push(input)
 
       const output = outputs[model.step]
@@ -27,7 +27,10 @@ export function makeMockModel(
       }
 
       model.step += 1
-      return output
+
+      for (const sign of output) {
+        yield { type: "sign", sign }
+      }
     },
   }
 

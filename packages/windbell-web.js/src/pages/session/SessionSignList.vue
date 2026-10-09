@@ -27,10 +27,25 @@ const bottomAnchorVisible = ref(true)
 const title = computed(() =>
   props.state.hasLoaded ? props.state.title || t("notFound") : "",
 )
-const signs = computed(() => [
-  ...props.state.context,
-  ...(props.state.activeTurn?.signs ?? []),
-])
+const signs = computed(() => {
+  const activeTurn = props.state.activeTurn
+  if (activeTurn === undefined) return props.state.context
+
+  const activeSigns = [...activeTurn.signs]
+
+  if (!activeSigns.some((sign) => sign.kind === "UserSign")) {
+    activeSigns.unshift({
+      kind: "UserSign",
+      content: activeTurn.input,
+    })
+  }
+
+  if (activeTurn.partialSign !== undefined) {
+    activeSigns.push(activeTurn.partialSign)
+  }
+
+  return [...props.state.context, ...activeSigns]
+})
 
 let bottomObserver: IntersectionObserver | undefined
 
@@ -69,9 +84,23 @@ onBeforeUnmount(() => {
   bottomObserver?.disconnect()
 })
 
-watch([() => signs.value.length, () => props.state.error], () => {
-  scheduleAutoScroll()
-})
+watch(
+  [
+    () => signs.value.length,
+    () => {
+      const sign = props.state.activeTurn?.partialSign
+      if (sign === undefined) return "none"
+      if (sign.kind === "ReasoningSign" || sign.kind === "AssistantSign") {
+        return `${sign.kind}:${sign.content.length}`
+      }
+      return sign.kind
+    },
+    () => props.state.error,
+  ],
+  () => {
+    scheduleAutoScroll()
+  },
+)
 
 defineExpose({ scrollToBottom })
 </script>

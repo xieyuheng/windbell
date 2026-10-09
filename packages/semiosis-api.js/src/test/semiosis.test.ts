@@ -138,6 +138,7 @@ test("semiosis client and server", async (t) => {
     input: [S.UserSign("hello")],
   })) {
     if (event.type === "error") throw new Error(event.message)
+    if (event.type === "delta") continue
 
     signs.push(event.sign)
   }
@@ -159,6 +160,7 @@ test("semiosis client and server", async (t) => {
     input: [S.UserSign("hello")],
   })) {
     if (event.type === "error") throw new Error(event.message)
+    if (event.type === "delta") continue
 
     replayedSigns.push(event.sign)
   }

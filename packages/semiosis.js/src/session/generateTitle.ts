@@ -1,4 +1,4 @@
-import type { Model } from "../model/index.ts"
+import { collectModelSigns, type Model } from "../model/index.ts"
 import { isAssistantSign, UserSign, type Sign } from "../sign/index.ts"
 
 export type GenerateTitleOptions = {
@@ -15,7 +15,7 @@ export async function generateTitle(
   options: GenerateTitleOptions,
 ): Promise<GenerateTitleResult> {
   try {
-    const output = await options.model.interpret([
+    const output = await collectModelSigns(options.model, [
       ...options.context,
       UserSign(
         "Generate a short title that summarizes the conversation above. Use the conversation's language. Reply with the title only.",

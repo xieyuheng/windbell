@@ -6,6 +6,22 @@ export type SessionActiveTurn = {
   turnId: string
   input: string
   signs: Array<S.Sign>
+  partialSign?: S.Sign
+}
+
+function appendSignDelta(
+  partialSign: S.Sign | undefined,
+  delta: S.SignDelta,
+): S.Sign {
+  const content =
+    partialSign?.kind === delta.signKind && "content" in partialSign
+      ? partialSign.content
+      : ""
+
+  return {
+    kind: delta.signKind,
+    content: content + delta.content,
+  }
 }
 
 export type SessionState = {
@@ -223,7 +239,24 @@ async function runInterpretAttempt(options: {
         return event.retryable
       }
 
+      if (event.type === "delta") {
+        activeTurn.partialSign = appendSignDelta(
+          activeTurn.partialSign,
+          event.delta,
+        )
+        continue
+      }
+
       activeTurn.signs.push(event.sign)
+
+      if (
+        event.sign.kind === "ReasoningSign" ||
+        event.sign.kind === "AssistantSign"
+      ) {
+        if (activeTurn.partialSign?.kind === event.sign.kind) {
+          activeTurn.partialSign = undefined
+        }
+      }
     }
 
     return false
@@ -249,6 +282,7 @@ async function runActiveTurnWithRetries(options: {
 
   for (let attempt = 1; attempt <= maxInterpretAttempts; attempt += 1) {
     activeTurn.signs = []
+    activeTurn.partialSign = undefined
 
     const shouldRetry =
       (await runInterpretAttempt({
@@ -321,6 +355,10 @@ export async function interpretSession(
       interpretationControllers.get(state.sessionId) === controller
     ) {
       interpretationControllers.delete(state.sessionId)
+    }
+
+    if (state.activeTurn !== undefined) {
+      state.activeTurn.partialSign = undefined
     }
 
     state.interpreting = false

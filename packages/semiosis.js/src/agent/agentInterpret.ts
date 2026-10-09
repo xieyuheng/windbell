@@ -4,6 +4,7 @@ import {
   isReasoningSign,
   isToolCallSign,
   type Sign,
+  type SignDelta,
   type ToolCallSign,
 } from "../sign/index.ts"
 import type { Agent } from "./Agent.ts"
@@ -14,7 +15,9 @@ export type AgentInterpretOptions = {
 }
 
 export type AgentInterpretEvent =
-  { type: "sign"; sign: Sign } | { type: "input-persisted" }
+  | { type: "delta"; delta: SignDelta }
+  | { type: "sign"; sign: Sign }
+  | { type: "input-persisted" }
 
 export async function* agentInterpret(
   agent: Agent,
@@ -24,7 +27,9 @@ export async function* agentInterpret(
   yield* repairAgent(agent)
 
   const context = [...(await agent.getContext()), ...input]
-  const output = await agent.model.interpret(context)
+  const output: Array<Sign> = []
+
+  yield* collectModelOutput(agent, context, output, options)
 
   await agent.appendContext(input)
   yield { type: "input-persisted" }
@@ -42,8 +47,9 @@ export async function* agentContinue(
 ): AsyncGenerator<AgentInterpretEvent> {
   yield* repairAgent(agent)
 
-  const output = await agent.model.interpret(await agent.getContext())
+  const output: Array<Sign> = []
 
+  yield* collectModelOutput(agent, await agent.getContext(), output, options)
   yield* runAgentOutput(agent, output, options)
 }
 
@@ -52,6 +58,24 @@ async function* repairAgent(agent: Agent): AsyncGenerator<AgentInterpretEvent> {
 
   for (const sign of repairs) {
     yield { type: "sign", sign }
+  }
+}
+
+async function* collectModelOutput(
+  agent: Agent,
+  context: Array<Sign>,
+  output: Array<Sign>,
+  options: AgentInterpretOptions,
+): AsyncGenerator<AgentInterpretEvent> {
+  for await (const event of agent.model.interpret(context, {
+    signal: options.signal,
+  })) {
+    if (event.type === "delta") {
+      yield { type: "delta", delta: event.delta }
+      continue
+    }
+
+    output.push(event.sign)
   }
 }
 
@@ -96,6 +120,13 @@ async function* runAgentOutput(
 
     if (options.signal?.aborted) return
 
-    output = await agent.model.interpret(await agent.getContext())
+    const nextOutput: Array<Sign> = []
+    yield* collectModelOutput(
+      agent,
+      await agent.getContext(),
+      nextOutput,
+      options,
+    )
+    output = nextOutput
   }
 }

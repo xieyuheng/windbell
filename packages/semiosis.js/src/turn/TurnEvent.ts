@@ -1,6 +1,7 @@
-import type { Sign } from "../sign/index.ts"
+import type { Sign, SignDelta } from "../sign/index.ts"
 
 export type TurnEvent =
+  | { type: "delta"; delta: SignDelta }
   | { type: "sign"; sign: Sign }
   | {
       type: "error"

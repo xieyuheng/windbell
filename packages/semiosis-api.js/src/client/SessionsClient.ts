@@ -35,6 +35,7 @@ export type InterpretOptions = {
 }
 
 export type InterpretEvent =
+  | { type: "delta"; delta: S.SignDelta }
   | { type: "sign"; sign: S.Sign }
   | { type: "done" }
   | {
@@ -45,6 +46,7 @@ export type InterpretEvent =
     }
 
 export type SessionsInterpretEvent =
+  | { type: "delta"; delta: S.SignDelta }
   | { type: "sign"; sign: S.Sign }
   | {
       type: "error"
@@ -126,7 +128,9 @@ export function makeSessionsClient(
         },
         signal: options.signal,
       })) {
-        if (event.type === "sign") {
+        if (event.type === "delta") {
+          yield { type: "delta", delta: event.delta }
+        } else if (event.type === "sign") {
           yield { type: "sign", sign: event.sign }
         } else if (event.type === "error") {
           yield {

@@ -6,6 +6,8 @@ import { test } from "node:test"
 import { makeDatabase } from "../database/index.ts"
 import type { Model } from "../model/index.ts"
 import {
+  AssistantSign,
+  ReasoningSign,
   ToolCallSign,
   ToolOutputSign,
   ToolSign,
@@ -29,11 +31,21 @@ const emptyObjectSchema = {
   additionalProperties: false,
 }
 
-const unusedModel: Model = {
-  providerName: "test",
-  name: "test",
-  interpret: async () => [],
+function makeArrayModel(
+  interpret: (input: Array<Sign>) => Array<Sign> | Promise<Array<Sign>>,
+): Model {
+  return {
+    providerName: "test",
+    name: "test",
+    interpret: async function* (input) {
+      for (const sign of await interpret(input)) {
+        yield { type: "sign", sign }
+      }
+    },
+  }
 }
+
+const unusedModel: Model = makeArrayModel(async () => [])
 
 function makeTestAgent(
   context: Array<Sign>,
@@ -128,14 +140,10 @@ test("agentInterpret repairs orphan tool calls before appending input", async ()
     }),
   ]
   let interpretedContext: Array<Sign> = []
-  const model: Model = {
-    providerName: "test",
-    name: "test",
-    interpret: async (input) => {
-      interpretedContext = [...input]
-      return []
-    },
-  }
+  const model: Model = makeArrayModel(async (input) => {
+    interpretedContext = [...input]
+    return []
+  })
   const agent = makeTestAgent(context, model)
   const yielded = await collectAgentInterpretSigns(
     agentInterpret(agent, [UserSign("next")]),
@@ -166,24 +174,20 @@ test("agentInterpret records a ToolOutputSign for every tool call", async () => 
   })
 
   let turn = 0
-  const model: Model = {
-    providerName: "test",
-    name: "test",
-    interpret: async () => {
-      turn += 1
-      if (turn === 1) {
-        return [
-          ToolCallSign({ callId: "call-ok", name: "ok", arguments: "{}" }),
-          ToolCallSign({
-            callId: "call-fail",
-            name: "fail",
-            arguments: "{}",
-          }),
-        ]
-      }
-      return []
-    },
-  }
+  const model: Model = makeArrayModel(async () => {
+    turn += 1
+    if (turn === 1) {
+      return [
+        ToolCallSign({ callId: "call-ok", name: "ok", arguments: "{}" }),
+        ToolCallSign({
+          callId: "call-fail",
+          name: "fail",
+          arguments: "{}",
+        }),
+      ]
+    }
+    return []
+  })
   const context: Array<Sign> = []
   const agent = makeTestAgent(context, model, toolRouter)
 
@@ -221,14 +225,10 @@ test("agentInterpret repairs persisted orphan tool calls and yields input", asyn
     )
 
     let interpretedContext: Array<Sign> = []
-    const model: Model = {
-      providerName: "test",
-      name: "test",
-      interpret: async (input) => {
-        interpretedContext = [...input]
-        return []
-      },
-    }
+    const model: Model = makeArrayModel(async (input) => {
+      interpretedContext = [...input]
+      return []
+    })
 
     const agent = await makeAgentFromSession({
       database,
@@ -289,29 +289,25 @@ test("agentInterpret marks remaining tool calls cancelled after abort", async ()
   )
 
   let interpretCount = 0
-  const model: Model = {
-    providerName: "test",
-    name: "test",
-    interpret: async () => {
-      interpretCount += 1
-      if (interpretCount === 1) {
-        return [
-          ToolCallSign({
-            callId: "call-first",
-            name: "first",
-            arguments: "{}",
-          }),
-          ToolCallSign({
-            callId: "call-second",
-            name: "second",
-            arguments: "{}",
-          }),
-        ]
-      }
+  const model: Model = makeArrayModel(async () => {
+    interpretCount += 1
+    if (interpretCount === 1) {
+      return [
+        ToolCallSign({
+          callId: "call-first",
+          name: "first",
+          arguments: "{}",
+        }),
+        ToolCallSign({
+          callId: "call-second",
+          name: "second",
+          arguments: "{}",
+        }),
+      ]
+    }
 
-      return []
-    },
-  }
+    return []
+  })
 
   const context: Array<Sign> = []
   const agent = makeTestAgent(context, model, toolRouter)
@@ -336,13 +332,9 @@ test("agentInterpret marks remaining tool calls cancelled after abort", async ()
 
 test("agentInterpret throws when model.interpret throws", async () => {
   const error = new Error("boom")
-  const model: Model = {
-    providerName: "test",
-    name: "test",
-    interpret: async () => {
-      throw error
-    },
-  }
+  const model: Model = makeArrayModel(async () => {
+    throw error
+  })
   const context: Array<Sign> = []
   const agent = makeTestAgent(context, model)
   let caughtError: unknown = undefined
@@ -362,14 +354,10 @@ test("agentInterpret throws when model.interpret throws", async () => {
 test("agentContinue continues from persisted context without appending input", async () => {
   const context: Array<Sign> = [UserSign("hello")]
   let interpretedContext: Array<Sign> = []
-  const model: Model = {
-    providerName: "test",
-    name: "test",
-    interpret: async (input) => {
-      interpretedContext = [...input]
-      return []
-    },
-  }
+  const model: Model = makeArrayModel(async (input) => {
+    interpretedContext = [...input]
+    return []
+  })
   const agent = makeTestAgent(context, model)
 
   const yielded = await collectAgentInterpretSigns(agentContinue(agent))
@@ -382,5 +370,39 @@ test("agentContinue continues from persisted context without appending input", a
   assert.deepEqual(
     context.map((sign) => sign.kind),
     ["UserSign"],
+  )
+})
+
+test("agentInterpret forwards delta model events without persisting them", async () => {
+  const context: Array<Sign> = []
+  const model: Model = {
+    providerName: "test",
+    name: "test",
+    interpret: async function* () {
+      yield {
+        type: "delta",
+        delta: { signKind: "ReasoningSign", content: "r" },
+      }
+      yield {
+        type: "delta",
+        delta: { signKind: "AssistantSign", content: "a" },
+      }
+      yield { type: "sign", sign: AssistantSign("answer") }
+    },
+  }
+  const agent = makeTestAgent(context, model)
+  const events: Array<AgentInterpretEvent> = []
+
+  for await (const event of agentInterpret(agent, [UserSign("hello")])) {
+    events.push(event)
+  }
+
+  assert.deepEqual(
+    events.map((event) => event.type),
+    ["delta", "delta", "input-persisted", "sign", "sign"],
+  )
+  assert.deepEqual(
+    context.map((sign) => sign.kind),
+    ["UserSign", "AssistantSign"],
   )
 })

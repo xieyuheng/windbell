@@ -461,6 +461,16 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
               return
             }
 
+            if (event.type === "delta") {
+              await stream.writeln(
+                JSON.stringify({
+                  type: "delta",
+                  delta: event.delta,
+                }),
+              )
+              continue
+            }
+
             await stream.writeln(
               JSON.stringify({
                 type: "sign",

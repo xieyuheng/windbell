@@ -15,4 +15,5 @@ export type ChatCompletionInput = {
   reasoning?: Reasoning | null
   provider?: Record<string, unknown> | null
   extraBody?: Record<string, unknown>
+  stream?: boolean
 }

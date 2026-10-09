@@ -9,4 +9,5 @@ export type ChatCompletionInput = {
     type: "enabled" | "disabled"
   }
   reasoning_effort: "none" | "low" | "high" | "max"
+  stream?: boolean
 }

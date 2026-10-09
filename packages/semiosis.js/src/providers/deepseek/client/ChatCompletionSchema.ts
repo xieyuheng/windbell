@@ -37,3 +37,40 @@ export const ChatCompletionSchema = z.object({
 })
 
 export type ChatCompletion = z.infer<typeof ChatCompletionSchema>
+
+const ToolCallDeltaSchema = z.object({
+  index: z.number().optional(),
+  id: z.string().optional(),
+  type: z.literal("function").optional(),
+  function: z
+    .object({
+      name: z.string().optional(),
+      arguments: z.string().optional(),
+    })
+    .optional(),
+})
+
+const ChoiceDeltaSchema = z.object({
+  role: z.string().optional(),
+  content: z.string().nullable().optional(),
+  reasoning_content: z.string().nullable().optional(),
+  tool_calls: z.array(ToolCallDeltaSchema).optional(),
+})
+
+const ChunkChoiceSchema = z.object({
+  index: z.number(),
+  delta: ChoiceDeltaSchema,
+  logprobs: z.unknown().nullable().optional(),
+  finish_reason: z.string().nullable().optional(),
+})
+
+export const ChatCompletionChunkSchema = z.object({
+  id: z.string().optional(),
+  object: z.string().optional(),
+  created: z.number().optional(),
+  model: z.string().optional(),
+  choices: z.array(ChunkChoiceSchema).optional(),
+  usage: z.unknown().optional(),
+})
+
+export type ChatCompletionChunk = z.infer<typeof ChatCompletionChunkSchema>
