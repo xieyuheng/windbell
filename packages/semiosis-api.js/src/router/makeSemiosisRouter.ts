@@ -2,14 +2,11 @@ import * as S from "@windbell/semiosis.js"
 import { Hono, type Context } from "hono"
 import { stream } from "hono/streaming"
 import { HTTPException } from "hono/http-exception"
-import { makeSemiosisService } from "../service/index.ts"
 import type { SemiosisRouterOptions } from "./SemiosisRouterOptions.ts"
 
 export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
   const app = new Hono()
-  const service = makeSemiosisService({
-    database: options.database,
-  })
+  const database = options.database
   const turnLock = new S.TurnLock()
 
   app.get("/health", async () => {
@@ -132,7 +129,7 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
   })
 
   app.get("/workspaces", async () => {
-    return sendJson(200, await service.workspaces.list())
+    return sendJson(200, await database.workspaces.list())
   })
 
   app.post("/workspaces/ensure", async (c) => {
@@ -140,11 +137,11 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const name = readString(body, "name")
     const root = readString(body, "root")
 
-    return sendJson(200, await service.workspaces.ensure({ name, root }))
+    return sendJson(200, await database.workspaces.ensure({ name, root }))
   })
 
   app.get("/workspaces/:workspaceId", async (c) => {
-    const workspace = await service.workspaces.get(c.req.param("workspaceId"))
+    const workspace = await database.workspaces.get(c.req.param("workspaceId"))
 
     if (workspace === undefined) {
       throw new HTTPException(404, { message: "workspace not found" })
@@ -161,19 +158,19 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       throw new HTTPException(400, { message: "workspace id mismatch" })
     }
 
-    await service.workspaces.put(workspace)
+    await database.workspaces.put(workspace)
     return sendEmpty(204)
   })
 
   app.delete("/workspaces/:workspaceId", async (c) => {
-    await service.workspaces.remove(c.req.param("workspaceId"))
+    await database.workspaces.remove(c.req.param("workspaceId"))
     return sendEmpty(204)
   })
 
   app.get("/sessions", async (c) => {
     const workspaceId = c.req.query("workspaceId")
 
-    return sendJson(200, await service.sessions.list({ workspaceId }))
+    return sendJson(200, await database.sessions.list({ workspaceId }))
   })
 
   app.post("/sessions", async (c) => {
@@ -188,15 +185,15 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       })
     }
 
-    const session = await service.sessions.make({ workspaceId, title })
+    const session = await database.sessions.make({ workspaceId, title })
     session.context = makeDefaultInitialSigns(workspace)
-    await service.sessions.put(session)
+    await database.sessions.put(session)
 
     return sendJson(201, session)
   })
 
   app.get("/sessions/:sessionId", async (c) => {
-    const session = await service.sessions.get(c.req.param("sessionId"))
+    const session = await database.sessions.get(c.req.param("sessionId"))
 
     if (session === undefined) {
       throw new HTTPException(404, { message: "session not found" })
@@ -213,13 +210,13 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       throw new HTTPException(400, { message: "session id mismatch" })
     }
 
-    await service.sessions.put(session)
+    await database.sessions.put(session)
     return sendEmpty(204)
   })
 
   app.post("/sessions/:sessionId/title", async (c) => {
     const sessionId = c.req.param("sessionId")
-    const session = await service.sessions.get(sessionId)
+    const session = await database.sessions.get(sessionId)
 
     if (session === undefined) {
       throw new HTTPException(404, { message: "session not found" })
@@ -238,25 +235,27 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const title = result.kind === "ok" ? result.title : ""
 
     if (title !== "") {
-      await service.sessions.updateTitle(sessionId, title)
+      await database.sessions.updateTitle(sessionId, title)
     }
 
     return sendJson(200, { title })
   })
 
   app.delete("/sessions/:sessionId", async (c) => {
-    await service.sessions.remove(c.req.param("sessionId"))
+    await database.sessions.remove(c.req.param("sessionId"))
     return sendEmpty(204)
   })
 
   app.get("/dustbin/sessions", async (c) => {
     const workspaceId = c.req.query("workspaceId")
 
-    return sendJson(200, await service.dustbin.sessions.list({ workspaceId }))
+    return sendJson(200, await database.dustbin.sessions.list({ workspaceId }))
   })
 
   app.get("/dustbin/sessions/:sessionId", async (c) => {
-    const session = await service.dustbin.sessions.get(c.req.param("sessionId"))
+    const session = await database.dustbin.sessions.get(
+      c.req.param("sessionId"),
+    )
 
     if (session === undefined) {
       throw new HTTPException(404, {
@@ -271,7 +270,7 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const body = readRecord(await readJsonBody(c))
     const sessionId = readString(body, "sessionId")
 
-    await runDustbinAction(() => service.dustbin.sessions.trash(sessionId))
+    await runDustbinAction(() => database.dustbin.sessions.trash(sessionId))
 
     return sendEmpty(204)
   })
@@ -279,22 +278,22 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
   app.post("/dustbin/sessions/:sessionId/restore", async (c) => {
     const sessionId = c.req.param("sessionId")
 
-    await runDustbinAction(() => service.dustbin.sessions.restore(sessionId))
+    await runDustbinAction(() => database.dustbin.sessions.restore(sessionId))
 
     return sendEmpty(204)
   })
 
   app.delete("/dustbin/sessions/:sessionId", async (c) => {
-    await service.dustbin.sessions.remove(c.req.param("sessionId"))
+    await database.dustbin.sessions.remove(c.req.param("sessionId"))
     return sendEmpty(204)
   })
 
   app.get("/dustbin/workspaces", async () => {
-    return sendJson(200, await service.dustbin.workspaces.list())
+    return sendJson(200, await database.dustbin.workspaces.list())
   })
 
   app.get("/dustbin/workspaces/:workspaceId", async (c) => {
-    const workspace = await service.dustbin.workspaces.get(
+    const workspace = await database.dustbin.workspaces.get(
       c.req.param("workspaceId"),
     )
 
@@ -312,15 +311,15 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const workspaceId = readString(body, "workspaceId")
 
     await runDustbinAction(async () => {
-      const sessions = await service.sessions.list({ workspaceId })
+      const sessions = await database.sessions.list({ workspaceId })
 
       for (const session of sessions) {
-        await service.dustbin.sessions.trash(session.id, {
+        await database.dustbin.sessions.trash(session.id, {
           trashedWithWorkspace: true,
         })
       }
 
-      await service.dustbin.workspaces.trash(workspaceId)
+      await database.dustbin.workspaces.trash(workspaceId)
     })
 
     return sendEmpty(204)
@@ -330,13 +329,13 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const workspaceId = c.req.param("workspaceId")
 
     await runDustbinAction(async () => {
-      await service.dustbin.workspaces.restore(workspaceId)
+      await database.dustbin.workspaces.restore(workspaceId)
 
-      const sessions = await service.dustbin.sessions.list({ workspaceId })
+      const sessions = await database.dustbin.sessions.list({ workspaceId })
 
       for (const session of sessions) {
         if (session.trashedWithWorkspace === true) {
-          await service.dustbin.sessions.restore(session.id)
+          await database.dustbin.sessions.restore(session.id)
         }
       }
     })
@@ -346,19 +345,21 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
 
   app.delete("/dustbin/workspaces/:workspaceId", async (c) => {
     const workspaceId = c.req.param("workspaceId")
-    const activeSessions = await service.sessions.list({ workspaceId })
+    const activeSessions = await database.sessions.list({ workspaceId })
 
     for (const session of activeSessions) {
-      await service.sessions.remove(session.id)
+      await database.sessions.remove(session.id)
     }
 
-    const dustbinSessions = await service.dustbin.sessions.list({ workspaceId })
+    const dustbinSessions = await database.dustbin.sessions.list({
+      workspaceId,
+    })
 
     for (const session of dustbinSessions) {
-      await service.dustbin.sessions.remove(session.id)
+      await database.dustbin.sessions.remove(session.id)
     }
 
-    await service.dustbin.workspaces.remove(workspaceId)
+    await database.dustbin.workspaces.remove(workspaceId)
     return sendEmpty(204)
   })
 
@@ -369,7 +370,7 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     const turnId = readTurnId(body)
     const input = readSigns(body, "input")
 
-    const session = await service.sessions.get(sessionId)
+    const session = await database.sessions.get(sessionId)
     if (session === undefined) {
       throw new HTTPException(404, { message: "session not found" })
     }
@@ -395,7 +396,7 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
 
     try {
       const resolved = await S.resolveTurn({
-        sessions: service.sessions,
+        sessions: database.sessions,
         sessionId,
         turnId,
         model: modelOptions,
@@ -410,7 +411,7 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
         return stream(c, async (stream) => {
           try {
             for await (const sign of S.replayTurn({
-              sessions: service.sessions,
+              sessions: database.sessions,
               turn: resolved.turn,
             })) {
               await stream.writeln(JSON.stringify({ type: "sign", sign }))
@@ -441,7 +442,7 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       return stream(c, async (stream) => {
         try {
           for await (const event of S.runTurn({
-            sessions: service.sessions,
+            sessions: database.sessions,
             agent,
             turn: resolved.turn,
             input,
