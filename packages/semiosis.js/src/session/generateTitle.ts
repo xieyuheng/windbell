@@ -1,4 +1,4 @@
-import { collectModelSigns, type Model } from "../model/index.ts"
+import type { Model } from "../model/index.ts"
 import { isAssistantSign, UserSign, type Sign } from "../sign/index.ts"
 
 export type GenerateTitleOptions = {
@@ -15,12 +15,18 @@ export async function generateTitle(
   options: GenerateTitleOptions,
 ): Promise<GenerateTitleResult> {
   try {
-    const output = await collectModelSigns(options.model, [
+    const output: Array<Sign> = []
+
+    for await (const event of options.model.interpret([
       ...options.context,
       UserSign(
         "Generate a short title that summarizes the conversation above. Use the conversation's language. Reply with the title only.",
       ),
-    ])
+    ])) {
+      if (event.type === "sign") {
+        output.push(event.sign)
+      }
+    }
 
     const assistantSign = output.find(isAssistantSign)
     if (assistantSign === undefined) {

@@ -38,7 +38,7 @@ export async function* agentInterpret(
     yield { type: "sign", sign }
   }
 
-  yield* runAgentOutput(agent, output, options)
+  yield* agentLoop(agent, output, options)
 }
 
 export async function* agentContinue(
@@ -50,7 +50,7 @@ export async function* agentContinue(
   const output: Array<Sign> = []
 
   yield* collectModelOutput(agent, await agent.getContext(), output, options)
-  yield* runAgentOutput(agent, output, options)
+  yield* agentLoop(agent, output, options)
 }
 
 async function* repairAgent(agent: Agent): AsyncGenerator<AgentInterpretEvent> {
@@ -92,7 +92,7 @@ function assertModelOutputSign(sign: Sign): void {
   }
 }
 
-async function* runAgentOutput(
+async function* agentLoop(
   agent: Agent,
   initialOutput: Array<Sign>,
   options: AgentInterpretOptions,

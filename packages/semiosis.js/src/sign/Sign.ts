@@ -194,8 +194,3 @@ export function asToolOutputSign(value: Sign): ToolOutputSign {
   if (isToolOutputSign(value)) return value
   throw new Error(`[asToolOutputSign] fail on: ${value.kind}`)
 }
-
-export type SignDelta = {
-  signKind: "ReasoningSign" | "AssistantSign"
-  content: string
-}
