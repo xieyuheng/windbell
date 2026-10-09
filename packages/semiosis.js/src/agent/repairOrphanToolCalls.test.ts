@@ -16,7 +16,7 @@ import {
 import { makeToolRouter, type ToolRouter } from "../tool/index.ts"
 import { makeAgentFromSession } from "../session/index.ts"
 import { makeAgent, type Agent } from "./Agent.ts"
-import { agentInterpret } from "./agentInterpret.ts"
+import { agentInterpret, type AgentInterpretEvent } from "./agentInterpret.ts"
 import { repairOrphanToolCalls } from "./repairOrphanToolCalls.ts"
 
 const emptyObjectSchema = {
@@ -44,6 +44,32 @@ function makeTestAgent(
       context.push(...signs)
     },
   })
+}
+
+async function collectAgentInterpretSigns(
+  events: AsyncIterable<AgentInterpretEvent>,
+): Promise<Array<Sign>> {
+  const signs: Array<Sign> = []
+
+  for await (const event of events) {
+    if (event.type === "error") {
+      throw event.error
+    }
+
+    signs.push(event.sign)
+  }
+
+  return signs
+}
+
+async function drainAgentInterpretEvents(
+  events: AsyncIterable<AgentInterpretEvent>,
+): Promise<void> {
+  for await (const event of events) {
+    if (event.type === "error") {
+      throw event.error
+    }
+  }
 }
 
 test("repairOrphanToolCalls appends one output per orphan call", async () => {
@@ -111,11 +137,9 @@ test("agentInterpret repairs orphan tool calls before appending input", async ()
     },
   }
   const agent = makeTestAgent(context, model)
-  const yielded: Array<Sign> = []
-
-  for await (const sign of agentInterpret(agent, [UserSign("next")])) {
-    yielded.push(sign)
-  }
+  const yielded = await collectAgentInterpretSigns(
+    agentInterpret(agent, [UserSign("next")]),
+  )
 
   assert.deepEqual(
     yielded.map((sign) => sign.kind),
@@ -163,9 +187,7 @@ test("agentInterpret records a ToolOutputSign for every tool call", async () => 
   const context: Array<Sign> = []
   const agent = makeTestAgent(context, model, toolRouter)
 
-  for await (const _sign of agentInterpret(agent, [UserSign("run")])) {
-    // drain
-  }
+  await drainAgentInterpretEvents(agentInterpret(agent, [UserSign("run")]))
 
   const outputs = context.filter(isToolOutputSign)
   assert.deepEqual(
@@ -221,11 +243,9 @@ test("agentInterpret repairs persisted orphan tool calls and yields input", asyn
       ["ToolCallSign"],
     )
 
-    const yielded: Array<Sign> = []
-
-    for await (const sign of agentInterpret(agent, [UserSign("next")])) {
-      yielded.push(sign)
-    }
+    const yielded = await collectAgentInterpretSigns(
+      agentInterpret(agent, [UserSign("next")]),
+    )
 
     assert.deepEqual(
       yielded.map((sign) => sign.kind),
@@ -295,13 +315,12 @@ test("agentInterpret marks remaining tool calls cancelled after abort", async ()
 
   const context: Array<Sign> = []
   const agent = makeTestAgent(context, model, toolRouter)
-  const yielded: Array<Sign> = []
 
-  for await (const sign of agentInterpret(agent, [UserSign("run")], {
-    signal: controller.signal,
-  })) {
-    yielded.push(sign)
-  }
+  await drainAgentInterpretEvents(
+    agentInterpret(agent, [UserSign("run")], {
+      signal: controller.signal,
+    }),
+  )
 
   assert.equal(interpretCount, 1)
   assert.deepEqual(handlerCalls, ["first"])
@@ -313,4 +332,28 @@ test("agentInterpret marks remaining tool calls cancelled after abort", async ()
   )
   assert.match(outputs[0]?.content ?? "", /\[cancelled\]/)
   assert.match(outputs[1]?.content ?? "", /not executed/)
+})
+
+test("agentInterpret yields error event when model.interpret throws", async () => {
+  const error = new Error("boom")
+  const model: Model = {
+    providerName: "test",
+    name: "test",
+    interpret: async () => {
+      throw error
+    },
+  }
+  const context: Array<Sign> = []
+  const agent = makeTestAgent(context, model)
+  const events: Array<AgentInterpretEvent> = []
+
+  for await (const event of agentInterpret(agent, [UserSign("hello")])) {
+    events.push(event)
+  }
+
+  const lastEvent = events.at(-1)
+
+  assert.equal(lastEvent?.type, "error")
+  if (lastEvent?.type !== "error") return
+  assert.equal(lastEvent.error, error)
 })

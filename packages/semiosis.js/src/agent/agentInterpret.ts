@@ -13,56 +13,69 @@ export type AgentInterpretOptions = {
   signal?: AbortSignal
 }
 
+export type AgentInterpretEvent =
+  { type: "sign"; sign: Sign } | { type: "error"; error: unknown }
+
 export async function* agentInterpret(
   agent: Agent,
   input: Array<Sign>,
   options: AgentInterpretOptions = {},
-): AsyncGenerator<Sign> {
-  const repairs = await repairOrphanToolCalls(agent)
-  yield* repairs
+): AsyncGenerator<AgentInterpretEvent> {
+  try {
+    const repairs = await repairOrphanToolCalls(agent)
 
-  await agent.appendContext(input)
-  yield* input
+    for (const sign of repairs) {
+      yield { type: "sign", sign }
+    }
 
-  while (true) {
-    if (options.signal?.aborted) return
+    await agent.appendContext(input)
 
-    const context = await agent.getContext()
-    const output = await agent.model.interpret(context)
+    for (const sign of input) {
+      yield { type: "sign", sign }
+    }
 
-    const toolCallSigns: Array<ToolCallSign> = []
+    while (true) {
+      if (options.signal?.aborted) return
 
-    for (const sign of output) {
-      if (
-        !isReasoningSign(sign) &&
-        !isAssistantSign(sign) &&
-        !isProviderDataSign(sign) &&
-        !isToolCallSign(sign)
-      ) {
-        throw new Error(
-          `[agentInterpret] unexpected model output sign: ${sign.kind}`,
-        )
+      const context = await agent.getContext()
+      const output = await agent.model.interpret(context)
+
+      const toolCallSigns: Array<ToolCallSign> = []
+
+      for (const sign of output) {
+        if (
+          !isReasoningSign(sign) &&
+          !isAssistantSign(sign) &&
+          !isProviderDataSign(sign) &&
+          !isToolCallSign(sign)
+        ) {
+          throw new Error(
+            `[agentInterpret] unexpected model output sign: ${sign.kind}`,
+          )
+        }
+
+        await agent.appendContext([sign])
+        yield { type: "sign", sign }
+
+        if (isToolCallSign(sign)) {
+          toolCallSigns.push(sign)
+        }
       }
 
-      await agent.appendContext([sign])
-      yield sign
+      if (toolCallSigns.length === 0) {
+        return
+      }
 
-      if (isToolCallSign(sign)) {
-        toolCallSigns.push(sign)
+      for (const toolCallSign of toolCallSigns) {
+        const sign = await agent.toolRouter.run(toolCallSign, {
+          signal: options.signal,
+        })
+
+        await agent.appendContext([sign])
+        yield { type: "sign", sign }
       }
     }
-
-    if (toolCallSigns.length === 0) {
-      return
-    }
-
-    for (const toolCallSign of toolCallSigns) {
-      const sign = await agent.toolRouter.run(toolCallSign, {
-        signal: options.signal,
-      })
-
-      await agent.appendContext([sign])
-      yield sign
-    }
+  } catch (error) {
+    yield { type: "error", error }
   }
 }

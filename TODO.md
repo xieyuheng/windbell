@@ -1,3 +1,13 @@
+你的意思是说，database 中的一个 session 目录下，
+除了保存 context 之外，还要保存 turn 的信息？
+比如 `turns/<turn-id>`。
+我们可以把 Turn 这个概念加入到代码中来。
+应该如何加入？
+TurnRecord 直接叫做 Turn，字段是否够用？
+
+- startSequence: number -- 这后两个 Sequence 字段是什么意思？
+- endSequence?: number
+
 # semiosis.js
 
 目前，我们的 agent 接口不支持 SSE 式的信息返回，

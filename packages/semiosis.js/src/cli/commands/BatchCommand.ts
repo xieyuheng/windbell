@@ -1,6 +1,7 @@
 import Path from "node:path"
 import process from "node:process"
 import type * as Cli from "@windbell/cli.js"
+import { errorReport } from "@windbell/std.js/error"
 import { agentInterpret } from "../../agent/index.ts"
 import type { Database } from "../../database/index.ts"
 import { formatSign } from "../../format/index.ts"
@@ -76,8 +77,13 @@ export function makeBatchHandler(options: BatchCommandOptions) {
     for (const prompt of promptBatch.prompts) {
       const userSign = UserSign(prompt)
 
-      for await (const sign of agentInterpret(agent, [userSign])) {
-        console.log(formatSign(sign))
+      for await (const event of agentInterpret(agent, [userSign])) {
+        if (event.type === "error") {
+          console.error(`[error] ${errorReport(event.error)}`)
+          return
+        }
+
+        console.log(formatSign(event.sign))
       }
     }
   }
