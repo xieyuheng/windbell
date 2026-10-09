@@ -1,15 +1,14 @@
 import type { SessionId } from "../session/Session.ts"
-import { TurnAlreadyRunningError } from "./TurnError.ts"
 import type { TurnId } from "./Turn.ts"
 
 export class TurnLock {
   private running = new Set<string>()
 
-  tryLock(sessionId: SessionId, turnId: TurnId): () => void {
+  tryLock(sessionId: SessionId, turnId: TurnId): (() => void) | undefined {
     const key = `${sessionId}:${turnId}`
 
     if (this.running.has(key)) {
-      throw new TurnAlreadyRunningError(turnId)
+      return undefined
     }
 
     this.running.add(key)

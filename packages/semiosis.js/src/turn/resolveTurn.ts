@@ -4,10 +4,6 @@ import type { SessionId } from "../session/Session.ts"
 import type { Sign } from "../sign/index.ts"
 import type { Turn, TurnId } from "./Turn.ts"
 import { makeInputHash } from "./Turn.ts"
-import {
-  TurnInputMismatchError,
-  TurnModelMismatchError,
-} from "./TurnError.ts"
 
 export type ResolveTurnOptions = {
   sessions: SessionStore
@@ -20,6 +16,7 @@ export type ResolveTurnOptions = {
 export type ResolveTurnResult =
   | { kind: "replay"; turn: Turn }
   | { kind: "run"; turn: Turn }
+  | { kind: "error"; message: string }
 
 export async function resolveTurn(
   options: ResolveTurnOptions,
@@ -32,14 +29,20 @@ export async function resolveTurn(
 
   if (existingTurn !== undefined) {
     if (existingTurn.inputHash !== inputHash) {
-      throw new TurnInputMismatchError(options.turnId)
+      return {
+        kind: "error",
+        message: `turn input mismatch: ${options.turnId}`,
+      }
     }
 
     if (
       existingTurn.model.providerName !== options.model.providerName ||
       existingTurn.model.name !== options.model.name
     ) {
-      throw new TurnModelMismatchError(options.turnId)
+      return {
+        kind: "error",
+        message: `turn model mismatch: ${options.turnId}`,
+      }
     }
   }
 

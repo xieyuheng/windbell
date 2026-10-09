@@ -385,16 +385,12 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
     c.header("Cache-Control", "no-store")
     c.header("X-Accel-Buffering", "no")
 
-    let unlock: () => void
+    const unlock = turnLock.tryLock(sessionId, turnId)
 
-    try {
-      unlock = turnLock.tryLock(sessionId, turnId)
-    } catch (error) {
-      if (error instanceof S.TurnAlreadyRunningError) {
-        throw new HTTPException(409, { message: error.message })
-      }
-
-      throw error
+    if (unlock === undefined) {
+      throw new HTTPException(409, {
+        message: `turn is already running: ${turnId}`,
+      })
     }
 
     try {
@@ -405,6 +401,10 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
         model: modelOptions,
         input,
       })
+
+      if (resolved.kind === "error") {
+        throw new HTTPException(409, { message: resolved.message })
+      }
 
       if (resolved.kind === "replay") {
         return stream(c, async (stream) => {
@@ -485,14 +485,6 @@ export function makeSemiosisRouter(options: SemiosisRouterOptions): Hono {
       })
     } catch (error) {
       unlock()
-
-      if (
-        error instanceof S.TurnInputMismatchError ||
-        error instanceof S.TurnModelMismatchError
-      ) {
-        throw new HTTPException(409, { message: error.message })
-      }
-
       throw error
     }
   })
